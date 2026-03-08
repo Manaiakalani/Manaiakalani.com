@@ -38,13 +38,17 @@
           crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- External CSS -->
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="geocities.css">
     
-    <!-- Prevent flash: apply saved theme before paint -->
+    <!-- Prevent flash: apply saved theme/geocities before paint -->
     <script>
         (function() {
             var t = localStorage.getItem('theme');
             if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.setAttribute('data-theme', 'dark');
+            }
+            if (localStorage.getItem('geocities') === 'true') {
+                document.documentElement.setAttribute('data-geocities', 'true');
             }
         })();
     </script>
@@ -81,6 +85,9 @@
         <button class="theme-toggle" aria-label="Toggle dark mode">
             <i class="fas fa-moon"></i>
             <i class="fas fa-sun"></i>
+        </button>
+        <button class="geocities-toggle" aria-label="Toggle GeoCities mode" title="Welcome to 1997!">
+            <span class="gc-icon">🚧</span>
         </button>
     </header>
 
@@ -125,6 +132,7 @@
 
     <!-- External JavaScript -->
     <script src="script.js"></script>
+    <script src="geocities.js"></script>
 
     <!-- ASCII Cube -->
     <script type="importmap">
