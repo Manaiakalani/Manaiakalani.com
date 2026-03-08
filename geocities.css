@@ -250,6 +250,10 @@ html[data-geocities="true"] .social-icons a:hover {
 html[data-geocities="true"] .footer-text {
   color: var(--gc-text);
   animation: gc-blink 1s step-end infinite;
+  text-align: center;
+  text-align-last: center;
+  display: block;
+  width: 100%;
 }
 
 /* ---------- Theme Toggle Buttons ---------- */
