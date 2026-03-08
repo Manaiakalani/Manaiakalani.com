@@ -38,6 +38,16 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="style.css">
     
+    <!-- Prevent flash: apply saved theme before paint -->
+    <script>
+        (function() {
+            var t = localStorage.getItem('theme');
+            if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+    
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
@@ -67,6 +77,10 @@
             <h1>MANAIAKALANI</h1>
             <p id="typing-effect"></p>
         </div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">
+            <i class="fas fa-moon"></i>
+            <i class="fas fa-sun"></i>
+        </button>
     </header>
 
     <!-- About Me Section -->
