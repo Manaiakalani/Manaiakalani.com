@@ -140,6 +140,7 @@ html[data-geocities="true"] h2 {
   color: var(--gc-link);
   text-shadow: 2px 2px 0 var(--gc-accent);
   font-size: 2rem;
+  text-align: center;
 }
 
 /* ---------- Paragraphs & Text ---------- */
@@ -237,6 +238,10 @@ html[data-geocities="true"] footer {
   background-color: #000066;
   border-top: 4px solid var(--gc-accent);
   position: relative;
+}
+
+html[data-geocities="true"] .social-icons {
+  margin-top: 0.5rem;
 }
 
 html[data-geocities="true"] .social-icons a {
@@ -567,12 +572,14 @@ html[data-geocities="true"] .geocities-toggle {
 }
 
 .gc-88x31 {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 88px;
   height: 31px;
   font-size: 0.5rem;
   font-weight: 700;
-  line-height: 31px;
+  line-height: 1.1;
   text-align: center;
   text-decoration: none;
   border: 1px solid #808080;
