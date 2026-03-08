@@ -28,6 +28,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     
     <!-- Google Fonts: Doto -->
     <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700&display=swap" rel="stylesheet">
@@ -107,6 +108,9 @@
     <!-- Footer Section -->
     <footer>
         <div class="container">
+            <div class="cube-wrapper" aria-hidden="true">
+                <canvas id="ascii-cube"></canvas>
+            </div>
             <div class="social-icons">
                 <a href="https://www.linkedin.com/in/manaiakalani/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
                 <a href="https://twitter.com/manaiakalani" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
@@ -121,5 +125,20 @@
 
     <!-- External JavaScript -->
     <script src="script.js"></script>
+
+    <!-- ASCII Cube -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module">
+        import { initCube } from './cube.js';
+        const canvas = document.getElementById('ascii-cube');
+        if (canvas) initCube(canvas, './cube-texture.webp');
+    </script>
 </body>
 </html>
