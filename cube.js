@@ -60,7 +60,7 @@ const ASCIIShader = {
     uColor:           { value: new THREE.Color('#ffffff') },
     uInvert:          { value: true },
     uTime:            { value: 0 },
-    uGradientMix:     { value: 0 },
+    uGradientMix:     { value: 1 },
     uOpacity:         { value: 0 },
     resolution:       { value: new THREE.Vector2() },
   },
@@ -222,10 +222,9 @@ export function initCube(canvasEl, textureUrl) {
     gcCurrent += (gcTarget - gcCurrent) * GC_LERP;
     const gc = gcCurrent;
 
-    // Faster time = faster rainbow cycling in geocities mode
-    const timeSpeed = 0.001 + gc * 0.009;
+    // Rainbow always on; GeoCities cranks the speed
+    const timeSpeed = 0.003 + gc * 0.007;
     asciiPass.material.uniforms.uTime.value += timeSpeed;
-    asciiPass.material.uniforms.uGradientMix.value = gc;
 
     // Faster spin in geocities mode
     const spin = AUTO_SPIN_SPEED + gc * 0.012;
