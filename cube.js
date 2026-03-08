@@ -196,10 +196,40 @@ export function initCube(canvasEl, textureUrl) {
     })();
   }
 
+  // GeoCities mode: rainbow cube with faster spin
+  let gcTarget = 0;
+  let gcCurrent = 0;
+  const GC_LERP = 0.04;
+
+  function isGeoCitiesActive() {
+    return document.documentElement.getAttribute('data-geocities') === 'true';
+  }
+
+  const gcObserver = new MutationObserver(() => {
+    gcTarget = isGeoCitiesActive() ? 1 : 0;
+  });
+  gcObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-geocities']
+  });
+  gcTarget = isGeoCitiesActive() ? 1 : 0;
+  gcCurrent = gcTarget;
+
   function animate() {
     if (!cube || !visible) return;
-    asciiPass.material.uniforms.uTime.value += 0.001;
-    _tmpEuler.set(0, AUTO_SPIN_SPEED * autoRotateDir, 0);
+
+    // Smoothly interpolate geocities mix
+    gcCurrent += (gcTarget - gcCurrent) * GC_LERP;
+    const gc = gcCurrent;
+
+    // Faster time = faster rainbow cycling in geocities mode
+    const timeSpeed = 0.001 + gc * 0.009;
+    asciiPass.material.uniforms.uTime.value += timeSpeed;
+    asciiPass.material.uniforms.uGradientMix.value = gc;
+
+    // Faster spin in geocities mode
+    const spin = AUTO_SPIN_SPEED + gc * 0.012;
+    _tmpEuler.set(0, spin * autoRotateDir, 0);
     _tmpQuat.setFromEuler(_tmpEuler);
     targetQ.multiplyQuaternions(_tmpQuat, targetQ);
     currentQ.slerp(targetQ, DAMPING_FACTOR);
