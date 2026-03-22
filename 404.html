@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 — Maximilian Stein</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="geocities.css">
+    <script>
+        (function() {
+            var t = localStorage.getItem('theme');
+            if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+            if (localStorage.getItem('geocities') === 'true') {
+                document.documentElement.setAttribute('data-geocities', 'true');
+            }
+        })();
+    </script>
+    <style>
+        .four-oh-four {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+        .glitch-code {
+            font-family: 'Doto', monospace;
+            font-size: clamp(6rem, 20vw, 12rem);
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            animation: glitch-shake 3s infinite;
+            position: relative;
+        }
+        .glitch-code::after {
+            content: '404';
+            position: absolute;
+            left: 2px;
+            top: 2px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0.3;
+            animation: glitch-shift 3s infinite;
+        }
+        @keyframes glitch-shake {
+            0%, 93%, 100% { transform: translate(0); }
+            94% { transform: translate(-2px, 1px); }
+            95% { transform: translate(2px, -1px); }
+            96% { transform: translate(-1px, 2px); }
+        }
+        @keyframes glitch-shift {
+            0%, 93%, 100% { clip-path: inset(0 0 0 0); }
+            94% { clip-path: inset(20% 0 60% 0); transform: translate(4px, 0); }
+            95% { clip-path: inset(50% 0 20% 0); transform: translate(-4px, 0); }
+            96% { clip-path: inset(70% 0 5% 0); transform: translate(3px, 0); }
+        }
+        .lost-message {
+            font-family: 'Doto', monospace;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            max-width: 500px;
+        }
+        .lost-message strong {
+            color: var(--text-primary);
+        }
+        .ascii-lost {
+            font-family: 'Doto', monospace;
+            font-size: 0.7rem;
+            line-height: 1.15;
+            color: var(--accent);
+            white-space: pre;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+        .home-btn {
+            font-family: 'Doto', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 0.75rem 2rem;
+            background: var(--gradient);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .easter-egg {
+            margin-top: 3rem;
+            font-family: 'Doto', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            opacity: 0.6;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .easter-egg:hover {
+            opacity: 1;
+        }
+        .path-echo {
+            font-family: 'Doto', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            opacity: 0.5;
+            margin-top: 0.75rem;
+            word-break: break-all;
+        }
+        .path-echo code {
+            background: var(--card-bg, rgba(255,255,255,0.05));
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+        /* GeoCities overrides */
+        [data-geocities="true"] .glitch-code {
+            background: none;
+            -webkit-text-fill-color: #ff0000;
+            text-shadow: 3px 3px #ffff00;
+            animation: gc-blink 0.8s step-end infinite;
+        }
+        [data-geocities="true"] .glitch-code::after { display: none; }
+        @keyframes gc-blink {
+            50% { opacity: 0.4; }
+        }
+        [data-geocities="true"] .lost-message {
+            color: #00ff00;
+            font-weight: bold;
+        }
+        [data-geocities="true"] .home-btn {
+            background: #0000ff;
+            border: 3px outset #c0c0c0;
+            border-radius: 0;
+            font-size: 1.1rem;
+        }
+        [data-geocities="true"] .ascii-lost {
+            color: #ff00ff;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo gradient-text" aria-label="Home">M.</a>
+            <nav class="site-nav" aria-label="Main">
+                <a href="index.html">About</a>
+                <a href="projects.html">Projects</a>
+                <a href="thoughts.html">Thoughts</a>
+            </nav>
+        </div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">
+            <i class="fas fa-moon"></i>
+            <i class="fas fa-sun"></i>
+        </button>
+        <button class="geocities-toggle" aria-label="Toggle GeoCities mode" title="Welcome to 1997!">
+            <i class="fas fa-floppy-disk"></i>
+        </button>
+    </header>
+
+    <main>
+        <section class="four-oh-four">
+            <div class="glitch-code">404</div>
+            <div class="ascii-lost" aria-hidden="true">
+    ┌─────────────────────────┐
+    │  ╔═╗╔═╗╔═╗╔═╗╔═╗╔═╗   │
+    │  ║ ║║ ║║ ║╠═╝╚═╗║     │
+    │  ╚═╝╚═╝║  ║  ╚═╝╚═╝   │
+    │                         │
+    │  File not found.        │
+    └─────────────────────────┘</div>
+            <p class="lost-message">
+                This page got lost somewhere between <strong>localhost</strong> and <strong>production</strong>. 
+                It happens to the best of us.
+            </p>
+            <p class="path-echo"><code id="path-display"></code></p>
+            <a href="index.html" class="home-btn">← Take me home</a>
+            <p class="easter-egg" id="egg" title="Click me">( ╯°□°)╯︵ ┻━┻</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p class="footer-text">Made with <span class="heart-beat" aria-hidden="true">❤️</span> in Seattle, WA</p>
+        </div>
+    </footer>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
+          integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="script.js" defer></script>
+    <script src="geocities.js" defer></script>
+    <script>
+        // Show the path that 404'd
+        document.getElementById('path-display').textContent = window.location.pathname;
+
+        // Easter egg: table flip → table unflip
+        var egg = document.getElementById('egg');
+        var flipped = false;
+        egg.addEventListener('click', function() {
+            if (!flipped) {
+                egg.textContent = '┬─┬ ノ( ゜-゜ノ)';
+                flipped = true;
+            } else {
+                egg.textContent = '( ╯°□°)╯︵ ┻━┻';
+                flipped = false;
+            }
+        });
+    </script>
+</body>
+</html>
