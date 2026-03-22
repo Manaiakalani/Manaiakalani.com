@@ -747,3 +747,122 @@ html[data-geocities="true"] .geocities-toggle {
     max-width: 240px;
   }
 }
+
+/* ---------- GeoCities: Navigation ---------- */
+html[data-geocities="true"] .site-nav a {
+  color: var(--gc-link);
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  font-weight: 700;
+  text-shadow: 1px 1px 0 #000;
+}
+
+html[data-geocities="true"] .site-nav a:hover {
+  color: var(--gc-accent);
+  background: rgba(255, 255, 0, 0.2);
+}
+
+html[data-geocities="true"] .site-nav a.active {
+  color: #ffffff;
+  background: rgba(255, 0, 0, 0.4);
+  animation: gc-blink 1.5s step-end infinite;
+}
+
+/* ---------- GeoCities: Header Subtitle ---------- */
+html[data-geocities="true"] .header-subtitle {
+  animation: gc-rainbow 3s linear infinite;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  font-weight: 700;
+  text-shadow: 2px 2px 0 #000;
+}
+
+/* ---------- GeoCities: Project Cards ---------- */
+html[data-geocities="true"] .project-card {
+  background: var(--gc-bg);
+  border: 2px solid var(--gc-border);
+  border-radius: 0;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+}
+
+html[data-geocities="true"] .project-card:hover {
+  border-color: var(--gc-accent);
+  box-shadow: 0 0 10px var(--gc-accent);
+  transform: none;
+}
+
+html[data-geocities="true"] .project-card h3 {
+  color: var(--gc-link);
+  text-shadow: 1px 1px 0 #000;
+}
+
+html[data-geocities="true"] .project-card p {
+  color: var(--gc-text);
+}
+
+html[data-geocities="true"] .project-meta {
+  color: var(--gc-text);
+}
+
+html[data-geocities="true"] .lang-badge {
+  color: var(--gc-text);
+}
+
+/* ---------- GeoCities: Featured Teaser ---------- */
+html[data-geocities="true"] .featured-teaser {
+  background: var(--gc-bg);
+}
+
+html[data-geocities="true"] .view-all {
+  color: var(--gc-link);
+  animation: gc-blink 1.5s step-end infinite;
+}
+
+/* ---------- GeoCities: Page Hero ---------- */
+html[data-geocities="true"] .page-hero {
+  background: var(--gc-bg);
+}
+
+html[data-geocities="true"] .page-hero h2 {
+  animation: gc-rainbow 3s linear infinite;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  text-shadow: 2px 2px 0 #000;
+}
+
+html[data-geocities="true"] .page-hero p {
+  color: var(--gc-text);
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+}
+
+/* ---------- GeoCities: Thoughts List ---------- */
+html[data-geocities="true"] .thought-entry {
+  border-color: var(--gc-border);
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+}
+
+html[data-geocities="true"] .thought-entry:hover {
+  background: rgba(255, 255, 0, 0.1);
+}
+
+html[data-geocities="true"] .thought-date {
+  color: var(--gc-visited);
+}
+
+html[data-geocities="true"] .thought-title {
+  color: var(--gc-link);
+  text-shadow: 1px 1px 0 #000;
+}
+
+html[data-geocities="true"] .thought-excerpt {
+  color: var(--gc-text);
+}
+
+/* ---------- GeoCities: GitHub Link ---------- */
+html[data-geocities="true"] .github-link {
+  color: var(--gc-link);
+  border-color: var(--gc-border);
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+}
+
+html[data-geocities="true"] .github-link:hover {
+  color: var(--gc-accent);
+  border-color: var(--gc-accent);
+}
