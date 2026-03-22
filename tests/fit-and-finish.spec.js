@@ -194,6 +194,34 @@ test('index: has meta description', async ({ page }) => {
   expect(desc.length).toBeGreaterThan(20);
 });
 
+// ── 404 page ──
+test('404: shows custom 404 page', async ({ page }) => {
+  const res = await page.goto('/this-page-does-not-exist-at-all');
+  expect(res.status()).toBe(404);
+  await expect(page.locator('.glitch-code')).toBeVisible();
+  await expect(page.locator('.glitch-code')).toHaveText('404');
+  await expect(page.locator('.home-btn')).toBeVisible();
+});
+
+test('404: table flip easter egg works', async ({ page }) => {
+  await page.goto('/nope-404');
+  const egg = page.locator('#egg');
+  await expect(egg).toContainText('╯︵ ┻━┻');
+  await egg.click();
+  await expect(egg).toContainText('┬─┬');
+});
+
+test('404: nav links present', async ({ page }) => {
+  await page.goto('/nope-404');
+  await expect(page.locator('nav')).toBeVisible();
+  await expect(page.locator('nav a[href="index.html"]')).toBeVisible();
+});
+
+test('404: shows attempted path', async ({ page }) => {
+  await page.goto('/some/fake/path');
+  await expect(page.locator('#path-display')).toContainText('/some/fake/path');
+});
+
 // ── Font loading ──
 test('index: Doto font is loaded', async ({ page }) => {
   await page.goto('/', { waitUntil: 'networkidle' });
