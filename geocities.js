@@ -103,6 +103,10 @@
       'https://www.spacejam.com/1996/',
       'https://www.cameronsworld.net/',
       'https://therestartpage.com/',
+      'https://zombo.com/',
+      'https://www.hamsterdance.org/hamsterdance/',
+      'https://www.arngren.net/',
+      'https://www.lingscars.com/',
     ];
     var rand = sites[Math.floor(Math.random() * sites.length)];
     const div = document.createElement('div');
@@ -186,10 +190,70 @@
   function createAsciiDivider() {
     var div = document.createElement('div');
     div.className = 'gc-ascii-divider';
-    // Responsive: use viewport-aware count
     var charCount = Math.min(60, Math.floor(window.innerWidth / 10));
     div.textContent = '\u2550'.repeat(charCount);
     return decorative(div);
+  }
+
+  // ---- Blinking NEW! badges on project cards ----
+  function injectNewBadges() {
+    var cards = document.querySelectorAll('.project-card');
+    // Tag the first 3 cards as "NEW!"
+    for (var i = 0; i < Math.min(3, cards.length); i++) {
+      var badge = document.createElement('span');
+      badge.className = 'gc-new-badge';
+      badge.textContent = 'NEW!';
+      badge.setAttribute('aria-hidden', 'true');
+      cards[i].style.position = 'relative';
+      cards[i].appendChild(badge);
+      gcElements.push(badge);
+    }
+  }
+
+  // ---- Construction cones near page titles ----
+  function createConstructionCones() {
+    var hero = document.querySelector('.page-hero h2');
+    if (!hero) return null;
+    var wrapper = document.createElement('span');
+    wrapper.className = 'gc-construction-cones';
+    wrapper.innerHTML = ' 🚧🏗️👷';
+    wrapper.setAttribute('aria-hidden', 'true');
+    hero.appendChild(wrapper);
+    return wrapper;
+  }
+
+  // ---- Twinkling stars overlay ----
+  function createTwinklingStars() {
+    var container = document.createElement('div');
+    container.className = 'gc-twinkling-stars';
+    container.setAttribute('aria-hidden', 'true');
+    for (var i = 0; i < 25; i++) {
+      var star = document.createElement('span');
+      star.className = 'gc-twinkle-star';
+      star.textContent = ['✦', '✧', '⋆', '★', '☆'][Math.floor(Math.random() * 5)];
+      star.style.left = Math.random() * 100 + '%';
+      star.style.top = Math.random() * 100 + '%';
+      star.style.animationDelay = (Math.random() * 3).toFixed(1) + 's';
+      star.style.animationDuration = (1.5 + Math.random() * 2).toFixed(1) + 's';
+      star.style.fontSize = (8 + Math.random() * 14) + 'px';
+      container.appendChild(star);
+    }
+    return container;
+  }
+
+  // ---- Graphical hit counter (digit-by-digit) ----
+  function createGraphicalCounter() {
+    var div = document.createElement('div');
+    div.className = 'gc-graphical-counter';
+    var digits = String(visitorCount).padStart(7, '0').split('');
+    div.innerHTML =
+      '<span class="gc-counter-label">~ You are visitor number ~</span>' +
+      '<div class="gc-digit-display">' +
+      digits.map(function(d) {
+        return '<span class="gc-digit">' + d + '</span>';
+      }).join('') +
+      '</div>';
+    return div;
   }
 
   // ---- Cursor trail (throttled, with touch support) ----
@@ -226,9 +290,11 @@
     injected = true;
 
     var header = document.querySelector('header');
-    var about = document.querySelector('#about');
     var footer = document.querySelector('footer');
-    if (!header || !about || !footer) return;
+    if (!header || !footer) return;
+
+    // Find the main content section (works on all pages)
+    var mainContent = document.querySelector('#about') || document.querySelector('.page-hero') || document.querySelector('main');
 
     // Construction banner above header
     var banner = createConstructionBanner();
@@ -245,15 +311,16 @@
     flames.parentNode.insertBefore(marquee, flames.nextSibling);
     gcElements.push(marquee);
 
-    // Rainbow HR before about
-    var hr1 = createRainbowHr();
-    about.parentNode.insertBefore(hr1, about);
-    gcElements.push(hr1);
+    // Rainbow HR + ASCII divider around main content
+    if (mainContent) {
+      var hr1 = createRainbowHr();
+      mainContent.parentNode.insertBefore(hr1, mainContent);
+      gcElements.push(hr1);
 
-    // ASCII divider after about
-    var ascii = createAsciiDivider();
-    about.parentNode.insertBefore(ascii, about.nextSibling);
-    gcElements.push(ascii);
+      var ascii = createAsciiDivider();
+      mainContent.parentNode.insertBefore(ascii, mainContent.nextSibling);
+      gcElements.push(ascii);
+    }
 
     // Rainbow HR before footer
     var hr2 = createRainbowHr();
@@ -270,7 +337,7 @@
     if (footerContainer) {
       var elements = [
         createMidiPlayer(),
-        createVisitorCounter(),
+        createGraphicalCounter(),
         createRainbowHr(),
         createBottomLinks(),
         createWebring(),
@@ -283,6 +350,18 @@
         gcElements.push(el);
       });
     }
+
+    // Blinking NEW! badges on project cards
+    injectNewBadges();
+
+    // Construction cones on sub-page titles
+    var cones = createConstructionCones();
+    if (cones) gcElements.push(cones);
+
+    // Twinkling stars overlay
+    var stars = createTwinklingStars();
+    document.body.appendChild(stars);
+    gcElements.push(stars);
 
     // Enable cursor trail
     cursorTrailEnabled = true;
