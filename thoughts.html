@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thoughts — Maximilian Stein</title>
+    <meta name="description" content="Reflections on community building, the tech industry, side projects, and everything in between — by Maximilian Stein (Manaiakalani).">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://manaiakalani.com/thoughts.html">
+    <meta property="og:title" content="Thoughts — Maximilian Stein">
+    <meta property="og:description" content="Reflections on community building, the tech industry, side projects, and everything in between.">
+    <meta property="og:image" content="https://manaiakalani.com/favicon.png">
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:title" content="Thoughts — Maximilian Stein">
+    <meta property="twitter:description" content="Reflections on community building, the tech industry, side projects, and everything in between.">
+    <meta name="theme-color" content="#0f4c81">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://manaiakalani.com/thoughts.html">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    
+    <!-- Google Fonts: Doto -->
+    <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" 
+          integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" 
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="geocities.css">
+    
+    <!-- Prevent flash: apply saved theme/geocities before paint -->
+    <script>
+        (function() {
+            var t = localStorage.getItem('theme');
+            if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+            if (localStorage.getItem('geocities') === 'true') {
+                document.documentElement.setAttribute('data-geocities', 'true');
+            }
+        })();
+    </script>
+    
+    <!-- Analytics -->
+    <script
+    src="https://analytics.manaiakalani.info/api/script.js"
+    data-site-id="c24b6c864956"
+    defer
+    ></script>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <h1>MANAIAKALANI</h1>
+            <p class="header-subtitle">Hi, I'm Maximilian Stein (Manaiakalani)</p>
+            <nav class="site-nav" aria-label="Main">
+                <a href="index.html">About</a>
+                <a href="thoughts.html" class="active">Thoughts</a>
+                <a href="projects.html">Projects</a>
+            </nav>
+        </div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">
+            <i class="fas fa-moon"></i>
+            <i class="fas fa-sun"></i>
+        </button>
+        <button class="geocities-toggle" aria-label="Toggle GeoCities mode" title="Welcome to 1997!">
+            <span class="gc-icon">🚧</span>
+        </button>
+    </header>
+
+    <!-- Page Hero -->
+    <section class="page-hero">
+        <div class="container">
+            <h2>Thoughts</h2>
+            <p>Reflections on community building, the tech industry, side projects, and everything in between.</p>
+        </div>
+    </section>
+
+    <!-- Thoughts List -->
+    <section>
+        <div class="container">
+            <ul class="thoughts-list">
+                <li>
+                    <div class="thought-entry">
+                        <div class="thought-date">2026.03.08</div>
+                        <div class="thought-title">Why GeoCities Mode Exists</div>
+                        <p class="thought-excerpt">Every website today looks the same. Clean sans-serif fonts, muted colors, generous whitespace. There's nothing wrong with that — this site does it too. But the early web had a raw, unpolished energy that we've lost. GeoCities mode is my love letter to that era. Hit the 🚧 button and you'll get Comic Sans, construction banners, visitor counters, and rainbow text. It's not ironic — it's genuine nostalgia for a time when every homepage was a personal statement, not a template.</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="thought-entry">
+                        <div class="thought-date">2026.03.02</div>
+                        <div class="thought-title">On Community Strategy</div>
+                        <p class="thought-excerpt">Community strategy isn't marketing. It's not social media management. It's the work of sitting between engineering teams and the people who use what they build, making sure the conversation flows both ways. At Microsoft, I spend my days translating customer frustration into actionable engineering feedback, and translating engineering decisions into content that helps people get their work done. The best community work is invisible — when it's working, people just feel heard.</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="thought-entry">
+                        <div class="thought-date">2026.02.25</div>
+                        <div class="thought-title">Building in Public</div>
+                        <p class="thought-excerpt">I have 50+ repositories on GitHub. Most of them are small experiments — a Tamagotchi on an e-ink display, a party card game, a turtle facts app. None of them are going to change the world. But each one taught me something, and putting them out there means someone else might learn from them too. Building in public isn't about showing off polished work. It's about showing the process, the rough edges, the weird ideas that might not work.</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="thought-entry">
+                        <div class="thought-date">2026.01.06</div>
+                        <div class="thought-title">From Racking Servers to Deploying Endpoints</div>
+                        <p class="thought-excerpt">My career started in Hawai'i, racking servers and running cable. Desktop support, service technician — the kind of work where you learn that technology isn't about the technology. It's about the person on the other end who just wants their thing to work. That perspective followed me to Microsoft, where I now work at the intersection of product engineering and the global IT community. The tools changed, but the job is the same: help people get their work done.</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="thought-entry">
+                        <div class="thought-date">2025.01.22</div>
+                        <div class="thought-title">The Clippy Philosophy</div>
+                        <p class="thought-excerpt">"It looks like you're trying to build something useful. Need help with that?" That line in my bio isn't just a joke. Clippy was annoying because he interrupted you. But the instinct was right — proactive help, offered at the right moment, is the best kind of support. That's what community strategy is. You don't wait for people to file a ticket. You watch the conversations, spot the patterns, and show up with the answer before they have to ask.</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="thought-entry">
+                        <div class="thought-date">2024.11.03</div>
+                        <div class="thought-title">Every Site Needs Dark Mode</div>
+                        <p class="thought-excerpt">I don't have strong opinions about most things in web development. But I will die on the hill that every website needs a dark mode toggle. Not just because some people prefer it — because your site is someone's companion at 2am when they're debugging a production issue. Blinding them with a white background at that moment is a small act of cruelty. Respect the night owls.</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="container">
+            <div class="cube-wrapper" aria-hidden="true">
+                <canvas id="ascii-cube"></canvas>
+            </div>
+            <div class="social-icons">
+                <a href="https://www.linkedin.com/in/manaiakalani/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://twitter.com/manaiakalani" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="https://github.com/manaiakalani" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://instagram.com/manaiakalani" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.youtube.com/kimaker213" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                <a href="https://bsky.app/profile/did:plc:kurxpumma6piictgpr424wcj" target="_blank" rel="noopener noreferrer" aria-label="Bluesky"><i class="fas fa-cloud"></i></a>
+            </div>
+            <p class="footer-text">Made with <span class="heart-beat" aria-hidden="true">❤️</span> in Seattle, WA</p>
+        </div>
+    </footer>
+
+    <!-- External JavaScript -->
+    <script src="script.js"></script>
+    <script src="geocities.js"></script>
+
+    <!-- ASCII Cube -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module">
+        import { initCube } from './cube.js';
+        const canvas = document.getElementById('ascii-cube');
+        if (canvas) initCube(canvas, './cube-texture.webp');
+    </script>
+</body>
+</html>

@@ -223,6 +223,251 @@ footer {
     100% { background-position: 0% 50%; }
 }
 
+/* Navigation */
+.site-nav {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.site-nav a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    transition: color var(--transition-speed) ease, background var(--transition-speed) ease;
+}
+
+.site-nav a:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.site-nav a.active {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Header Subtitle */
+.header-subtitle {
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+/* Featured Projects Teaser */
+.featured-teaser {
+    padding: 4rem 0;
+    background-color: var(--bg-primary);
+    transition: background-color var(--transition-speed) ease;
+}
+
+.featured-teaser h2 {
+    margin-bottom: 2rem;
+}
+
+.featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+/* Project Cards */
+.project-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid rgba(128, 128, 128, 0.15);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color var(--transition-speed) ease;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.project-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.project-card h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    color: var(--text-primary);
+}
+
+.project-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0 0 1rem;
+    text-align: left;
+    text-align-last: left;
+    line-height: 1.5;
+}
+
+.project-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+}
+
+.lang-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--text-secondary);
+}
+
+.lang-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* View All Link */
+.view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 2rem;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: gap 0.2s ease;
+}
+
+.view-all:hover {
+    gap: 0.7rem;
+}
+
+/* Page Heading Section */
+.page-hero {
+    padding: 3rem 0;
+    background-color: var(--bg-primary);
+    transition: background-color var(--transition-speed) ease;
+}
+
+.page-hero h2 {
+    text-align: left;
+    margin-bottom: 0.5rem;
+}
+
+.page-hero p {
+    text-align: left;
+    text-align-last: left;
+    color: var(--text-secondary);
+}
+
+/* Thoughts List */
+.thoughts-list {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+}
+
+.thought-entry {
+    display: block;
+    padding: 1.2rem 1rem;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.15);
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.2s ease;
+}
+
+.thought-entry:first-child {
+    border-top: 1px solid rgba(128, 128, 128, 0.15);
+}
+
+.thought-entry:hover {
+    background-color: var(--bg-secondary);
+}
+
+.thought-date {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 0.25rem;
+}
+
+.thought-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+}
+
+.thought-excerpt {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-align: left;
+    text-align-last: left;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Projects Full Page Grid */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2.5rem;
+    padding: 0.6rem 1.2rem;
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.github-link:hover {
+    color: var(--text-primary);
+    border-color: var(--text-primary);
+}
+
+/* GeoCities Toggle Position Adjust */
+.geocities-toggle {
+    position: absolute;
+    top: 1.2rem;
+    left: 1.5rem;
+    background: var(--toggle-bg);
+    border: none;
+    color: var(--header-text);
+    font-size: 1.2rem;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition-speed) ease, transform var(--transition-speed) ease;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.geocities-toggle:hover {
+    background: var(--toggle-hover);
+    transform: scale(1.1);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     h1 { font-size: 2rem; }
@@ -231,5 +476,11 @@ footer {
     .container { width: 90%; }
     .social-icons a { font-size: 1.5rem; margin: 0 0.6rem; }
     .theme-toggle { top: 0.8rem; right: 0.8rem; width: 2.2rem; height: 2.2rem; font-size: 1rem; }
+    .geocities-toggle { top: 0.8rem; left: 0.8rem; width: 2.2rem; height: 2.2rem; font-size: 1rem; }
     .cube-wrapper { width: 160px; height: 160px; margin-bottom: 1rem; }
+    .site-nav { gap: 0.8rem; flex-wrap: wrap; }
+    .site-nav a { font-size: 0.85rem; }
+    .header-subtitle { font-size: 0.95rem; }
+    .featured-grid { grid-template-columns: 1fr; }
+    .projects-grid { grid-template-columns: 1fr; }
 }
