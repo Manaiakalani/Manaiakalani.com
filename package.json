@@ -1,0 +1,23 @@
+{
+  "name": "manaiakalani.com",
+  "version": "1.0.0",
+  "description": "Personal website for **Maximilian Stein** — Community Strategy Lead for **Microsoft Intune** and **Microsoft Security** within Customer Experience Engineering (CxE).",
+  "main": "cube.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Manaiakalani/Manaiakalani.com.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Manaiakalani/Manaiakalani.com/issues"
+  },
+  "homepage": "https://github.com/Manaiakalani/Manaiakalani.com#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
+  }
+}
