@@ -1,3 +1,5 @@
+Sitemap: https://manaiakalani.com/sitemap.xml
+
 # Allow all legitimate search engines
 User-agent: Googlebot
 Allow: /

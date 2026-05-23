@@ -127,13 +127,20 @@ test('geocities toggle deactivates cleanly', async ({ page }) => {
   await expect(page.locator('html')).not.toHaveAttribute('data-geocities', 'true');
 });
 
-// ── No dead Umami scripts ──
-test('no dead analytics scripts on any page', async ({ page }) => {
-  for (const pg of PAGES) {
-    await page.goto(pg.path);
-    const html = await page.content();
-    expect(html).not.toContain('analytics.manaiakalani.info');
-  }
+// ── Analytics script ──
+test('index: analytics script is present and configured correctly', async ({ page }) => {
+  await page.goto('/');
+  const analyticsScript = page.locator(
+    'script[src="https://analytics.manaiakalani.info/api/script.js"]'
+  );
+
+  await expect(analyticsScript).toHaveCount(1);
+  await expect(analyticsScript).toHaveAttribute(
+    'src',
+    'https://analytics.manaiakalani.info/api/script.js'
+  );
+  await expect(analyticsScript).toHaveAttribute('defer', '');
+  await expect(analyticsScript).toHaveAttribute('data-site-id', 'c24b6c864956');
 });
 
 // ── No console errors ──

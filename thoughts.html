@@ -11,8 +11,8 @@
     <meta property="og:url" content="https://manaiakalani.com/thoughts.html">
     <meta property="og:title" content="Thoughts — Maximilian Stein">
     <meta property="og:description" content="Reflections on community building, the tech industry, side projects, and everything in between.">
-    <meta property="og:image" content="https://manaiakalani.com/favicon.png">
-    <meta property="twitter:card" content="summary">
+    <meta property="og:image" content="https://manaiakalani.com/og-image.png">
+    <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:title" content="Thoughts — Maximilian Stein">
     <meta property="twitter:description" content="Reflections on community building, the tech industry, side projects, and everything in between.">
     <meta name="theme-color" content="#0f4c81">
@@ -27,30 +27,148 @@
     <!-- Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     
     <!-- Google Fonts: Doto -->
     <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" 
-          integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" 
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- External CSS -->
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="geocities.css">
     
     <!-- Prevent flash: apply saved theme/geocities before paint -->
     <script>
-        (function() {
-            var t = localStorage.getItem('theme');
-            if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.setAttribute('data-theme', 'dark');
+      (function () {
+        var GEO_CSS_HREF = "geocities.css";
+        var GEO_JS_HREF = "geocities.js";
+        var GEO_KEY = "geocities";
+        var geoCssPromise;
+        var geoJsPromise;
+        var geoScriptReady = false;
+
+        function onReady(callback) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", callback, { once: true });
+          } else {
+            callback();
+          }
+        }
+
+        function loadGeoCitiesStyles() {
+          if (geoCssPromise) return geoCssPromise;
+          geoCssPromise = new Promise(function (resolve) {
+            var existing = document.querySelector("link[data-geocities-css]");
+            if (existing) {
+              if (existing.sheet) {
+                resolve();
+              } else {
+                existing.addEventListener("load", resolve, { once: true });
+                existing.addEventListener("error", resolve, { once: true });
+              }
+              return;
             }
-            if (localStorage.getItem('geocities') === 'true') {
-                document.documentElement.setAttribute('data-geocities', 'true');
+
+            var link = document.createElement("link");
+            link.rel = "stylesheet";
+            link.href = GEO_CSS_HREF;
+            link.setAttribute("data-geocities-css", "true");
+            link.addEventListener("load", resolve, { once: true });
+            link.addEventListener("error", resolve, { once: true });
+
+            var anchor = document.querySelector('link[href="style.css"]');
+            if (anchor) {
+              anchor.insertAdjacentElement("afterend", link);
+            } else {
+              document.head.appendChild(link);
             }
-        })();
+          });
+          return geoCssPromise;
+        }
+
+        function loadGeoCitiesScript() {
+          if (geoJsPromise) return geoJsPromise;
+          geoJsPromise = new Promise(function (resolve, reject) {
+            var existing = document.querySelector("script[data-geocities-js]");
+            if (existing) {
+              if (existing.getAttribute("data-loaded") === "true") {
+                geoScriptReady = true;
+                resolve();
+              } else {
+                existing.addEventListener(
+                  "load",
+                  function () {
+                    geoScriptReady = true;
+                    resolve();
+                  },
+                  { once: true }
+                );
+                existing.addEventListener("error", reject, { once: true });
+              }
+              return;
+            }
+
+            var script = document.createElement("script");
+            script.src = GEO_JS_HREF;
+            script.setAttribute("data-geocities-js", "true");
+            script.addEventListener(
+              "load",
+              function () {
+                geoScriptReady = true;
+                script.setAttribute("data-loaded", "true");
+                resolve();
+              },
+              { once: true }
+            );
+            script.addEventListener("error", reject, { once: true });
+            document.head.appendChild(script);
+          });
+          return geoJsPromise;
+        }
+
+        function loadGeoCitiesAssets() {
+          loadGeoCitiesStyles();
+          return new Promise(function (resolve, reject) {
+            onReady(function () {
+              loadGeoCitiesScript().then(resolve).catch(reject);
+            });
+          });
+        }
+
+        var t = localStorage.getItem("theme");
+        if (
+          t === "dark" ||
+          (!t && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+
+        var geocitiesEnabled = localStorage.getItem(GEO_KEY) === "true";
+        if (geocitiesEnabled) {
+          document.documentElement.setAttribute("data-geocities", "true");
+          loadGeoCitiesStyles();
+          loadGeoCitiesAssets().catch(function () {});
+        }
+
+        onReady(function () {
+          var toggle = document.querySelector(".geocities-toggle");
+          if (!toggle) return;
+
+          toggle.addEventListener(
+            "click",
+            function (event) {
+              if (geoScriptReady) return;
+              event.preventDefault();
+              event.stopImmediatePropagation();
+              loadGeoCitiesAssets()
+                .then(function () {
+                  toggle.click();
+                })
+                .catch(function () {});
+            },
+            { capture: true }
+          );
+        });
+
+        window.loadGeoCitiesAssets = loadGeoCitiesAssets;
+      })();
     </script>
     
 
@@ -68,15 +186,16 @@
             </nav>
         </div>
         <button class="theme-toggle" aria-label="Toggle dark mode">
-            <i class="fas fa-moon"></i>
-            <i class="fas fa-sun"></i>
+            <svg class="fa-moon" aria-hidden="true" width="1em" height="1em" fill="currentColor" viewBox="0 0 384 512"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"/></svg>
+            <svg class="fa-sun" aria-hidden="true" width="1em" height="1em" fill="currentColor" viewBox="0 0 512 512"><path d="M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 8.6-11.9 9.6L391 391 371.1 498.9c-1 5.3-4.6 9.8-9.6 11.9s-10.7 1.5-15.2-1.6L256 446.9l-90.3 62.3c-4.5 3.1-10.2 3.7-15.2 1.6s-8.6-6.6-9.6-11.9L121 391 13.1 371.1c-5.3-1-9.8-4.6-11.9-9.6s-1.5-10.7 1.6-15.2L65.1 256 2.8 165.7c-3.1-4.5-3.7-10.2-1.6-15.2s6.6-8.6 11.9-9.6L121 121 140.9 13.1c1-5.3 4.6-9.8 9.6-11.9s10.7-1.5 15.2 1.6L256 65.1 346.3 2.8c4.5-3.1 10.2-3.7 15.2-1.6zM256 160a96 96 0 1 0 0 192 96 96 0 1 0 0-192z"/></svg>
         </button>
         <button class="geocities-toggle" aria-label="Toggle GeoCities mode" title="Welcome to 1997!">
             <span class="gc-icon">🚧</span>
         </button>
     </header>
 
-    <!-- Page Hero -->
+    <main>
+        <!-- Page Hero -->
     <section class="page-hero">
         <div class="container">
             <h2>Thoughts</h2>
@@ -134,6 +253,8 @@
         </div>
     </section>
 
+    </main>
+
     <!-- Footer Section -->
     <footer>
         <div class="container">
@@ -141,12 +262,12 @@
                 <canvas id="ascii-cube"></canvas>
             </div>
             <div class="social-icons">
-                <a href="https://www.linkedin.com/in/manaiakalani/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                <a href="https://twitter.com/manaiakalani" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                <a href="https://github.com/manaiakalani" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                <a href="https://instagram.com/manaiakalani" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="https://www.youtube.com/kimaker213" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                <a href="https://bsky.app/profile/did:plc:kurxpumma6piictgpr424wcj" target="_blank" rel="noopener noreferrer" aria-label="Bluesky"><i class="fas fa-cloud"></i></a>
+                <a href="https://www.linkedin.com/in/manaiakalani/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg aria-hidden="true" width="1em" height="1em" fill="currentColor" viewBox="0 0 448 512"><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg></a>
+                <a href="https://twitter.com/manaiakalani" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><svg aria-hidden="true" width="1em" height="1em" fill="currentColor" viewBox="0 0 512 512"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg></a>
+                <a href="https://github.com/manaiakalani" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><svg aria-hidden="true" width="1em" height="1em" fill="currentColor" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.8-14.9-112.8-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></a>
+                <a href="https://instagram.com/manaiakalani" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg aria-hidden="true" width="1em" height="1em" fill="currentColor" viewBox="0 0 448 512"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg></a>
+                <a href="https://www.youtube.com/kimaker213" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg aria-hidden="true" width="1em" height="1em" fill="currentColor" viewBox="0 0 576 512"><path d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"/></svg></a>
+                <a href="https://bsky.app/profile/did:plc:kurxpumma6piictgpr424wcj" target="_blank" rel="noopener noreferrer" aria-label="Bluesky"><svg aria-hidden="true" width="1em" height="1em" fill="currentColor" viewBox="0 0 640 512"><path d="M0 336c0 79.5 64.5 144 144 144H512c70.7 0 128-57.3 128-128 0-61.9-44-113.6-102.4-125.4 4.1-10.7 6.4-22.4 6.4-34.6 0-53-43-96-96-96-19.7 0-38.1 6-53.3 16.2C367 64.2 315.3 32 256 32 167.6 32 96 103.6 96 192c0 2.7.1 5.4.2 8.1C40.2 219.8 0 273.2 0 336z"/></svg></a>
             </div>
             <p class="footer-text">Made with <span class="heart-beat" aria-hidden="true">❤️</span> in Seattle, WA</p>
         </div>
@@ -154,7 +275,6 @@
 
     <!-- External JavaScript -->
     <script src="script.js"></script>
-    <script src="geocities.js"></script>
 
     <!-- ASCII Cube -->
     <script type="importmap">
@@ -166,9 +286,31 @@
     }
     </script>
     <script type="module">
-        import { initCube } from './cube.js';
-        const canvas = document.getElementById('ascii-cube');
-        if (canvas) initCube(canvas, './cube-texture.webp');
+      const canvas = document.getElementById("ascii-cube");
+
+      if (canvas) {
+        let loaded = false;
+        const loadCube = async () => {
+          if (loaded) return;
+          loaded = true;
+          const { initCube } = await import("./cube.js");
+          initCube(canvas, "./cube-texture.webp");
+        };
+
+        if (!("IntersectionObserver" in window)) {
+          loadCube();
+        } else {
+          const observer = new IntersectionObserver(
+            (entries) => {
+              if (!entries.some((entry) => entry.isIntersecting)) return;
+              observer.disconnect();
+              loadCube();
+            },
+            { rootMargin: "200px 0px", threshold: 0 }
+          );
+          observer.observe(canvas);
+        }
+      }
     </script>
 </body>
 </html>
