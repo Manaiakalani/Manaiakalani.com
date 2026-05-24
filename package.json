@@ -1,7 +1,7 @@
 {
   "name": "manaiakalani.com",
   "version": "1.0.0",
-  "description": "Personal website for **Maximilian Stein** — Community Strategy Lead for **Microsoft Intune** and **Microsoft Security** within Customer Experience Engineering (CxE).",
+  "description": "Personal website for **Maximilian Stein** — Product Manager for **Microsoft Intune** and **Microsoft Security** within Customer Experience Engineering (CxE).",
   "main": "cube.js",
   "scripts": {
     "test": "npx playwright test"
