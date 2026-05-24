@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Thoughts — Maximilian Stein</title>
+  <subtitle>Reflections on community building, the tech industry, side projects, and everything in between.</subtitle>
+  <link href="https://manaiakalani.com/feed.xml" rel="self" />
+  <link href="https://manaiakalani.com/thoughts.html" />
+  <id>https://manaiakalani.com/feed.xml</id>
+  <updated>2026-05-23T00:00:00Z</updated>
+  <author>
+    <name>Maximilian Stein</name>
+  </author>
+  <entry>
+    <title>Let the API Be the CMS</title>
+    <link href="https://manaiakalani.com/thoughts.html#let-the-api-be-the-cms" />
+    <id>https://manaiakalani.com/thoughts.html#let-the-api-be-the-cms</id>
+    <updated>2026-05-23T00:00:00Z</updated>
+    <summary>I just made my projects page dynamic — it pulls straight from the GitHub API now. No more editing HTML every time I ship a new repo. The site reflects what I'm actually working on, not what I remembered to update three weeks ago. If your portfolio doesn't match your commit history, it's fiction. Let the API be the CMS.</summary>
+  </entry>
+  <entry>
+    <title>Side Projects Are Career Development</title>
+    <link href="https://manaiakalani.com/thoughts.html#side-projects-are-career-development" />
+    <id>https://manaiakalani.com/thoughts.html#side-projects-are-career-development</id>
+    <updated>2026-05-15T00:00:00Z</updated>
+    <summary>People ask why I build so many random things — a step tracker for an offsite, an LED badge controller, a party card game. None of these are on my performance review. But every one of them taught me something I used at work within a month. Side projects are the fastest way to learn because the stakes are low and the feedback is instant. Your manager doesn't need to approve a PR for your weekend project.</summary>
+  </entry>
+  <entry>
+    <title>The Tools Changed, the Job Didn't</title>
+    <link href="https://manaiakalani.com/thoughts.html#the-tools-changed-the-job-didnt" />
+    <id>https://manaiakalani.com/thoughts.html#the-tools-changed-the-job-didnt</id>
+    <updated>2026-04-28T00:00:00Z</updated>
+    <summary>Ten years ago I was racking servers in Hawai'i. Now I'm shaping social media strategy for enterprise security products at Microsoft. The tools are completely different but the job is exactly the same: figure out what someone needs and help them get it. Whether it's a cable run or a blog post about Zero Trust, the skill is empathy. Everything else is just execution.</summary>
+  </entry>
+  <entry>
+    <title>Why GeoCities Mode Exists</title>
+    <link href="https://manaiakalani.com/thoughts.html#why-geocities-mode-exists" />
+    <id>https://manaiakalani.com/thoughts.html#why-geocities-mode-exists</id>
+    <updated>2026-03-08T00:00:00Z</updated>
+    <summary>Every website today looks the same. Clean sans-serif fonts, muted colors, generous whitespace. There's nothing wrong with that — this site does it too. But the early web had a raw, unpolished energy that we've lost. GeoCities mode is my love letter to that era. Hit the 🚧 button and you'll get Comic Sans, construction banners, visitor counters, and rainbow text. It's not ironic — it's genuine nostalgia for a time when every homepage was a personal statement, not a template.</summary>
+  </entry>
+  <entry>
+    <title>On Community Strategy</title>
+    <link href="https://manaiakalani.com/thoughts.html#on-community-strategy" />
+    <id>https://manaiakalani.com/thoughts.html#on-community-strategy</id>
+    <updated>2026-03-02T00:00:00Z</updated>
+    <summary>Community strategy isn't marketing. It's not social media management. It's the work of sitting between engineering teams and the people who use what they build, making sure the conversation flows both ways. At Microsoft, I spend my days translating customer frustration into actionable engineering feedback, and translating engineering decisions into content that helps people get their work done. The best community work is invisible — when it's working, people just feel heard.</summary>
+  </entry>
+  <entry>
+    <title>Building in Public</title>
+    <link href="https://manaiakalani.com/thoughts.html#building-in-public" />
+    <id>https://manaiakalani.com/thoughts.html#building-in-public</id>
+    <updated>2026-02-25T00:00:00Z</updated>
+    <summary>I have 50+ repositories on GitHub. Most of them are small experiments — a Tamagotchi on an e-ink display, a party card game, a turtle facts app. None of them are going to change the world. But each one taught me something, and putting them out there means someone else might learn from them too. Building in public isn't about showing off polished work. It's about showing the process, the rough edges, the weird ideas that might not work.</summary>
+  </entry>
+  <entry>
+    <title>From Racking Servers to Deploying Endpoints</title>
+    <link href="https://manaiakalani.com/thoughts.html#from-racking-servers-to-deploying-endpoints" />
+    <id>https://manaiakalani.com/thoughts.html#from-racking-servers-to-deploying-endpoints</id>
+    <updated>2026-01-06T00:00:00Z</updated>
+    <summary>My career started in Hawai'i, racking servers and running cable. Desktop support, service technician — the kind of work where you learn that technology isn't about the technology. It's about the person on the other end who just wants their thing to work. That perspective followed me to Microsoft, where I now work at the intersection of product engineering and the global IT community. The tools changed, but the job is the same: help people get their work done.</summary>
+  </entry>
+  <entry>
+    <title>The Clippy Philosophy</title>
+    <link href="https://manaiakalani.com/thoughts.html#the-clippy-philosophy" />
+    <id>https://manaiakalani.com/thoughts.html#the-clippy-philosophy</id>
+    <updated>2025-01-22T00:00:00Z</updated>
+    <summary>&quot;It looks like you're trying to build something useful. Need help with that?&quot; That line in my bio isn't just a joke. Clippy was annoying because he interrupted you. But the instinct was right — proactive help, offered at the right moment, is the best kind of support. That's what community strategy is. You don't wait for people to file a ticket. You watch the conversations, spot the patterns, and show up with the answer before they have to ask.</summary>
+  </entry>
+  <entry>
+    <title>Every Site Needs Dark Mode</title>
+    <link href="https://manaiakalani.com/thoughts.html#every-site-needs-dark-mode" />
+    <id>https://manaiakalani.com/thoughts.html#every-site-needs-dark-mode</id>
+    <updated>2024-11-03T00:00:00Z</updated>
+    <summary>I don't have strong opinions about most things in web development. But I will die on the hill that every website needs a dark mode toggle. Not just because some people prefer it — because your site is someone's companion at 2am when they're debugging a production issue. Blinding them with a white background at that moment is a small act of cruelty. Respect the night owls.</summary>
+  </entry>
+</feed>

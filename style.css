@@ -31,6 +31,29 @@
     --toggle-hover: rgba(255, 255, 255, 0.2);
 }
 
+/* Skip Navigation Link */
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: #ffffff;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0 0 6px 6px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    z-index: 1000;
+    transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+    top: 0;
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
 /* General Styles */
 body {
     font-family: 'Doto', sans-serif;

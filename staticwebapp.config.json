@@ -15,6 +15,14 @@
     { "route": "/node_modules/*", "statusCode": 404 },
     { "route": "/.github/*", "statusCode": 404 },
     {
+      "route": "/feed.xml",
+      "headers": { "Cache-Control": "public, max-age=3600" }
+    },
+    {
+      "route": "/manifest.json",
+      "headers": { "Cache-Control": "public, max-age=86400" }
+    },
+    {
       "route": "*.css",
       "headers": { "Cache-Control": "public, max-age=86400" }
     },

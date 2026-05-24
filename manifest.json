@@ -1,0 +1,16 @@
+{
+  "name": "Maximilian Stein",
+  "short_name": "Manaiakalani",
+  "description": "Personal website for Maximilian Stein — Community Strategy Lead for Microsoft Intune & Microsoft Security",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0f4c81",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

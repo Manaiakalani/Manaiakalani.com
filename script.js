@@ -32,8 +32,12 @@
     var path = window.location.pathname;
     var links = document.querySelectorAll('.site-nav a');
     links.forEach(function(link) {
+        link.classList.remove('active');
+        link.removeAttribute('aria-current');
         var href = link.getAttribute('href');
-        if (path.endsWith(href) || (href === '/' && (path === '/' || path.endsWith('/')))) {
+        var isHome = href === '/' && (path === '/' || path === '/index.html' || path.endsWith('/'));
+        var isPage = href !== '/' && path.endsWith(href);
+        if (isHome || isPage) {
             link.classList.add('active');
             link.setAttribute('aria-current', 'page');
         }
