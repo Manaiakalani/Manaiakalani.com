@@ -1,12 +1,44 @@
 {
   "globalHeaders": {
-    "Content-Security-Policy": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://analytics.manaiakalani.info; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://analytics.manaiakalani.info; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://analytics.manaiakalani.info; manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests",
+    "Content-Security-Policy": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://analytics.manaiakalani.info; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://analytics.manaiakalani.info; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://analytics.manaiakalani.info https://api.github.com; manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests",
     "Permissions-Policy": "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), clipboard-read=(), clipboard-write=(), display-capture=(), encrypted-media=(), geolocation=(), gyroscope=(), hid=(), magnetometer=(), microphone=(), midi=(), payment=(), publickey-credentials-get=(), serial=(), usb=(), web-share=(), xr-spatial-tracking=()",
     "X-Frame-Options": "DENY",
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload"
   },
+  "routes": [
+    { "route": "/tests/*", "statusCode": 404 },
+    { "route": "/package.json", "statusCode": 404 },
+    { "route": "/package-lock.json", "statusCode": 404 },
+    { "route": "/playwright.config.js", "statusCode": 404 },
+    { "route": "/node_modules/*", "statusCode": 404 },
+    { "route": "/.github/*", "statusCode": 404 },
+    {
+      "route": "*.css",
+      "headers": { "Cache-Control": "public, max-age=86400" }
+    },
+    {
+      "route": "*.js",
+      "headers": { "Cache-Control": "public, max-age=86400" }
+    },
+    {
+      "route": "*.png",
+      "headers": { "Cache-Control": "public, max-age=604800" }
+    },
+    {
+      "route": "*.jpg",
+      "headers": { "Cache-Control": "public, max-age=604800" }
+    },
+    {
+      "route": "*.svg",
+      "headers": { "Cache-Control": "public, max-age=604800" }
+    },
+    {
+      "route": "*.woff2",
+      "headers": { "Cache-Control": "public, max-age=2592000, immutable" }
+    }
+  ],
   "responseOverrides": {
     "404": {
       "rewrite": "/404.html"

@@ -10,9 +10,11 @@
     <meta property="og:title" content="Projects — Maximilian Stein">
     <meta property="og:description" content="Projects by Maximilian Stein (Manaiakalani) — gaming utilities, public health dashboards, creative experiments, and homelab docs.">
     <meta property="og:image" content="https://manaiakalani.com/og-image.png">
+    <meta property="og:image:alt" content="Maximilian Stein — Projects">
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:title" content="Projects — Maximilian Stein">
     <meta property="twitter:description" content="Projects by Maximilian Stein (Manaiakalani) — gaming utilities, public health dashboards, creative experiments, and homelab docs.">
+    <meta property="twitter:image" content="https://manaiakalani.com/og-image.png">
     <meta name="theme-color" content="#0f4c81">
     <link rel="canonical" href="https://manaiakalani.com/projects.html">
     <link rel="icon" type="image/png" href="favicon.png">
@@ -22,149 +24,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 
-    <script>
-      (function () {
-        var GEO_CSS_HREF = "geocities.css";
-        var GEO_JS_HREF = "geocities.js";
-        var GEO_KEY = "geocities";
-        var geoCssPromise;
-        var geoJsPromise;
-        var geoScriptReady = false;
-
-        function onReady(callback) {
-          if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", callback, { once: true });
-          } else {
-            callback();
-          }
+    <script src="boot.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "Projects — Maximilian Stein",
+        "description": "A selection of projects by Maximilian Stein — from gaming utilities and public health dashboards to creative experiments.",
+        "url": "https://manaiakalani.com/projects.html",
+        "author": {
+          "@type": "Person",
+          "name": "Maximilian Stein",
+          "url": "https://manaiakalani.com"
         }
-
-        function loadGeoCitiesStyles() {
-          if (geoCssPromise) return geoCssPromise;
-          geoCssPromise = new Promise(function (resolve) {
-            var existing = document.querySelector("link[data-geocities-css]");
-            if (existing) {
-              if (existing.sheet) {
-                resolve();
-              } else {
-                existing.addEventListener("load", resolve, { once: true });
-                existing.addEventListener("error", resolve, { once: true });
-              }
-              return;
-            }
-
-            var link = document.createElement("link");
-            link.rel = "stylesheet";
-            link.href = GEO_CSS_HREF;
-            link.setAttribute("data-geocities-css", "true");
-            link.addEventListener("load", resolve, { once: true });
-            link.addEventListener("error", resolve, { once: true });
-
-            var anchor = document.querySelector('link[href="style.css"]');
-            if (anchor) {
-              anchor.insertAdjacentElement("afterend", link);
-            } else {
-              document.head.appendChild(link);
-            }
-          });
-          return geoCssPromise;
-        }
-
-        function loadGeoCitiesScript() {
-          if (geoJsPromise) return geoJsPromise;
-          geoJsPromise = new Promise(function (resolve, reject) {
-            var existing = document.querySelector("script[data-geocities-js]");
-            if (existing) {
-              if (existing.getAttribute("data-loaded") === "true") {
-                geoScriptReady = true;
-                resolve();
-              } else {
-                existing.addEventListener(
-                  "load",
-                  function () {
-                    geoScriptReady = true;
-                    resolve();
-                  },
-                  { once: true }
-                );
-                existing.addEventListener("error", reject, { once: true });
-              }
-              return;
-            }
-
-            var script = document.createElement("script");
-            script.src = GEO_JS_HREF;
-            script.setAttribute("data-geocities-js", "true");
-            script.addEventListener(
-              "load",
-              function () {
-                geoScriptReady = true;
-                script.setAttribute("data-loaded", "true");
-                resolve();
-              },
-              { once: true }
-            );
-            script.addEventListener("error", reject, { once: true });
-            document.head.appendChild(script);
-          });
-          return geoJsPromise;
-        }
-
-        function loadGeoCitiesAssets() {
-          loadGeoCitiesStyles();
-          return new Promise(function (resolve, reject) {
-            onReady(function () {
-              loadGeoCitiesScript().then(resolve).catch(reject);
-            });
-          });
-        }
-
-        var t = localStorage.getItem("theme");
-        if (
-          t === "dark" ||
-          (!t && window.matchMedia("(prefers-color-scheme: dark)").matches)
-        ) {
-          document.documentElement.setAttribute("data-theme", "dark");
-        }
-
-        var geocitiesEnabled = localStorage.getItem(GEO_KEY) === "true";
-        if (geocitiesEnabled) {
-          document.documentElement.setAttribute("data-geocities", "true");
-          loadGeoCitiesStyles();
-          loadGeoCitiesAssets().catch(function () {});
-        }
-
-        onReady(function () {
-          var toggle = document.querySelector(".geocities-toggle");
-          if (!toggle) return;
-
-          toggle.addEventListener(
-            "click",
-            function (event) {
-              if (geoScriptReady) return;
-              event.preventDefault();
-              event.stopImmediatePropagation();
-              loadGeoCitiesAssets()
-                .then(function () {
-                  toggle.click();
-                })
-                .catch(function () {});
-            },
-            { capture: true }
-          );
-        });
-
-        window.loadGeoCitiesAssets = loadGeoCitiesAssets;
-      })();
+      }
     </script>
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>MANAIAKALANI</h1>
+            <span class="brand-text">MANAIAKALANI</span>
             <p class="header-subtitle">Aloha, I'm Maximilian Stein (Manaiakalani)</p>
             <nav class="site-nav" aria-label="Main">
-                <a href="index.html">About</a>
+                <a href="/">About</a>
                 <a href="thoughts.html">Thoughts</a>
                 <a href="projects.html" class="active">Projects</a>
             </nav>
@@ -180,12 +62,17 @@
 
     <main class="container">
         <section class="page-hero">
-            <h2>Projects</h2>
+            <h1>Projects</h1>
             <p>A selection of projects I've built — from gaming utilities and public health dashboards to creative experiments and homelab docs.</p>
         </section>
 
         <div class="projects-grid" id="all-projects">
-            <!-- Populated dynamically from GitHub API -->
+            <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div><div class="skeleton-line medium"></div><div class="skeleton-line badge"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div><div class="skeleton-line medium"></div><div class="skeleton-line badge"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div><div class="skeleton-line medium"></div><div class="skeleton-line badge"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div><div class="skeleton-line medium"></div><div class="skeleton-line badge"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div><div class="skeleton-line medium"></div><div class="skeleton-line badge"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div><div class="skeleton-line medium"></div><div class="skeleton-line badge"></div></div>
         </div>
 
         <a href="https://github.com/Manaiakalani" target="_blank" rel="noopener noreferrer" class="github-link">

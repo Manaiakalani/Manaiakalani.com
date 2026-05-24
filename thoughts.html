@@ -12,9 +12,11 @@
     <meta property="og:title" content="Thoughts — Maximilian Stein">
     <meta property="og:description" content="Reflections on community building, the tech industry, side projects, and everything in between.">
     <meta property="og:image" content="https://manaiakalani.com/og-image.png">
+    <meta property="og:image:alt" content="Maximilian Stein — Thoughts">
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:title" content="Thoughts — Maximilian Stein">
     <meta property="twitter:description" content="Reflections on community building, the tech industry, side projects, and everything in between.">
+    <meta property="twitter:image" content="https://manaiakalani.com/og-image.png">
     <meta name="theme-color" content="#0f4c81">
     
     <!-- Canonical -->
@@ -35,152 +37,31 @@
     <link rel="stylesheet" href="style.css">
     
     <!-- Prevent flash: apply saved theme/geocities before paint -->
-    <script>
-      (function () {
-        var GEO_CSS_HREF = "geocities.css";
-        var GEO_JS_HREF = "geocities.js";
-        var GEO_KEY = "geocities";
-        var geoCssPromise;
-        var geoJsPromise;
-        var geoScriptReady = false;
-
-        function onReady(callback) {
-          if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", callback, { once: true });
-          } else {
-            callback();
-          }
+    <script src="boot.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "name": "Thoughts — Maximilian Stein",
+        "description": "Reflections on community building, the tech industry, side projects, and everything in between.",
+        "url": "https://manaiakalani.com/thoughts.html",
+        "author": {
+          "@type": "Person",
+          "name": "Maximilian Stein",
+          "url": "https://manaiakalani.com"
         }
-
-        function loadGeoCitiesStyles() {
-          if (geoCssPromise) return geoCssPromise;
-          geoCssPromise = new Promise(function (resolve) {
-            var existing = document.querySelector("link[data-geocities-css]");
-            if (existing) {
-              if (existing.sheet) {
-                resolve();
-              } else {
-                existing.addEventListener("load", resolve, { once: true });
-                existing.addEventListener("error", resolve, { once: true });
-              }
-              return;
-            }
-
-            var link = document.createElement("link");
-            link.rel = "stylesheet";
-            link.href = GEO_CSS_HREF;
-            link.setAttribute("data-geocities-css", "true");
-            link.addEventListener("load", resolve, { once: true });
-            link.addEventListener("error", resolve, { once: true });
-
-            var anchor = document.querySelector('link[href="style.css"]');
-            if (anchor) {
-              anchor.insertAdjacentElement("afterend", link);
-            } else {
-              document.head.appendChild(link);
-            }
-          });
-          return geoCssPromise;
-        }
-
-        function loadGeoCitiesScript() {
-          if (geoJsPromise) return geoJsPromise;
-          geoJsPromise = new Promise(function (resolve, reject) {
-            var existing = document.querySelector("script[data-geocities-js]");
-            if (existing) {
-              if (existing.getAttribute("data-loaded") === "true") {
-                geoScriptReady = true;
-                resolve();
-              } else {
-                existing.addEventListener(
-                  "load",
-                  function () {
-                    geoScriptReady = true;
-                    resolve();
-                  },
-                  { once: true }
-                );
-                existing.addEventListener("error", reject, { once: true });
-              }
-              return;
-            }
-
-            var script = document.createElement("script");
-            script.src = GEO_JS_HREF;
-            script.setAttribute("data-geocities-js", "true");
-            script.addEventListener(
-              "load",
-              function () {
-                geoScriptReady = true;
-                script.setAttribute("data-loaded", "true");
-                resolve();
-              },
-              { once: true }
-            );
-            script.addEventListener("error", reject, { once: true });
-            document.head.appendChild(script);
-          });
-          return geoJsPromise;
-        }
-
-        function loadGeoCitiesAssets() {
-          loadGeoCitiesStyles();
-          return new Promise(function (resolve, reject) {
-            onReady(function () {
-              loadGeoCitiesScript().then(resolve).catch(reject);
-            });
-          });
-        }
-
-        var t = localStorage.getItem("theme");
-        if (
-          t === "dark" ||
-          (!t && window.matchMedia("(prefers-color-scheme: dark)").matches)
-        ) {
-          document.documentElement.setAttribute("data-theme", "dark");
-        }
-
-        var geocitiesEnabled = localStorage.getItem(GEO_KEY) === "true";
-        if (geocitiesEnabled) {
-          document.documentElement.setAttribute("data-geocities", "true");
-          loadGeoCitiesStyles();
-          loadGeoCitiesAssets().catch(function () {});
-        }
-
-        onReady(function () {
-          var toggle = document.querySelector(".geocities-toggle");
-          if (!toggle) return;
-
-          toggle.addEventListener(
-            "click",
-            function (event) {
-              if (geoScriptReady) return;
-              event.preventDefault();
-              event.stopImmediatePropagation();
-              loadGeoCitiesAssets()
-                .then(function () {
-                  toggle.click();
-                })
-                .catch(function () {});
-            },
-            { capture: true }
-          );
-        });
-
-        window.loadGeoCitiesAssets = loadGeoCitiesAssets;
-      })();
+      }
     </script>
-    
 
 </head>
 <body>
     <!-- Header Section -->
     <header>
         <div class="container">
-            <h1>MANAIAKALANI</h1>
+            <span class="brand-text">MANAIAKALANI</span>
             <p class="header-subtitle">Aloha, I'm Maximilian Stein (Manaiakalani)</p>
             <nav class="site-nav" aria-label="Main">
-                <a href="index.html">About</a>
+                <a href="/">About</a>
                 <a href="thoughts.html" class="active">Thoughts</a>
                 <a href="projects.html">Projects</a>
             </nav>
@@ -198,7 +79,7 @@
         <!-- Page Hero -->
     <section class="page-hero">
         <div class="container">
-            <h2>Thoughts</h2>
+            <h1>Thoughts</h1>
             <p>Reflections on community building, the tech industry, side projects, and everything in between.</p>
         </div>
     </section>

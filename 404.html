@@ -11,143 +11,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <script>
-      (function () {
-        var GEO_CSS_HREF = "geocities.css";
-        var GEO_JS_HREF = "geocities.js";
-        var GEO_KEY = "geocities";
-        var geoCssPromise;
-        var geoJsPromise;
-        var geoScriptReady = false;
-
-        function onReady(callback) {
-          if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", callback, { once: true });
-          } else {
-            callback();
-          }
-        }
-
-        function loadGeoCitiesStyles() {
-          if (geoCssPromise) return geoCssPromise;
-          geoCssPromise = new Promise(function (resolve) {
-            var existing = document.querySelector("link[data-geocities-css]");
-            if (existing) {
-              if (existing.sheet) {
-                resolve();
-              } else {
-                existing.addEventListener("load", resolve, { once: true });
-                existing.addEventListener("error", resolve, { once: true });
-              }
-              return;
-            }
-
-            var link = document.createElement("link");
-            link.rel = "stylesheet";
-            link.href = GEO_CSS_HREF;
-            link.setAttribute("data-geocities-css", "true");
-            link.addEventListener("load", resolve, { once: true });
-            link.addEventListener("error", resolve, { once: true });
-
-            var anchor = document.querySelector('link[href="style.css"]');
-            if (anchor) {
-              anchor.insertAdjacentElement("afterend", link);
-            } else {
-              document.head.appendChild(link);
-            }
-          });
-          return geoCssPromise;
-        }
-
-        function loadGeoCitiesScript() {
-          if (geoJsPromise) return geoJsPromise;
-          geoJsPromise = new Promise(function (resolve, reject) {
-            var existing = document.querySelector("script[data-geocities-js]");
-            if (existing) {
-              if (existing.getAttribute("data-loaded") === "true") {
-                geoScriptReady = true;
-                resolve();
-              } else {
-                existing.addEventListener(
-                  "load",
-                  function () {
-                    geoScriptReady = true;
-                    resolve();
-                  },
-                  { once: true }
-                );
-                existing.addEventListener("error", reject, { once: true });
-              }
-              return;
-            }
-
-            var script = document.createElement("script");
-            script.src = GEO_JS_HREF;
-            script.setAttribute("data-geocities-js", "true");
-            script.addEventListener(
-              "load",
-              function () {
-                geoScriptReady = true;
-                script.setAttribute("data-loaded", "true");
-                resolve();
-              },
-              { once: true }
-            );
-            script.addEventListener("error", reject, { once: true });
-            document.head.appendChild(script);
-          });
-          return geoJsPromise;
-        }
-
-        function loadGeoCitiesAssets() {
-          loadGeoCitiesStyles();
-          return new Promise(function (resolve, reject) {
-            onReady(function () {
-              loadGeoCitiesScript().then(resolve).catch(reject);
-            });
-          });
-        }
-
-        var t = localStorage.getItem("theme");
-        if (
-          t === "dark" ||
-          (!t && window.matchMedia("(prefers-color-scheme: dark)").matches)
-        ) {
-          document.documentElement.setAttribute("data-theme", "dark");
-        }
-
-        var geocitiesEnabled = localStorage.getItem(GEO_KEY) === "true";
-        if (geocitiesEnabled) {
-          document.documentElement.setAttribute("data-geocities", "true");
-          loadGeoCitiesStyles();
-          loadGeoCitiesAssets().catch(function () {});
-        }
-
-        onReady(function () {
-          var toggle = document.querySelector(".geocities-toggle");
-          if (!toggle) return;
-
-          toggle.addEventListener(
-            "click",
-            function (event) {
-              if (geoScriptReady) return;
-              event.preventDefault();
-              event.stopImmediatePropagation();
-              loadGeoCitiesAssets()
-                .then(function () {
-                  toggle.click();
-                })
-                .catch(function () {});
-            },
-            { capture: true }
-          );
-        });
-
-        window.loadGeoCitiesAssets = loadGeoCitiesAssets;
-      })();
-    </script>
+    <script src="boot.js"></script>
     <style>
         .four-oh-four {
+            --gradient: linear-gradient(-45deg, #0f4c81, #d14836, #6b7280, #8a6f00, #5d7f3d);
             min-height: 70vh;
             display: flex;
             flex-direction: column;
@@ -284,9 +151,9 @@
 <body>
     <header>
         <div class="container">
-            <a href="index.html" class="logo gradient-text" aria-label="Home">M.</a>
+            <span class="brand-text">MANAIAKALANI</span>
             <nav class="site-nav" aria-label="Main">
-                <a href="index.html">About</a>
+                <a href="/">About</a>
                 <a href="projects.html">Projects</a>
                 <a href="thoughts.html">Thoughts</a>
             </nav>
@@ -302,7 +169,7 @@
 
     <main>
         <section class="four-oh-four">
-            <div class="glitch-code">404</div>
+            <h1 class="glitch-code">404</h1>
             <div class="ascii-lost" aria-hidden="true">
     ┌─────────────────────────┐
     │  ╔═╗╔═╗╔═╗╔═╗╔═╗╔═╗   │
@@ -316,8 +183,8 @@
                 It happens to the best of us.
             </p>
             <p class="path-echo"><code id="path-display"></code></p>
-            <a href="index.html" class="home-btn">← Take me home</a>
-            <p class="easter-egg" id="egg" title="Click me">( ╯°□°)╯︵ ┻━┻</p>
+            <a href="/" class="home-btn">← Take me home</a>
+            <button type="button" class="easter-egg" id="egg" title="Click me" aria-label="Table flip easter egg">( ╯°□°)╯︵ ┻━┻</button>
         </section>
     </main>
 

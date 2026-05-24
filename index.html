@@ -18,12 +18,14 @@
       content="Connecting engineering teams with the global technical community through actionable insights and real customer engagement."
     />
     <meta property="og:image" content="https://manaiakalani.com/og-image.png" />
+    <meta property="og:image:alt" content="Maximilian Stein — Community Strategy Lead" />
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:title" content="Maximilian Stein" />
     <meta
       property="twitter:description"
       content="Connecting engineering teams with the global technical community through actionable insights and real customer engagement."
     />
+    <meta property="twitter:image" content="https://manaiakalani.com/og-image.png" />
     <meta name="theme-color" content="#0f4c81" />
 
     <!-- Canonical -->
@@ -47,141 +49,7 @@
     <link rel="stylesheet" href="style.css" />
 
     <!-- Prevent flash: apply saved theme/geocities before paint -->
-    <script>
-      (function () {
-        var GEO_CSS_HREF = "geocities.css";
-        var GEO_JS_HREF = "geocities.js";
-        var GEO_KEY = "geocities";
-        var geoCssPromise;
-        var geoJsPromise;
-        var geoScriptReady = false;
-
-        function onReady(callback) {
-          if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", callback, { once: true });
-          } else {
-            callback();
-          }
-        }
-
-        function loadGeoCitiesStyles() {
-          if (geoCssPromise) return geoCssPromise;
-          geoCssPromise = new Promise(function (resolve) {
-            var existing = document.querySelector("link[data-geocities-css]");
-            if (existing) {
-              if (existing.sheet) {
-                resolve();
-              } else {
-                existing.addEventListener("load", resolve, { once: true });
-                existing.addEventListener("error", resolve, { once: true });
-              }
-              return;
-            }
-
-            var link = document.createElement("link");
-            link.rel = "stylesheet";
-            link.href = GEO_CSS_HREF;
-            link.setAttribute("data-geocities-css", "true");
-            link.addEventListener("load", resolve, { once: true });
-            link.addEventListener("error", resolve, { once: true });
-
-            var anchor = document.querySelector('link[href="style.css"]');
-            if (anchor) {
-              anchor.insertAdjacentElement("afterend", link);
-            } else {
-              document.head.appendChild(link);
-            }
-          });
-          return geoCssPromise;
-        }
-
-        function loadGeoCitiesScript() {
-          if (geoJsPromise) return geoJsPromise;
-          geoJsPromise = new Promise(function (resolve, reject) {
-            var existing = document.querySelector("script[data-geocities-js]");
-            if (existing) {
-              if (existing.getAttribute("data-loaded") === "true") {
-                geoScriptReady = true;
-                resolve();
-              } else {
-                existing.addEventListener(
-                  "load",
-                  function () {
-                    geoScriptReady = true;
-                    resolve();
-                  },
-                  { once: true }
-                );
-                existing.addEventListener("error", reject, { once: true });
-              }
-              return;
-            }
-
-            var script = document.createElement("script");
-            script.src = GEO_JS_HREF;
-            script.setAttribute("data-geocities-js", "true");
-            script.addEventListener(
-              "load",
-              function () {
-                geoScriptReady = true;
-                script.setAttribute("data-loaded", "true");
-                resolve();
-              },
-              { once: true }
-            );
-            script.addEventListener("error", reject, { once: true });
-            document.head.appendChild(script);
-          });
-          return geoJsPromise;
-        }
-
-        function loadGeoCitiesAssets() {
-          loadGeoCitiesStyles();
-          return new Promise(function (resolve, reject) {
-            onReady(function () {
-              loadGeoCitiesScript().then(resolve).catch(reject);
-            });
-          });
-        }
-
-        var t = localStorage.getItem("theme");
-        if (
-          t === "dark" ||
-          (!t && window.matchMedia("(prefers-color-scheme: dark)").matches)
-        ) {
-          document.documentElement.setAttribute("data-theme", "dark");
-        }
-
-        var geocitiesEnabled = localStorage.getItem(GEO_KEY) === "true";
-        if (geocitiesEnabled) {
-          document.documentElement.setAttribute("data-geocities", "true");
-          loadGeoCitiesStyles();
-          loadGeoCitiesAssets().catch(function () {});
-        }
-
-        onReady(function () {
-          var toggle = document.querySelector(".geocities-toggle");
-          if (!toggle) return;
-
-          toggle.addEventListener(
-            "click",
-            function (event) {
-              if (geoScriptReady) return;
-              event.preventDefault();
-              event.stopImmediatePropagation();
-              loadGeoCitiesAssets()
-                .then(function () {
-                  toggle.click();
-                })
-                .catch(function () {});
-            },
-            { capture: true }
-          );
-        });
-
-        window.loadGeoCitiesAssets = loadGeoCitiesAssets;
-      })();
-    </script>
+    <script src="boot.js"></script>
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -216,7 +84,7 @@
         </p>
         <p id="typing-effect"></p>
         <nav class="site-nav" aria-label="Main">
-          <a href="index.html" class="active">About</a>
+          <a href="/" class="active">About</a>
           <a href="thoughts.html">Thoughts</a>
           <a href="projects.html">Projects</a>
         </nav>
@@ -253,7 +121,7 @@
             <em>actually helps people get their work done</em>.
           </p>
           <p>
-            With <strong>more than eight years at Microsoft</strong>, I focus on
+            With <strong>deep roots at Microsoft</strong>, I focus on
             bringing customers, engineers, and community voices together to
             improve how products evolve and how people experience them. My role
             often sits <em>between teams</em>—translating feedback, identifying
@@ -285,7 +153,9 @@
       <div class="container">
         <h2>Featured Projects</h2>
         <div class="featured-grid" id="featured-projects">
-          <!-- Populated dynamically from GitHub API -->
+          <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div><div class="skeleton-line medium"></div><div class="skeleton-line badge"></div></div>
+          <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div><div class="skeleton-line medium"></div><div class="skeleton-line badge"></div></div>
+          <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div><div class="skeleton-line medium"></div><div class="skeleton-line badge"></div></div>
         </div>
         <a href="projects.html" class="view-all">View All Projects →</a>
       </div>

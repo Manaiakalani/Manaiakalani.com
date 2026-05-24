@@ -73,15 +73,6 @@
     return decorative(hr);
   }
 
-  function createVisitorCounter() {
-    const div = document.createElement('div');
-    div.className = 'gc-visitor-counter';
-    div.innerHTML =
-      '<span class="gc-counter-label">~ You are visitor number ~</span>' +
-      '<span class="gc-counter-display">' + String(visitorCount).padStart(7, '0') + '</span>';
-    return div;
-  }
-
   function createBottomLinks() {
     const div = document.createElement('div');
     div.className = 'gc-bottom-links';

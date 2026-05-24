@@ -137,7 +137,6 @@ const ASCIIShader = {
 // Pre-allocated reusable objects
 const _tmpQuat  = new THREE.Quaternion();
 const _tmpEuler = new THREE.Euler();
-const _tmpAxis  = new THREE.Vector3();
 
 export function initCube(canvasEl, textureUrl) {
   const scene  = new THREE.Scene();
@@ -158,7 +157,7 @@ export function initCube(canvasEl, textureUrl) {
   let visible = true;
 
   function setup(texture) {
-    const geo = new THREE.BoxGeometry(50, 50, 50, 32, 32, 32);
+    const geo = new THREE.BoxGeometry(50, 50, 50, 8, 8, 8);
     cubeMaterial = new THREE.MeshStandardMaterial({ map: texture });
     cube = new THREE.Mesh(geo, cubeMaterial);
 

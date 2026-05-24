@@ -5,8 +5,15 @@
     const stored = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
+    function updateToggleState(isDark) {
+        if (toggle) toggle.setAttribute('aria-pressed', String(isDark));
+    }
+
     if (stored === 'dark' || (!stored && prefersDark)) {
         root.setAttribute('data-theme', 'dark');
+        updateToggleState(true);
+    } else {
+        updateToggleState(false);
     }
 
     if (toggle) {
@@ -15,6 +22,7 @@
             const next = isDark ? 'light' : 'dark';
             root.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
+            updateToggleState(!isDark);
         });
     }
 })();
@@ -25,25 +33,30 @@
     var links = document.querySelectorAll('.site-nav a');
     links.forEach(function(link) {
         var href = link.getAttribute('href');
-        if (path.endsWith(href) || (href === 'index.html' && (path === '/' || path.endsWith('/')))) {
+        if (path.endsWith(href) || (href === '/' && (path === '/' || path.endsWith('/')))) {
             link.classList.add('active');
+            link.setAttribute('aria-current', 'page');
         }
     });
 })();
 
-// Typing Effect
+// Typing Effect (respects prefers-reduced-motion)
 var typingEl = document.getElementById('typing-effect');
 if (typingEl) {
     var typingText = "Turning problems into solutions, framing memories, and dad 24/7.";
-    var index = 0;
-    function type() {
-        if (index < typingText.length) {
-            typingEl.textContent += typingText.charAt(index);
-            index++;
-            setTimeout(type, 100);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        typingEl.textContent = typingText;
+    } else {
+        var index = 0;
+        function type() {
+            if (index < typingText.length) {
+                typingEl.textContent += typingText.charAt(index);
+                index++;
+                setTimeout(type, 100);
+            }
         }
+        type();
     }
-    type();
 }
 
 // --- Dynamic GitHub Projects ---
@@ -106,10 +119,21 @@ if (typingEl) {
         container.innerHTML = filtered.map(buildCard).join('');
     }
 
+    function showFallback(message) {
+        var containers = [
+            document.getElementById('featured-projects'),
+            document.getElementById('all-projects')
+        ];
+        containers.forEach(function (el) {
+            if (el) el.innerHTML = '<p class="projects-fallback" style="text-align:center;color:var(--text-secondary);padding:2rem;">' + message + '</p>';
+        });
+    }
+
     function loadRepos() {
         // Check cache first
+        var cached;
         try {
-            var cached = JSON.parse(localStorage.getItem(CACHE_KEY));
+            cached = JSON.parse(localStorage.getItem(CACHE_KEY));
             if (cached && (Date.now() - cached.ts < CACHE_TTL)) {
                 renderFeatured(cached.data);
                 renderAll(cached.data);
@@ -118,7 +142,10 @@ if (typingEl) {
         } catch (e) { /* ignore */ }
 
         fetch(API_URL)
-            .then(function (res) { return res.json(); })
+            .then(function (res) {
+                if (!res.ok) throw new Error('GitHub API returned ' + res.status);
+                return res.json();
+            })
             .then(function (repos) {
                 if (!Array.isArray(repos)) return;
                 try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: repos })); } catch (e) { /* quota */ }
@@ -126,7 +153,13 @@ if (typingEl) {
                 renderAll(repos);
             })
             .catch(function () {
-                // Silently fail — static fallback if needed
+                // Use stale cache if available, otherwise show fallback
+                if (cached && Array.isArray(cached.data)) {
+                    renderFeatured(cached.data);
+                    renderAll(cached.data);
+                } else {
+                    showFallback('Projects are loading from GitHub — <a href="https://github.com/Manaiakalani" style="color:var(--accent)">view them directly</a>.');
+                }
             });
     }
 
