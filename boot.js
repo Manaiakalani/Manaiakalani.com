@@ -1,6 +1,6 @@
 (function () {
-  var GEO_CSS_HREF = "geocities.css";
-  var GEO_JS_HREF = "geocities.js";
+  var GEO_CSS_HREF = "geocities.css?v=1";
+  var GEO_JS_HREF = "geocities.js?v=1";
   var GEO_KEY = "geocities";
   var geoCssPromise;
   var geoJsPromise;
@@ -35,7 +35,7 @@
       link.addEventListener("load", resolve, { once: true });
       link.addEventListener("error", resolve, { once: true });
 
-      var anchor = document.querySelector('link[href="style.css"]');
+      var anchor = document.querySelector('link[href^="style.css"]');
       if (anchor) {
         anchor.insertAdjacentElement("afterend", link);
       } else {
