@@ -45,3 +45,93 @@ if (typingEl) {
     }
     type();
 }
+
+// --- Dynamic GitHub Projects ---
+(function () {
+    var GITHUB_USER = 'Manaiakalani';
+    var API_URL = 'https://api.github.com/users/' + GITHUB_USER + '/repos?sort=pushed&per_page=100&type=owner';
+    var CACHE_KEY = 'gh_repos_cache';
+    var CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
+    // Repos to exclude from display (e.g. profile repo, portfolio itself)
+    var EXCLUDE = ['Manaiakalani', 'manaiakalani.info', 'seatac.social', 'manaiakalani.github.io'];
+
+    var LANG_COLORS = {
+        TypeScript: '#3178c6',
+        JavaScript: '#f1e05a',
+        Python: '#3572A5',
+        HTML: '#e34c26',
+        CSS: '#563d7c',
+        'C++': '#f34b7d',
+        MDX: '#fcb32c',
+        Shell: '#89e051',
+        Go: '#00ADD8',
+        Rust: '#dea584'
+    };
+
+    function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+    }
+
+    function buildCard(repo) {
+        var name = escapeHtml(repo.name);
+        var desc = repo.description ? escapeHtml(repo.description) : 'No description provided.';
+        var lang = repo.language || '';
+        var color = LANG_COLORS[lang] || '#888';
+        var langBadge = lang
+            ? '<div class="project-meta"><span class="lang-badge"><span class="lang-dot" style="background:' + color + '"></span> ' + escapeHtml(lang) + '</span></div>'
+            : '';
+
+        return '<a href="' + escapeHtml(repo.html_url) + '" target="_blank" rel="noopener noreferrer" class="project-card">' +
+            '<h3>' + name + '</h3>' +
+            '<p>' + desc + '</p>' +
+            langBadge +
+            '</a>';
+    }
+
+    function renderFeatured(repos) {
+        var container = document.getElementById('featured-projects');
+        if (!container) return;
+        // Show top 3 most recently pushed non-fork repos
+        var featured = repos.filter(function (r) { return !r.fork && EXCLUDE.indexOf(r.name) === -1 && r.description; }).slice(0, 3);
+        container.innerHTML = featured.map(buildCard).join('');
+    }
+
+    function renderAll(repos) {
+        var container = document.getElementById('all-projects');
+        if (!container) return;
+        var filtered = repos.filter(function (r) { return !r.fork && EXCLUDE.indexOf(r.name) === -1; });
+        container.innerHTML = filtered.map(buildCard).join('');
+    }
+
+    function loadRepos() {
+        // Check cache first
+        try {
+            var cached = JSON.parse(localStorage.getItem(CACHE_KEY));
+            if (cached && (Date.now() - cached.ts < CACHE_TTL)) {
+                renderFeatured(cached.data);
+                renderAll(cached.data);
+                return;
+            }
+        } catch (e) { /* ignore */ }
+
+        fetch(API_URL)
+            .then(function (res) { return res.json(); })
+            .then(function (repos) {
+                if (!Array.isArray(repos)) return;
+                try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: repos })); } catch (e) { /* quota */ }
+                renderFeatured(repos);
+                renderAll(repos);
+            })
+            .catch(function () {
+                // Silently fail — static fallback if needed
+            });
+    }
+
+    // Only run if either target container exists
+    if (document.getElementById('featured-projects') || document.getElementById('all-projects')) {
+        loadRepos();
+    }
+})();
