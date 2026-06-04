@@ -514,6 +514,22 @@ footer {
     text-decoration: none;
     color: inherit;
     transition: background-color 0.2s ease;
+    scroll-margin-top: 1.5rem;
+}
+
+.thought-entry:target {
+    background-color: var(--bg-secondary);
+    box-shadow: inset 3px 0 0 0 var(--accent);
+}
+
+.thought-anchor {
+    color: inherit;
+    text-decoration: none;
+}
+
+.thought-anchor:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
 }
 
 .thought-entry:first-child {
@@ -548,6 +564,13 @@ footer {
 }
 
 /* Projects Full Page Grid */
+.sort-note {
+    margin: 0.75rem 0 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
 .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
