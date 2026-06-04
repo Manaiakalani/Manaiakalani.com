@@ -7,8 +7,10 @@
     <meta name="description" content="The page you requested could not be found on Maximilian Stein's website.">
     <meta name="robots" content="noindex">
     <meta name="author" content="Maximilian Stein">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0f4c81">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121218">
     <link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
     <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -197,24 +199,7 @@
         <div class="container" id="footer-content"></div>
     </footer>
 
-    <script src="script.js?v=3" defer></script>
-    <script>
-        // Show the path that 404'd
-        document.getElementById('path-display').textContent = window.location.pathname;
-
-        // Easter egg: table flip → table unflip
-        var egg = document.getElementById('egg');
-        var flipped = false;
-        egg.addEventListener('click', function() {
-            if (!flipped) {
-                egg.textContent = '┬─┬ ノ( ゜-゜ノ)';
-                flipped = true;
-            } else {
-                egg.textContent = '( ╯°□°)╯︵ ┻━┻';
-                flipped = false;
-            }
-        });
-    </script>
+    <script src="script.js?v=4" defer></script>
     <script type="importmap">
     {
         "imports": {
@@ -223,6 +208,6 @@
         }
     }
     </script>
-    <script src="components.js"></script>
+    <script src="components.js?v=4"></script>
 </body>
 </html>

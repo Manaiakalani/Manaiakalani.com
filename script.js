@@ -199,3 +199,25 @@ if (typingEl) {
         loadRepos();
     }
 })();
+
+// --- 404 page: show attempted path + table-flip easter egg ---
+(function () {
+    var pathDisplay = document.getElementById('path-display');
+    if (pathDisplay) {
+        pathDisplay.textContent = window.location.pathname;
+    }
+
+    var egg = document.getElementById('egg');
+    if (egg) {
+        var flipped = false;
+        egg.addEventListener('click', function () {
+            if (!flipped) {
+                egg.textContent = '┬─┬ ノ( ゜-゜ノ)';
+                flipped = true;
+            } else {
+                egg.textContent = '( ╯°□°)╯︵ ┻━┻';
+                flipped = false;
+            }
+        });
+    }
+})();
