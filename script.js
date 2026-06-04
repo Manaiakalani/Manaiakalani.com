@@ -71,7 +71,7 @@ if (typingEl) {
     var CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
     // Repos to exclude from display (e.g. profile repo, portfolio itself)
-    var EXCLUDE = ['Manaiakalani', 'manaiakalani.info', 'seatac.social', 'manaiakalani.github.io'];
+    var EXCLUDE = ['Manaiakalani', 'Manaiakalani.com', 'manaiakalani.info', 'seatac.social', 'manaiakalani.github.io'];
 
     var LANG_COLORS = {
         TypeScript: '#3178c6',
