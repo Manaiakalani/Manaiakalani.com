@@ -97,29 +97,54 @@ if (typingEl) {
         var desc = repo.description ? escapeHtml(repo.description) : 'No description provided.';
         var lang = repo.language || '';
         var color = LANG_COLORS[lang] || '#888';
-        var langBadge = lang
-            ? '<div class="project-meta"><span class="lang-badge"><span class="lang-dot" style="background:' + color + '"></span> ' + escapeHtml(lang) + '</span></div>'
+
+        var metaParts = [];
+        if (lang) {
+            metaParts.push('<span class="lang-badge"><span class="lang-dot" style="background:' + color + '"></span> ' + escapeHtml(lang) + '</span>');
+        }
+        var stars = repo.stargazers_count || 0;
+        if (stars > 0) {
+            metaParts.push('<span class="star-badge" title="' + stars + ' star' + (stars === 1 ? '' : 's') + ' on GitHub">' +
+                '<svg aria-hidden="true" width="0.85em" height="0.85em" fill="currentColor" viewBox="0 0 576 512"><path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/></svg> ' + stars + '</span>');
+        }
+        var meta = metaParts.length
+            ? '<div class="project-meta">' + metaParts.join('') + '</div>'
             : '';
 
         return '<a href="' + escapeHtml(repo.html_url) + '" target="_blank" rel="noopener noreferrer" class="project-card">' +
             '<h3>' + name + '</h3>' +
             '<p>' + desc + '</p>' +
-            langBadge +
+            meta +
             '</a>';
+    }
+
+    // Rank by community impact: stars first, then forks, then recency (stable).
+    function byImpact(a, b) {
+        var sa = a.stargazers_count || 0, sb = b.stargazers_count || 0;
+        if (sb !== sa) return sb - sa;
+        var fa = a.forks_count || 0, fb = b.forks_count || 0;
+        if (fb !== fa) return fb - fa;
+        return new Date(b.pushed_at) - new Date(a.pushed_at);
     }
 
     function renderFeatured(repos) {
         var container = document.getElementById('featured-projects');
         if (!container) return;
-        // Show top 3 most recently pushed non-fork repos
-        var featured = repos.filter(function (r) { return !r.fork && EXCLUDE.indexOf(r.name) === -1 && r.description; }).slice(0, 3);
+        // Show the 3 highest-impact (most-starred) repos with a description.
+        var featured = repos
+            .filter(function (r) { return !r.fork && EXCLUDE.indexOf(r.name) === -1 && r.description; })
+            .sort(byImpact)
+            .slice(0, 3);
         container.innerHTML = featured.map(buildCard).join('');
     }
 
     function renderAll(repos) {
         var container = document.getElementById('all-projects');
         if (!container) return;
-        var filtered = repos.filter(function (r) { return !r.fork && EXCLUDE.indexOf(r.name) === -1; });
+        // Lead with the highest-impact repos, then the rest by recency.
+        var filtered = repos
+            .filter(function (r) { return !r.fork && EXCLUDE.indexOf(r.name) === -1; })
+            .sort(byImpact);
         container.innerHTML = filtered.map(buildCard).join('');
     }
 

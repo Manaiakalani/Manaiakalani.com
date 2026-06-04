@@ -426,6 +426,17 @@ footer {
     display: inline-block;
 }
 
+.star-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--text-secondary);
+}
+
+.star-badge svg {
+    color: #e3b341;
+}
+
 /* Skeleton Loading */
 .skeleton-card {
     background-color: var(--bg-secondary);
