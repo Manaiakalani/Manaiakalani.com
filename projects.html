@@ -25,13 +25,15 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://api.github.com">
     <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=4">
+    <link rel="stylesheet" href="style.css?v=5">
 
     <!-- RSS Feed -->
     <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml">
 
-    <script src="boot.js?v=2"></script>
+    <script src="boot.js?v=3"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -57,6 +59,7 @@
                 <a href="/">About</a>
                 <a href="thoughts.html">Thoughts</a>
                 <a href="projects.html">Projects</a>
+                <a href="uses.html">Uses</a>
             </nav>
         </div>
         <button class="theme-toggle" aria-label="Toggle dark mode">
@@ -75,6 +78,10 @@
         </section>
 
         <p class="sort-note" id="projects-sort-note" hidden>Sorted by community impact — most-starred first, then most recent.</p>
+        <div class="project-search-wrapper">
+            <label for="project-search" class="visually-hidden">Search projects</label>
+            <input type="search" id="project-search" class="project-search-input" placeholder="Search projects…" autocomplete="off">
+        </div>
         <div class="projects-grid" id="all-projects">
             <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div><div class="skeleton-line medium"></div><div class="skeleton-line badge"></div></div>
             <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div><div class="skeleton-line medium"></div><div class="skeleton-line badge"></div></div>
@@ -93,7 +100,7 @@
         <div class="container" id="footer-content"></div>
     </footer>
 
-    <script src="script.js?v=5"></script>
+    <script src="script.js?v=6"></script>
     <script type="importmap">
     {
         "imports": {
@@ -103,5 +110,6 @@
     }
     </script>
     <script src="components.js?v=4"></script>
+    <script type="module" src="web-vitals-report.js?v=1"></script>
 </body>
 </html>

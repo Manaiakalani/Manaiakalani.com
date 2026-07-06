@@ -2,7 +2,7 @@
 (function() {
     const toggle = document.querySelector('.theme-toggle');
     const root = document.documentElement;
-    const stored = localStorage.getItem('theme');
+    const stored = localStorage.getItem('mnk:theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     function updateToggleState(isDark) {
@@ -21,7 +21,7 @@
             const isDark = root.getAttribute('data-theme') === 'dark';
             const next = isDark ? 'light' : 'dark';
             root.setAttribute('data-theme', next);
-            localStorage.setItem('theme', next);
+            localStorage.setItem('mnk:theme', next);
             updateToggleState(!isDark);
         });
     }
@@ -67,7 +67,7 @@ if (typingEl) {
 (function () {
     var GITHUB_USER = 'Manaiakalani';
     var API_URL = 'https://api.github.com/users/' + GITHUB_USER + '/repos?sort=pushed&per_page=100&type=owner';
-    var CACHE_KEY = 'gh_repos_cache';
+    var CACHE_KEY = 'mnk:gh_repos_cache';
     var CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
     // Repos to exclude from display (e.g. profile repo, portfolio itself)
@@ -161,33 +161,63 @@ if (typingEl) {
         });
     }
 
+    // Persistent reference for search/filter (item 9)
+    var allLoadedRepos = [];
+
+    function parseLinkHeader(header) {
+        if (!header) return {};
+        var links = {};
+        header.split(',').forEach(function (part) {
+            var match = part.match(/<([^>]+)>;\s*rel="([^"]+)"/);
+            if (match) links[match[2]] = match[1];
+        });
+        return links;
+    }
+
     function loadRepos() {
         // Check cache first
         var cached;
         try {
             cached = JSON.parse(localStorage.getItem(CACHE_KEY));
             if (cached && (Date.now() - cached.ts < CACHE_TTL)) {
+                allLoadedRepos = cached.data;
                 renderFeatured(cached.data);
                 renderAll(cached.data);
                 return;
             }
         } catch (e) { /* ignore */ }
 
-        fetch(API_URL)
-            .then(function (res) {
-                if (res.status === 403 || res.status === 429) throw new Error('rate-limited');
-                if (!res.ok) throw new Error('GitHub API returned ' + res.status);
-                return res.json();
-            })
-            .then(function (repos) {
-                if (!Array.isArray(repos)) return;
-                try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: repos })); } catch (e) { /* quota */ }
-                renderFeatured(repos);
-                renderAll(repos);
+        var allRepos = [];
+        function fetchPage(url) {
+            return fetch(url)
+                .then(function (res) {
+                    if (res.status === 403 || res.status === 429) throw new Error('rate-limited');
+                    if (!res.ok) throw new Error('GitHub API returned ' + res.status);
+                    var linkHeader = res.headers.get('Link');
+                    var links = parseLinkHeader(linkHeader);
+                    return res.json().then(function (repos) {
+                        if (!Array.isArray(repos)) return;
+                        allRepos = allRepos.concat(repos);
+                        if (links.next) {
+                            // If a later page fails, we still use what we fetched so far
+                            return fetchPage(links.next).catch(function () {});
+                        }
+                    });
+                });
+        }
+
+        fetchPage(API_URL)
+            .then(function () {
+                if (!allRepos.length) return;
+                try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: allRepos })); } catch (e) { /* quota */ }
+                allLoadedRepos = allRepos;
+                renderFeatured(allRepos);
+                renderAll(allRepos);
             })
             .catch(function (err) {
                 // Use stale cache if available, otherwise show fallback
                 if (cached && Array.isArray(cached.data)) {
+                    allLoadedRepos = cached.data;
                     renderFeatured(cached.data);
                     renderAll(cached.data);
                 } else {
@@ -202,6 +232,37 @@ if (typingEl) {
     // Only run if either target container exists
     if (document.getElementById('featured-projects') || document.getElementById('all-projects')) {
         loadRepos();
+    }
+
+    // --- Project search/filter (projects.html only) ---
+    var searchInput = document.getElementById('project-search');
+    if (searchInput && document.getElementById('all-projects')) {
+        var debounceTimer;
+        searchInput.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function () {
+                var query = searchInput.value.trim().toLowerCase();
+                var container = document.getElementById('all-projects');
+                if (!query) {
+                    renderAll(allLoadedRepos);
+                    return;
+                }
+                var filtered = allLoadedRepos
+                    .filter(function (r) { return !r.fork && EXCLUDE.indexOf(r.name) === -1; })
+                    .filter(function (r) {
+                        var name = (r.name || '').toLowerCase();
+                        var desc = (r.description || '').toLowerCase();
+                        var lang = (r.language || '').toLowerCase();
+                        return name.indexOf(query) !== -1 || desc.indexOf(query) !== -1 || lang.indexOf(query) !== -1;
+                    })
+                    .sort(byImpact);
+                if (filtered.length) {
+                    container.innerHTML = filtered.map(buildCard).join('');
+                } else {
+                    container.innerHTML = '<p class="projects-fallback" style="text-align:center;color:var(--text-secondary);padding:2rem;">No projects match your search.</p>';
+                }
+            }, 150);
+        });
     }
 })();
 

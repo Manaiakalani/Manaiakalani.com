@@ -18,5 +18,9 @@ module.exports = defineConfig({
   projects: [
     { name: 'desktop', use: { viewport: { width: 1280, height: 800 } } },
     { name: 'mobile', use: { viewport: { width: 375, height: 812 } } },
+    { name: 'narrow', use: { viewport: { width: 320, height: 568 } } },
+    { name: 'tablet', use: { viewport: { width: 768, height: 1024 } } },
+    { name: 'laptop', use: { viewport: { width: 1024, height: 768 } } },
+    { name: 'wide', use: { viewport: { width: 1440, height: 900 } } },
   ],
 });
