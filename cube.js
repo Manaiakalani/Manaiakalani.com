@@ -155,6 +155,7 @@ export function initCube(canvasEl, textureUrl) {
   let resizeTimer = 0;
   let loopId = null;
   let visible = true;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function setup(texture) {
     const geo = new THREE.BoxGeometry(50, 50, 50, 8, 8, 8);
@@ -183,6 +184,12 @@ export function initCube(canvasEl, textureUrl) {
   }
 
   function playEntrance() {
+    if (prefersReducedMotion) {
+      asciiPass.uniforms.uOpacity.value = 1;
+      cube.scale.set(1, 1, 1);
+      composer.render();
+      return;
+    }
     asciiPass.uniforms.uOpacity.value = 0;
     cube.scale.set(0, 0, 0);
     const start = performance.now();
@@ -225,11 +232,13 @@ export function initCube(canvasEl, textureUrl) {
     const timeSpeed = 0.003 + gc * 0.007;
     asciiPass.material.uniforms.uTime.value += timeSpeed;
 
-    // Faster spin in geocities mode
-    const spin = AUTO_SPIN_SPEED + gc * 0.012;
-    _tmpEuler.set(0, spin * autoRotateDir, 0);
-    _tmpQuat.setFromEuler(_tmpEuler);
-    targetQ.multiplyQuaternions(_tmpQuat, targetQ);
+    // Skip auto-rotation under reduced motion; drag still works
+    if (!prefersReducedMotion) {
+      const spin = AUTO_SPIN_SPEED + gc * 0.012;
+      _tmpEuler.set(0, spin * autoRotateDir, 0);
+      _tmpQuat.setFromEuler(_tmpEuler);
+      targetQ.multiplyQuaternions(_tmpQuat, targetQ);
+    }
     currentQ.slerp(targetQ, DAMPING_FACTOR);
     cube.quaternion.copy(currentQ);
     composer.render();

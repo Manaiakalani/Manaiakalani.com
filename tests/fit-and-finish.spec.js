@@ -89,7 +89,7 @@ test('projects: cards have title and description', async ({ page }) => {
   await page.goto('/projects.html');
   await page.waitForSelector('.project-card', { timeout: 10000 });
   const firstCard = page.locator('.project-card').first();
-  await expect(firstCard.locator('h3')).toBeVisible();
+  await expect(firstCard.locator('h2')).toBeVisible();
   await expect(firstCard.locator('p')).toBeVisible();
 });
 

@@ -113,6 +113,8 @@
     var toggle = document.querySelector(".geocities-toggle");
     if (!toggle) return;
 
+    toggle.setAttribute("aria-pressed", String(geocitiesEnabled));
+
     toggle.addEventListener(
       "click",
       function (event) {

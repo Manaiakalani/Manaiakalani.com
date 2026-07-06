@@ -1,13 +1,16 @@
 const { defineConfig } = require('@playwright/test');
 
+const baseURL = process.env.BASE_URL || 'http://localhost:4173';
+const isLocal = /localhost|127\.0\.0\.1/.test(baseURL);
+
 module.exports = defineConfig({
   testDir: './tests',
   timeout: 30000,
   use: {
-    baseURL: process.env.BASE_URL || 'https://manaiakalani.com',
+    baseURL,
     screenshot: 'only-on-failure',
   },
-  webServer: process.env.BASE_URL ? {
+  webServer: isLocal ? {
     command: 'npx serve . -l 4173',
     port: 4173,
     reuseExistingServer: true,

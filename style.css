@@ -25,6 +25,7 @@
     --text-secondary: #b0b0b0;
     --text-footer: #e4e4e4;
     --text-footer-muted: #888888;
+    --accent: #e66a5a;
     --focus-ring: #ffb4ab;
     --focus-ring-shadow: rgba(255, 180, 171, 0.35);
     --toggle-bg: rgba(255, 255, 255, 0.1);
@@ -389,7 +390,7 @@ footer {
     box-shadow: 0 0 0 4px var(--focus-ring-shadow), 0 8px 18px rgba(0, 0, 0, 0.35);
 }
 
-.project-card h3 {
+.project-card h2 {
     font-size: 1.2rem;
     font-weight: 700;
     margin: 0 0 0.5rem;
