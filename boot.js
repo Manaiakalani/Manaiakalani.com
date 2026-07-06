@@ -1,7 +1,19 @@
 (function () {
+  // One-time localStorage migration: unnamespaced → mnk: prefix
+  try {
+    var migrations = [['theme','mnk:theme'],['geocities','mnk:geocities'],['gh_repos_cache','mnk:gh_repos_cache']];
+    for (var i = 0; i < migrations.length; i++) {
+      var oldK = migrations[i][0], newK = migrations[i][1];
+      if (localStorage.getItem(newK) === null && localStorage.getItem(oldK) !== null) {
+        localStorage.setItem(newK, localStorage.getItem(oldK));
+        localStorage.removeItem(oldK);
+      }
+    }
+  } catch (e) { /* localStorage unavailable */ }
+
   var GEO_CSS_HREF = "geocities.css?v=2";
-  var GEO_JS_HREF = "geocities.js?v=2";
-  var GEO_KEY = "geocities";
+  var GEO_JS_HREF = "geocities.js?v=3";
+  var GEO_KEY = "mnk:geocities";
   var geoCssPromise;
   var geoJsPromise;
   var geoScriptReady = false;
@@ -94,7 +106,7 @@
     });
   }
 
-  var t = localStorage.getItem("theme");
+  var t = localStorage.getItem("mnk:theme");
   if (
     t === "dark" ||
     (!t && window.matchMedia("(prefers-color-scheme: dark)").matches)

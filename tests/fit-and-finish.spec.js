@@ -4,6 +4,7 @@ const PAGES = [
   { path: '/', title: 'Maximilian Stein', name: 'index' },
   { path: '/projects.html', title: 'Projects — Maximilian Stein', name: 'projects' },
   { path: '/thoughts.html', title: 'Thoughts — Maximilian Stein', name: 'thoughts' },
+  { path: '/uses.html', title: 'Uses — Maximilian Stein', name: 'uses' },
 ];
 
 // Block the analytics domain — its SSL cert is broken and hangs the load event in CI
@@ -22,9 +23,11 @@ test.beforeEach(async ({ page }) => {
   await page.route('**/api.github.com/users/*/repos*', route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_REPOS) })
   );
+  // Block web-vitals CDN to avoid external dependency in tests
+  await page.route('**/cdn.jsdelivr.net/npm/web-vitals**', route => route.abort());
   // Clear localStorage cache to ensure mock data is used
   await page.addInitScript(() => {
-    try { localStorage.removeItem('gh_repos_cache'); } catch (e) {}
+    try { localStorage.removeItem('mnk:gh_repos_cache'); } catch (e) {}
   });
 });
 
@@ -44,8 +47,9 @@ test('nav links are present and correct on all pages', async ({ page }) => {
     const nav = page.locator('nav');
     await expect(nav).toBeVisible();
     await expect(nav.locator('a[href="/"]')).toBeVisible();
-    await expect(nav.locator('a[href="projects.html"]')).toBeVisible();
-    await expect(nav.locator('a[href="thoughts.html"]')).toBeVisible();
+    await expect(nav.locator('a[href="projects.html"], a[href="/projects.html"]')).toBeVisible();
+    await expect(nav.locator('a[href="thoughts.html"], a[href="/thoughts.html"]')).toBeVisible();
+    await expect(nav.locator('a[href="uses.html"], a[href="/uses.html"]')).toBeVisible();
   }
 });
 
@@ -99,11 +103,54 @@ test('projects: GitHub link is visible', async ({ page }) => {
   await expect(ghLink).toBeVisible();
 });
 
+// ── Projects: search/filter ──
+test('projects: search filters visible cards', async ({ page }) => {
+  await page.goto('/projects.html');
+  await page.waitForSelector('.project-card', { timeout: 10000 });
+  const search = page.locator('#project-search');
+  await expect(search).toBeVisible();
+
+  // Type a query that matches one mock repo
+  await search.fill('alpha');
+  await page.waitForTimeout(300); // debounce
+  const filtered = await page.locator('.project-card').count();
+  expect(filtered).toBe(1);
+
+  // Clear restores all
+  await search.fill('');
+  await page.waitForTimeout(300);
+  const restored = await page.locator('.project-card').count();
+  expect(restored).toBeGreaterThanOrEqual(3);
+});
+
+test('projects: search shows no-results message', async ({ page }) => {
+  await page.goto('/projects.html');
+  await page.waitForSelector('.project-card', { timeout: 10000 });
+  await page.locator('#project-search').fill('zzz-no-match-zzz');
+  await page.waitForTimeout(300);
+  await expect(page.locator('.projects-fallback')).toBeVisible();
+});
+
 // ── Thoughts page ──
 test('thoughts: has thought entries', async ({ page }) => {
   await page.goto('/thoughts.html');
   const entries = page.locator('.thought-entry');
   const count = await entries.count();
+  expect(count).toBeGreaterThanOrEqual(3);
+});
+
+// ── Uses page ──
+test('uses: hero heading is visible', async ({ page }) => {
+  await page.goto('/uses.html');
+  const h1 = page.locator('h1');
+  await expect(h1).toBeVisible();
+  await expect(h1).toContainText('Uses');
+});
+
+test('uses: has content sections', async ({ page }) => {
+  await page.goto('/uses.html');
+  const sections = page.locator('.uses-section');
+  const count = await sections.count();
   expect(count).toBeGreaterThanOrEqual(3);
 });
 
@@ -164,6 +211,13 @@ test('index: analytics script is present and configured correctly', async ({ pag
   await expect(analyticsScript).toHaveAttribute('data-site-id', 'c24b6c864956');
 });
 
+// ── Web Vitals script ──
+test('index: web-vitals script tag is present', async ({ page }) => {
+  await page.goto('/');
+  const wvScript = page.locator('script[type="module"][src*="web-vitals-report"]');
+  await expect(wvScript).toHaveCount(1);
+});
+
 // ── No console errors ──
 for (const pg of PAGES) {
   test(`${pg.name}: no console errors`, async ({ page }) => {
@@ -176,7 +230,7 @@ for (const pg of PAGES) {
       !e.includes('favicon') && !e.includes('fonts.googleapis') &&
       !e.includes('WebGL') && !e.includes('THREE.') &&
       !e.includes('ERR_CERT') && !e.includes('analytics') &&
-      !e.includes('Failed to load resource')
+      !e.includes('Failed to load resource') && !e.includes('web-vitals')
     );
     expect(real).toEqual([]);
   });
@@ -202,6 +256,16 @@ test('no horizontal overflow on narrow viewport', async ({ page }) => {
   const viewWidth = await page.evaluate(() => window.innerWidth);
   expect(bodyWidth).toBeLessThanOrEqual(viewWidth + 5);
 });
+
+// Also test overflow on all pages at current viewport
+for (const pg of PAGES) {
+  test(`${pg.name}: no horizontal overflow`, async ({ page }) => {
+    await page.goto(pg.path, { waitUntil: 'domcontentloaded' });
+    const bodyWidth = await page.evaluate(() => document.body.scrollWidth);
+    const viewWidth = await page.evaluate(() => window.innerWidth);
+    expect(bodyWidth).toBeLessThanOrEqual(viewWidth + 5);
+  });
+}
 
 // ── Links don't 404 ──
 test('internal links resolve (no 404s)', async ({ page }) => {
@@ -301,8 +365,9 @@ test('projects: shows fallback when GitHub API fails', async ({ page }) => {
   await page.unrouteAll({ behavior: 'ignoreErrors' });
   await page.route('**/analytics.manaiakalani.info/**', route => route.abort());
   await page.route('**/api.github.com/**', route => route.abort());
+  await page.route('**/cdn.jsdelivr.net/npm/web-vitals**', route => route.abort());
   await page.addInitScript(() => {
-    try { localStorage.removeItem('gh_repos_cache'); } catch (e) {}
+    try { localStorage.removeItem('mnk:gh_repos_cache'); } catch (e) {}
   });
   await page.goto('/projects.html');
   await page.waitForSelector('.projects-fallback', { timeout: 10000 });
@@ -328,4 +393,13 @@ test('projects: has JSON-LD structured data', async ({ page }) => {
   const content = await jsonLd.textContent();
   const data = JSON.parse(content);
   expect(data['@type']).toBe('CollectionPage');
+});
+
+test('uses: has JSON-LD structured data', async ({ page }) => {
+  await page.goto('/uses.html');
+  const jsonLd = page.locator('script[type="application/ld+json"]');
+  await expect(jsonLd).toHaveCount(1);
+  const content = await jsonLd.textContent();
+  const data = JSON.parse(content);
+  expect(data['@type']).toBe('WebPage');
 });

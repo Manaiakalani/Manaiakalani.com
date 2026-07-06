@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const GC_KEY = 'geocities';
+  const GC_KEY = 'mnk:geocities';
   const root = document.documentElement;
   const toggle = document.querySelector('.geocities-toggle');
   if (!toggle) return;
