@@ -89,10 +89,11 @@ if (typingEl) {
     function escapeHtml(str) {
         var div = document.createElement('div');
         div.appendChild(document.createTextNode(str));
-        return div.innerHTML;
+        return div.innerHTML.replace(/"/g, '&quot;');
     }
 
     function buildCard(repo) {
+        if (!repo || typeof repo.name !== 'string' || typeof repo.html_url !== 'string') return '';
         var name = escapeHtml(repo.name);
         var desc = repo.description ? escapeHtml(repo.description) : 'No description provided.';
         var lang = repo.language || '';
@@ -112,7 +113,7 @@ if (typingEl) {
             : '';
 
         return '<a href="' + escapeHtml(repo.html_url) + '" target="_blank" rel="noopener noreferrer" class="project-card">' +
-            '<h3>' + name + '</h3>' +
+            '<h2>' + name + '</h2>' +
             '<p>' + desc + '</p>' +
             meta +
             '</a>';
@@ -174,6 +175,7 @@ if (typingEl) {
 
         fetch(API_URL)
             .then(function (res) {
+                if (res.status === 403 || res.status === 429) throw new Error('rate-limited');
                 if (!res.ok) throw new Error('GitHub API returned ' + res.status);
                 return res.json();
             })
@@ -183,13 +185,16 @@ if (typingEl) {
                 renderFeatured(repos);
                 renderAll(repos);
             })
-            .catch(function () {
+            .catch(function (err) {
                 // Use stale cache if available, otherwise show fallback
                 if (cached && Array.isArray(cached.data)) {
                     renderFeatured(cached.data);
                     renderAll(cached.data);
                 } else {
-                    showFallback('Projects are loading from GitHub — <a href="https://github.com/Manaiakalani" style="color:var(--accent)">view them directly</a>.');
+                    var msg = err && err.message === 'rate-limited'
+                        ? 'GitHub API rate limit reached — projects will reload shortly. <a href="https://github.com/Manaiakalani" style="color:var(--accent)">View them directly</a>.'
+                        : 'Projects are loading from GitHub — <a href="https://github.com/Manaiakalani" style="color:var(--accent)">view them directly</a>.';
+                    showFallback(msg);
                 }
             });
     }

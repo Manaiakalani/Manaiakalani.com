@@ -203,7 +203,7 @@
 
   // ---- Construction cones near page titles ----
   function createConstructionCones() {
-    var hero = document.querySelector('.page-hero h2');
+    var hero = document.querySelector('.page-hero h1, .page-hero h2');
     if (!hero) return null;
     var wrapper = document.createElement('span');
     wrapper.className = 'gc-construction-cones';
@@ -354,10 +354,12 @@
     document.body.appendChild(stars);
     gcElements.push(stars);
 
-    // Enable cursor trail
-    cursorTrailEnabled = true;
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('touchmove', onTouchMove, { passive: true });
+    // Enable cursor trail (skip under reduced motion)
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      cursorTrailEnabled = true;
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('touchmove', onTouchMove, { passive: true });
+    }
   }
 
   // ---- Remove all geocities elements ----
@@ -393,6 +395,7 @@
     var isActive = root.getAttribute('data-geocities') === 'true';
     var next = !isActive;
     localStorage.setItem(GC_KEY, next ? 'true' : 'false');
+    toggle.setAttribute('aria-pressed', String(next));
     applyGeoCities(next);
   });
 

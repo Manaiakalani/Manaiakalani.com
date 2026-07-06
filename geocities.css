@@ -789,7 +789,7 @@ html[data-geocities="true"] .project-card:hover {
   transform: none;
 }
 
-html[data-geocities="true"] .project-card h3 {
+html[data-geocities="true"] .project-card h2 {
   color: var(--gc-link);
   text-shadow: 1px 1px 0 #000;
 }
@@ -821,6 +821,7 @@ html[data-geocities="true"] .page-hero {
   background: var(--gc-bg);
 }
 
+html[data-geocities="true"] .page-hero h1,
 html[data-geocities="true"] .page-hero h2 {
   animation: gc-rainbow 3s linear infinite;
   font-family: 'Comic Neue', 'Comic Sans MS', cursive;
