@@ -69,6 +69,8 @@ body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
     transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 *:focus-visible {
@@ -91,6 +93,7 @@ button:focus-visible {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    box-sizing: border-box;
 }
 
 /* Headings */
@@ -634,6 +637,7 @@ footer {
 /* Responsive */
 @media (max-width: 768px) {
     h1 { font-size: 2rem; }
+    .brand-text { font-size: 2rem; }
     h2 { font-size: 1.75rem; }
     header p { font-size: 1.1rem; }
     .container { width: 90%; }
@@ -646,6 +650,18 @@ footer {
     .header-subtitle { font-size: 0.95rem; }
     .featured-grid { grid-template-columns: 1fr; }
     .projects-grid { grid-template-columns: 1fr; }
+    .github-link { font-size: 0.8rem; padding: 0.5rem 1rem; }
+}
+
+@media (max-width: 374px) {
+    h1 { font-size: 1.6rem; }
+    .brand-text { font-size: 2rem; }
+    header p { font-size: 0.9rem; }
+    .header-subtitle { font-size: 0.8rem; }
+    .container { width: 100%; padding: 0 12px; }
+    .site-nav { gap: 0.5rem; }
+    .site-nav a { font-size: 0.75rem; padding: 0.25rem 0.4rem; }
+    .page-hero h1 { font-size: 1.8rem; }
 }
 
 /* Visually Hidden (accessible label helper) */
