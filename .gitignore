@@ -9,3 +9,4 @@ playwright-report/
 .vscode/
 .idea/
 Thumbs.db
+pr-body.md
