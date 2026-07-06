@@ -1,6 +1,6 @@
 (function () {
-  var GEO_CSS_HREF = "geocities.css?v=1";
-  var GEO_JS_HREF = "geocities.js?v=1";
+  var GEO_CSS_HREF = "geocities.css?v=2";
+  var GEO_JS_HREF = "geocities.js?v=2";
   var GEO_KEY = "geocities";
   var geoCssPromise;
   var geoJsPromise;

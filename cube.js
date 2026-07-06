@@ -228,9 +228,11 @@ export function initCube(canvasEl, textureUrl) {
     gcCurrent += (gcTarget - gcCurrent) * GC_LERP;
     const gc = gcCurrent;
 
-    // Rainbow always on; GeoCities cranks the speed
-    const timeSpeed = 0.003 + gc * 0.007;
-    asciiPass.material.uniforms.uTime.value += timeSpeed;
+    // Rainbow always on; GeoCities cranks the speed (frozen under reduced motion)
+    if (!prefersReducedMotion) {
+      const timeSpeed = 0.003 + gc * 0.007;
+      asciiPass.material.uniforms.uTime.value += timeSpeed;
+    }
 
     // Skip auto-rotation under reduced motion; drag still works
     if (!prefersReducedMotion) {
