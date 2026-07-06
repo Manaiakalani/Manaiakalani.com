@@ -5,7 +5,7 @@ if (canvas) {
   const loadCube = async () => {
     if (loaded) return;
     loaded = true;
-    const { initCube } = await import("./cube.js");
+    const { initCube } = await import("./cube.js?v=2");
     initCube(canvas, "./cube-texture.webp");
   };
 
