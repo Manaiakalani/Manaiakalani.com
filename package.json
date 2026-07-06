@@ -18,8 +18,12 @@
   },
   "homepage": "https://github.com/Manaiakalani/Manaiakalani.com#readme",
   "devDependencies": {
-    "@lhci/cli": "^0.14.0",
+    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.58.2",
     "serve": "^14.2.6"
+  },
+  "overrides": {
+    "tmp": "^0.2.7",
+    "uuid": "^11.1.1"
   }
 }
