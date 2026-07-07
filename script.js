@@ -188,7 +188,9 @@ if (typingEl) {
         } catch (e) { /* ignore */ }
 
         var allRepos = [];
-        function fetchPage(url) {
+        var MAX_PAGES = 10; // safety cap (10 * per_page=100 = 1,000 repos); guards against a malformed/cyclical Link header
+        function fetchPage(url, pageNum) {
+            if (pageNum > MAX_PAGES) return Promise.resolve();
             return fetch(url)
                 .then(function (res) {
                     if (res.status === 403 || res.status === 429) throw new Error('rate-limited');
@@ -200,13 +202,13 @@ if (typingEl) {
                         allRepos = allRepos.concat(repos);
                         if (links.next) {
                             // If a later page fails, we still use what we fetched so far
-                            return fetchPage(links.next).catch(function () {});
+                            return fetchPage(links.next, pageNum + 1).catch(function () {});
                         }
                     });
                 });
         }
 
-        fetchPage(API_URL)
+        fetchPage(API_URL, 1)
             .then(function () {
                 if (!allRepos.length) return;
                 try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: allRepos })); } catch (e) { /* quota */ }
