@@ -16,6 +16,8 @@
     { "route": "/compute-hashes.js", "rewrite": "/404.html" },
     { "route": "/node_modules/*", "rewrite": "/404.html" },
     { "route": "/.github/*", "rewrite": "/404.html" },
+    { "route": "/README.md", "rewrite": "/404.html" },
+    { "route": "/.gitignore", "rewrite": "/404.html" },
     {
       "route": "/feed.xml",
       "headers": { "Cache-Control": "public, max-age=3600" }
