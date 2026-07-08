@@ -37,7 +37,7 @@
     <!-- Google Fonts: Doto -->
     <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700&display=swap" rel="stylesheet">
     <!-- External CSS -->
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=6">
 
     <!-- RSS Feed -->
     <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml">
@@ -164,12 +164,26 @@
         <div class="container">
             <h1>Thoughts</h1>
             <p>Reflections on community building, the tech industry, side projects, and everything in between.</p>
+            <button type="button" id="random-thought-btn" class="random-thought-btn">🎲 Random thought</button>
         </div>
     </section>
 
     <!-- Thoughts List -->
     <section>
         <div class="container">
+            <div class="page-toolbar">
+                <div class="search-wrapper">
+                    <label for="thought-search" class="visually-hidden">Search thoughts</label>
+                    <input type="search" id="thought-search" class="search-input" placeholder="Search thoughts…" autocomplete="off">
+                </div>
+                <div class="select-wrapper">
+                    <label for="thoughts-jump-nav" class="visually-hidden">Jump to entry</label>
+                    <select id="thoughts-jump-nav" class="select-input">
+                        <option value="">Jump to an entry…</option>
+                    </select>
+                </div>
+            </div>
+            <p class="thoughts-no-results" id="thoughts-no-results" hidden>No thoughts match your search.</p>
             <ul class="thoughts-list">
                 <li>
                     <div class="thought-entry" id="ship-it-where-someone-can-use-it">
@@ -253,7 +267,7 @@
     </footer>
 
     <!-- External JavaScript -->
-    <script src="script.js?v=7"></script>
+    <script src="script.js?v=8"></script>
 
     <!-- ASCII Cube -->
     <script type="importmap">

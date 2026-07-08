@@ -9,13 +9,18 @@ const PAGES = [
 
 // Block the analytics domain — its SSL cert is broken and hangs the load event in CI
 // Mock GitHub API to avoid rate limits and make tests deterministic
+// pushed_at/stargazers_count are staggered so sort order (impact/recent/name) and the
+// "currently building" widget (most recent pushed_at) are all independently deterministic.
+const DAY = 24 * 60 * 60 * 1000;
+const NOW = Date.now();
+const daysAgo = n => new Date(NOW - n * DAY).toISOString();
 const MOCK_REPOS = [
-  { name: 'project-alpha', description: 'A test project', language: 'TypeScript', html_url: 'https://github.com/test/alpha', fork: false },
-  { name: 'project-beta', description: 'Another project', language: 'Python', html_url: 'https://github.com/test/beta', fork: false },
-  { name: 'project-gamma', description: 'Third project', language: 'JavaScript', html_url: 'https://github.com/test/gamma', fork: false },
-  { name: 'project-delta', description: 'Fourth project', language: 'Go', html_url: 'https://github.com/test/delta', fork: false },
-  { name: 'project-epsilon', description: 'Fifth project', language: 'Rust', html_url: 'https://github.com/test/epsilon', fork: false },
-  { name: 'project-zeta', description: 'Sixth project', language: 'HTML', html_url: 'https://github.com/test/zeta', fork: false },
+  { name: 'project-alpha', description: 'A test project', language: 'TypeScript', html_url: 'https://github.com/test/alpha', fork: false, stargazers_count: 10, forks_count: 2, pushed_at: daysAgo(5) },
+  { name: 'project-beta', description: 'Another project', language: 'Python', html_url: 'https://github.com/test/beta', fork: false, stargazers_count: 3, forks_count: 1, pushed_at: daysAgo(10) },
+  { name: 'project-gamma', description: 'Third project', language: 'JavaScript', html_url: 'https://github.com/test/gamma', fork: false, stargazers_count: 1, forks_count: 0, pushed_at: daysAgo(1) },
+  { name: 'project-delta', description: 'Fourth project', language: 'Go', html_url: 'https://github.com/test/delta', fork: false, stargazers_count: 50, forks_count: 5, pushed_at: daysAgo(20) },
+  { name: 'project-epsilon', description: 'Fifth project', language: 'Rust', html_url: 'https://github.com/test/epsilon', fork: false, stargazers_count: 0, forks_count: 0, pushed_at: daysAgo(15) },
+  { name: 'project-zeta', description: 'Sixth project', language: 'HTML', html_url: 'https://github.com/test/zeta', fork: false, stargazers_count: 0, forks_count: 0, pushed_at: daysAgo(30) },
 ];
 
 test.beforeEach(async ({ page }) => {
@@ -80,6 +85,29 @@ test('index: footer with ASCII cube canvas exists', async ({ page }) => {
   await expect(page.locator('#ascii-cube')).toBeVisible();
 });
 
+// ── Currently building widget ──
+test('index: currently building widget shows most recently active project', async ({ page }) => {
+  await page.goto('/');
+  await page.waitForSelector('#currently-building .building-card', { timeout: 10000 });
+  await expect(page.locator('.currently-building-teaser')).toBeVisible();
+  // project-gamma has the most recent pushed_at in the mock data
+  await expect(page.locator('#currently-building .building-card h3')).toHaveText('project-gamma');
+  await expect(page.locator('#currently-building .skeleton-card')).toHaveCount(0);
+});
+
+test('index: currently building widget hides when GitHub API fails', async ({ page }) => {
+  await page.unrouteAll({ behavior: 'ignoreErrors' });
+  await page.route('**/analytics.manaiakalani.info/**', route => route.abort());
+  await page.route('**/api.github.com/**', route => route.abort());
+  await page.route('**/cdn.jsdelivr.net/npm/web-vitals**', route => route.abort());
+  await page.addInitScript(() => {
+    try { localStorage.removeItem('mnk:gh_repos_cache'); } catch (e) {}
+  });
+  await page.goto('/');
+  await page.waitForSelector('.featured-teaser .projects-fallback', { timeout: 10000 });
+  await expect(page.locator('.currently-building-teaser')).toBeHidden();
+});
+
 // ── Projects page ──
 test('projects: has project cards', async ({ page }) => {
   await page.goto('/projects.html');
@@ -131,12 +159,108 @@ test('projects: search shows no-results message', async ({ page }) => {
   await expect(page.locator('.projects-fallback')).toBeVisible();
 });
 
+// ── Projects: sort control ──
+test('projects: sort control reorders cards by impact, recency, and name', async ({ page }) => {
+  await page.goto('/projects.html');
+  await page.waitForSelector('.project-card', { timeout: 10000 });
+  const sortSelect = page.locator('#project-sort');
+  await expect(sortSelect).toBeVisible();
+
+  // Default sort is "impact" — most stars first (project-delta has the most in mock data)
+  await expect(page.locator('.project-card h2').first()).toHaveText('project-delta');
+
+  await sortSelect.selectOption('recent');
+  await page.waitForTimeout(200);
+  await expect(page.locator('.project-card h2').first()).toHaveText('project-gamma');
+
+  await sortSelect.selectOption('name');
+  await page.waitForTimeout(200);
+  await expect(page.locator('.project-card h2').first()).toHaveText('project-alpha');
+});
+
+test('projects: sort note only shows for the impact sort', async ({ page }) => {
+  await page.goto('/projects.html');
+  await page.waitForSelector('.project-card', { timeout: 10000 });
+  const note = page.locator('#projects-sort-note');
+  await expect(note).toBeVisible();
+
+  await page.locator('#project-sort').selectOption('recent');
+  await page.waitForTimeout(200);
+  await expect(note).toBeHidden();
+
+  await page.locator('#project-sort').selectOption('impact');
+  await page.waitForTimeout(200);
+  await expect(note).toBeVisible();
+});
+
 // ── Thoughts page ──
 test('thoughts: has thought entries', async ({ page }) => {
   await page.goto('/thoughts.html');
   const entries = page.locator('.thought-entry');
   const count = await entries.count();
   expect(count).toBeGreaterThanOrEqual(3);
+});
+
+test('thoughts: reading time is shown for each entry', async ({ page }) => {
+  await page.goto('/thoughts.html');
+  const dateEl = page.locator('.thought-entry .thought-date').first();
+  await expect(dateEl).toContainText('min read');
+});
+
+test('thoughts: search filters entries and shows no-results message', async ({ page }) => {
+  await page.goto('/thoughts.html');
+  const search = page.locator('#thought-search');
+  await expect(search).toBeVisible();
+
+  await search.fill('GeoCities');
+  await page.waitForTimeout(300);
+  const visibleEntries = await page.locator('.thought-entry:visible').count();
+  expect(visibleEntries).toBe(1);
+
+  await search.fill('zzz-no-match-zzz');
+  await page.waitForTimeout(300);
+  await expect(page.locator('#thoughts-no-results')).toBeVisible();
+
+  await search.fill('');
+  await page.waitForTimeout(300);
+  const restored = await page.locator('.thought-entry:visible').count();
+  expect(restored).toBeGreaterThanOrEqual(10);
+});
+
+test('thoughts: jump-to-entry nav lists all entries and navigates', async ({ page }) => {
+  await page.goto('/thoughts.html');
+  const jumpNav = page.locator('#thoughts-jump-nav');
+  await expect(jumpNav).toBeVisible();
+  const optionCount = await jumpNav.locator('option').count();
+  expect(optionCount).toBe(11); // 10 entries + the "Jump to an entry…" placeholder
+
+  await jumpNav.selectOption('the-clippy-philosophy');
+  await expect(page).toHaveURL(/#the-clippy-philosophy$/);
+  await expect(page.locator('#the-clippy-philosophy')).toBeFocused();
+});
+
+test('thoughts: random thought button jumps to a valid entry', async ({ page }) => {
+  await page.goto('/thoughts.html');
+  const btn = page.locator('#random-thought-btn');
+  await expect(btn).toBeVisible();
+  await btn.click();
+  await page.waitForTimeout(100);
+  const hash = await page.evaluate(() => window.location.hash.slice(1));
+  expect(hash.length).toBeGreaterThan(0);
+  await expect(page.locator('.thought-entry#' + hash)).toBeFocused();
+});
+
+test('thoughts: copy-link button copies the entry URL to the clipboard', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/thoughts.html');
+  const firstEntry = page.locator('.thought-entry').first();
+  const entryId = await firstEntry.getAttribute('id');
+  const copyBtn = firstEntry.locator('.copy-link-btn');
+  await expect(copyBtn).toBeVisible();
+  await copyBtn.click();
+  await expect(copyBtn).toHaveClass(/copied/);
+  const clipText = await page.evaluate(() => navigator.clipboard.readText());
+  expect(clipText).toContain('#' + entryId);
 });
 
 // ── Uses page ──

@@ -352,6 +352,63 @@ footer {
     font-weight: 400;
 }
 
+/* Currently Building Teaser (homepage, dynamic from GitHub) */
+.currently-building-teaser {
+    padding: 1.5rem 0 0;
+}
+
+.building-card {
+    display: block;
+    background-color: var(--bg-secondary);
+    border: 1px solid rgba(128, 128, 128, 0.15);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color var(--transition-speed) ease;
+}
+
+a.building-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+a.building-card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 4px var(--focus-ring-shadow), 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.building-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+}
+
+.building-card h3 {
+    font-size: 1.1rem;
+    margin: 0 0 0.3rem;
+    color: var(--text-primary);
+}
+
+.building-card p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0 0 0.5rem;
+    text-align: left;
+    text-align-last: left;
+    line-height: 1.5;
+}
+
+.building-updated {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
 /* Featured Projects Teaser */
 .featured-teaser {
     padding: 4rem 0;
@@ -509,11 +566,44 @@ footer {
     color: var(--text-secondary);
 }
 
+.random-thought-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+    padding: 0.6rem 1.2rem;
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    border-radius: 6px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-family: 'Doto', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease, background-color var(--transition-speed) ease;
+}
+
+.random-thought-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.random-thought-btn:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
 /* Thoughts List */
 .thoughts-list {
     list-style: none;
     padding: 0;
     margin: 2rem 0 0;
+}
+
+.thoughts-no-results {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 2rem 0;
 }
 
 .thought-entry {
@@ -561,6 +651,52 @@ footer {
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 0.3rem;
+}
+
+.copy-link-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.4rem;
+    min-width: 2rem;
+    min-height: 2rem;
+    padding: 0.25rem;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    line-height: 1;
+    cursor: pointer;
+    position: relative;
+    vertical-align: middle;
+    transition: background-color 0.2s ease;
+}
+
+.copy-link-btn:hover,
+.copy-link-btn:focus-visible {
+    background-color: var(--bg-secondary);
+}
+
+.copy-link-btn:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+.copy-link-btn.copied::after {
+    content: 'Copied!';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 0.3rem;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
 }
 
 .thought-excerpt {
@@ -677,18 +813,27 @@ footer {
     border: 0;
 }
 
-/* Project Search */
-.project-search-wrapper {
+/* Page Toolbar: search + sort/jump controls (Projects, Thoughts) */
+.page-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
     margin: 1rem 0 0;
-    text-align: center;
 }
 
-.project-search-input {
+.search-wrapper,
+.select-wrapper {
+    flex: 1 1 240px;
+    max-width: 320px;
+}
+
+.search-input,
+.select-input {
     font-family: 'Doto', sans-serif;
     font-size: 0.95rem;
     padding: 0.6rem 1rem;
     width: 100%;
-    max-width: 400px;
     border: 1px solid rgba(128, 128, 128, 0.3);
     border-radius: 6px;
     background: var(--bg-secondary);
@@ -696,12 +841,17 @@ footer {
     transition: border-color 0.2s ease, background-color var(--transition-speed) ease;
 }
 
-.project-search-input::placeholder {
+.select-input {
+    cursor: pointer;
+}
+
+.search-input::placeholder {
     color: var(--text-secondary);
     opacity: 0.7;
 }
 
-.project-search-input:focus {
+.search-input:focus,
+.select-input:focus {
     border-color: var(--accent);
     outline: none;
     box-shadow: 0 0 0 3px var(--focus-ring-shadow);
