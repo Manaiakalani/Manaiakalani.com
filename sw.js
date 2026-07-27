@@ -13,7 +13,7 @@
  *     network — the worker never intercepts them.
  * Bump CACHE on every deploy so the activate step purges the previous cache.
  */
-var CACHE = 'mnk-cache-v1';
+var CACHE = 'mnk-cache-v2';
 var CORE = [
     '/',
     '/projects.html',
@@ -65,14 +65,19 @@ self.addEventListener('fetch', function (event) {
     if (isDoc) {
         event.respondWith(
             fetch(req).then(function (res) {
-                if (res && res.ok && res.type === 'basic') {
+                if (res && res.status === 200 && res.type === 'basic') {
                     var copy = res.clone();
-                    caches.open(CACHE).then(function (cache) { cache.put(req, copy); });
+                    event.waitUntil(caches.open(CACHE).then(function (cache) {
+                        return cache.put(req, copy);
+                    }).catch(function () { /* ignore */ }));
                 }
                 return res;
             }).catch(function () {
                 return caches.match(req, { ignoreSearch: true }).then(function (hit) {
-                    return hit || caches.match('/404.html') || caches.match('/');
+                    if (hit) return hit;
+                    return caches.match('/404.html').then(function (f404) {
+                        return f404 || caches.match('/');
+                    });
                 });
             })
         );
@@ -89,7 +94,9 @@ self.addEventListener('fetch', function (event) {
                 return fetch(req).then(function (res) {
                     if (res && res.status === 200 && res.type === 'basic') {
                         var copy = res.clone();
-                        caches.open(CACHE).then(function (cache) { cache.put(req, copy); });
+                        event.waitUntil(caches.open(CACHE).then(function (cache) {
+                            return cache.put(req, copy);
+                        }).catch(function () { /* ignore */ }));
                     }
                     return res;
                 });
@@ -100,7 +107,9 @@ self.addEventListener('fetch', function (event) {
             fetch(req).then(function (res) {
                 if (res && res.status === 200 && res.type === 'basic') {
                     var copy = res.clone();
-                    caches.open(CACHE).then(function (cache) { cache.put(req, copy); });
+                    event.waitUntil(caches.open(CACHE).then(function (cache) {
+                        return cache.put(req, copy);
+                    }).catch(function () { /* ignore */ }));
                 }
                 return res;
             }).catch(function () { return caches.match(req, { ignoreSearch: true }); })
