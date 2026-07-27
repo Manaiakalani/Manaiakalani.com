@@ -73,6 +73,155 @@
     return decorative(hr);
   }
 
+  // ---- Persistent guestbook (localStorage-backed, retro dialog UI) ----
+  var GB_KEY = 'mnk:guestbook';
+  var guestbookDialog = null;
+  var GB_SEED = [
+    { name: 'CoolDude99', message: 'Great site dude!!!', date: 'Aug 12, 1998' },
+    { name: 'xX_ShadowWolf_Xx', message: 'awesome page, check out mine!', date: 'Sep 03, 1998' },
+    { name: 'SurfGirl2000', message: 'LoVe ThE fLaMeS!!1!', date: 'Oct 21, 1998' },
+    { name: 'WebMaster_Joe', message: 'Nice HTML skills!', date: 'Nov 15, 1998' }
+  ];
+
+  function sanitizeEntries(arr) {
+    // Coerce every record to safe strings and bound the list, so a hand-edited
+    // or corrupt localStorage payload can't crash rendering or freeze the page.
+    var out = [];
+    for (var i = 0; i < arr.length && out.length < 100; i++) {
+      var e = arr[i];
+      if (!e || typeof e !== 'object') continue;
+      var name = typeof e.name === 'string' ? e.name : '';
+      var message = typeof e.message === 'string' ? e.message : '';
+      if (!name && !message) continue;
+      out.push({
+        name: name.slice(0, 40),
+        message: message.slice(0, 200),
+        date: typeof e.date === 'string' ? e.date.slice(0, 40) : ''
+      });
+    }
+    return out;
+  }
+
+  function loadGuestbook() {
+    try {
+      var raw = localStorage.getItem(GB_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return sanitizeEntries(parsed);
+      }
+    } catch (e) { /* corrupt or unavailable — fall through to seed */ }
+    saveGuestbook(GB_SEED);
+    return GB_SEED.slice();
+  }
+
+  function saveGuestbook(entries) {
+    try { localStorage.setItem(GB_KEY, JSON.stringify(entries)); } catch (e) { /* ignore */ }
+  }
+
+  function guestbookToday() {
+    return new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' });
+  }
+
+  function renderGuestbookEntries(listEl, countEl) {
+    var entries = loadGuestbook();
+    listEl.textContent = '';
+    if (countEl) {
+      countEl.textContent = '~ ' + entries.length + (entries.length === 1 ? ' soul has' : ' souls have') + ' signed ~';
+    }
+    entries.forEach(function (entry) {
+      var li = document.createElement('li');
+      li.className = 'gc-gb-entry';
+      var who = document.createElement('div');
+      who.className = 'gc-gb-who';
+      who.textContent = entry.name; // textContent keeps user input inert (no HTML injection)
+      var when = document.createElement('span');
+      when.className = 'gc-gb-when';
+      when.textContent = entry.date ? ' — ' + entry.date : '';
+      who.appendChild(when);
+      var msg = document.createElement('div');
+      msg.className = 'gc-gb-msg';
+      msg.textContent = entry.message;
+      li.appendChild(who);
+      li.appendChild(msg);
+      listEl.appendChild(li);
+    });
+  }
+
+  function buildGuestbookDialog() {
+    if (guestbookDialog) return guestbookDialog;
+    var dlg = document.createElement('dialog');
+    dlg.className = 'gc-guestbook-dialog';
+    dlg.setAttribute('aria-label', 'Guestbook');
+    dlg.innerHTML =
+      '<div class="gc-gb-titlebar">' +
+        '<span>📖 Sign My Guestbook!</span>' +
+        '<button type="button" class="gc-gb-close" aria-label="Close guestbook">✕</button>' +
+      '</div>' +
+      '<div class="gc-gb-body">' +
+        '<form class="gc-gb-form">' +
+          '<label class="gc-gb-field">Your name:' +
+            '<input type="text" name="name" maxlength="40" required autocomplete="off" placeholder="xX_CoolVisitor_Xx">' +
+          '</label>' +
+          '<label class="gc-gb-field">Your message:' +
+            '<textarea name="message" maxlength="200" required rows="3" placeholder="Sign my guestbook!!1!"></textarea>' +
+          '</label>' +
+          '<div class="gc-gb-actions">' +
+            '<button type="submit" class="gc-gb-sign">✍️ Sign it!</button>' +
+            '<span class="gc-gb-status" role="status" aria-live="polite"></span>' +
+          '</div>' +
+        '</form>' +
+        '<hr class="gc-hr-rainbow" aria-hidden="true">' +
+        '<div class="gc-gb-count" aria-live="polite"></div>' +
+        '<ul class="gc-gb-list"></ul>' +
+      '</div>';
+
+    var listEl = dlg.querySelector('.gc-gb-list');
+    var countEl = dlg.querySelector('.gc-gb-count');
+    var form = dlg.querySelector('.gc-gb-form');
+    var status = dlg.querySelector('.gc-gb-status');
+    var closeBtn = dlg.querySelector('.gc-gb-close');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      // Use form.elements to avoid the form.name property collision.
+      var name = form.elements['name'].value.trim();
+      var message = form.elements['message'].value.trim();
+      if (!name || !message) {
+        status.textContent = 'Please fill in both fields!';
+        return;
+      }
+      var entries = loadGuestbook();
+      entries.unshift({ name: name.slice(0, 40), message: message.slice(0, 200), date: guestbookToday() });
+      if (entries.length > 100) entries.length = 100;
+      saveGuestbook(entries);
+      form.reset();
+      status.textContent = 'Thanks for signing! 📖✨';
+      renderGuestbookEntries(listEl, countEl);
+      listEl.scrollTop = 0;
+    });
+
+    closeBtn.addEventListener('click', function () { dlg.close(); });
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+
+    document.body.appendChild(dlg);
+    gcElements.push(dlg);
+    guestbookDialog = dlg;
+    return dlg;
+  }
+
+  function openGuestbook(focusForm) {
+    var dlg = buildGuestbookDialog();
+    var status = dlg.querySelector('.gc-gb-status');
+    if (status) status.textContent = '';
+    renderGuestbookEntries(dlg.querySelector('.gc-gb-list'), dlg.querySelector('.gc-gb-count'));
+    if (typeof dlg.showModal === 'function') dlg.showModal();
+    else dlg.setAttribute('open', '');
+    if (focusForm) {
+      var nameInput = dlg.querySelector('input[name="name"]');
+      if (nameInput) nameInput.focus();
+    }
+  }
+
   function createBottomLinks() {
     const div = document.createElement('div');
     div.className = 'gc-bottom-links';
@@ -87,18 +236,14 @@
     if (sign) {
       sign.addEventListener('click', function (e) {
         e.preventDefault();
-        alert('Thanks for signing my guestbook! 📖');
+        openGuestbook(true);
       });
     }
     var viewBook = div.querySelector('[data-gc-action="view-guestbook"]');
     if (viewBook) {
       viewBook.addEventListener('click', function (e) {
         e.preventDefault();
-        alert('Guestbook entries:\n\n' +
-          'CoolDude99: Great site dude!!!\n' +
-          'xX_ShadowWolf_Xx: awesome page, check out mine!\n' +
-          'SurfGirl2000: LoVe ThE fLaMeS!!1!\n' +
-          'WebMaster_Joe: Nice HTML skills!');
+        openGuestbook(false);
       });
     }
     return div;
@@ -392,10 +537,17 @@
     document.removeEventListener('mousemove', onMouseMove);
     document.removeEventListener('touchmove', onTouchMove);
 
+    // Close the guestbook modal before detaching it so focus and scroll-lock
+    // state are properly restored (showModal leaves them set otherwise).
+    if (guestbookDialog && guestbookDialog.open) {
+      try { guestbookDialog.close(); } catch (e) { /* ignore */ }
+    }
+
     gcElements.forEach(function (el) {
       if (el.parentNode) el.parentNode.removeChild(el);
     });
     gcElements.length = 0;
+    guestbookDialog = null; // detached with gcElements; rebuild on next enable
 
     // Clean up any leftover cursor trails
     document.querySelectorAll('.gc-cursor-trail').forEach(function (el) { el.remove(); });

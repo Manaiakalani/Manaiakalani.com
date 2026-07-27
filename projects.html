@@ -28,12 +28,12 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://api.github.com">
     <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=7">
+    <link rel="stylesheet" href="style.css?v=9">
 
     <!-- RSS Feed -->
     <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml">
 
-    <script src="boot.js?v=5"></script>
+    <script src="boot.js?v=7"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -82,6 +82,7 @@
         <section class="page-hero">
             <h1>Projects</h1>
             <p>A selection of projects I've built — from gaming utilities and public health dashboards to creative experiments and homelab docs.</p>
+            <button type="button" id="random-project-btn" class="random-project-btn">🎲 Random project</button>
         </section>
 
         <p class="sort-note" id="projects-sort-note" hidden>Sorted by community impact — most-starred first, then most recent.</p>
@@ -123,7 +124,7 @@
         <div class="container" id="footer-content"></div>
     </footer>
 
-    <script src="script.js?v=9"></script>
+    <script src="script.js?v=11"></script>
     <script type="importmap">
     {
         "imports": {
@@ -132,7 +133,8 @@
         }
     }
     </script>
-    <script src="components.js?v=4"></script>
+    <script src="components.js?v=5"></script>
+    <script defer src="command-palette.js?v=2"></script>
     <script type="module" src="web-vitals-report.js?v=1"></script>
 </body>
 </html>

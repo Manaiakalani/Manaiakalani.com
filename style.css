@@ -145,7 +145,7 @@ header {
     background: linear-gradient(-45deg, 
         #0f4c81, /* Classic Blue */
         #c84534, /* Accessible Coral */
-        #6b7280, /* Deep Gray */
+        #6a4c93, /* Royal Purple */
         #8a6f00, /* Rich Gold */
         #5a7b3b  /* Deep Green */
     );
@@ -207,7 +207,7 @@ header p {
 
 /* About Section */
 #about {
-    padding: 4rem 0;
+    padding: 2.5rem 0 3.5rem;
     background-color: var(--bg-secondary);
     transition: background-color var(--transition-speed) ease;
 }
@@ -554,7 +554,7 @@ a.building-card:focus-visible {
 
 /* Page Heading Section */
 .page-hero {
-    padding: 3rem 0;
+    padding: 2.25rem 0 1rem;
     background-color: var(--bg-primary);
     transition: background-color var(--transition-speed) ease;
 }
@@ -567,14 +567,18 @@ a.building-card:focus-visible {
 .page-hero p {
     text-align: left;
     text-align-last: left;
-    color: var(--text-secondary);
+    color: var(--text-primary);
+    font-weight: 500;
 }
 
-.random-thought-btn {
-    display: inline-flex;
+.random-thought-btn,
+.random-project-btn {
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
-    margin-top: 1.25rem;
+    margin: 1.5rem auto 0;
+    width: fit-content;
     padding: 0.6rem 1.2rem;
     border: 1px solid rgba(128, 128, 128, 0.3);
     border-radius: 6px;
@@ -587,14 +591,30 @@ a.building-card:focus-visible {
     transition: color 0.2s ease, border-color 0.2s ease, background-color var(--transition-speed) ease;
 }
 
-.random-thought-btn:hover {
+.random-thought-btn:hover,
+.random-project-btn:hover {
     color: var(--accent);
     border-color: var(--accent);
 }
 
-.random-thought-btn:focus-visible {
+.random-thought-btn:focus-visible,
+.random-project-btn:focus-visible {
     outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
+}
+
+/* Brief pulse when the Random project button jumps to a card */
+@keyframes project-highlight {
+    from { box-shadow: 0 0 0 3px var(--focus-ring); }
+    to   { box-shadow: 0 0 0 3px transparent; }
+}
+
+.project-card--highlight {
+    animation: project-highlight 1.4s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .project-card--highlight { animation: none; }
 }
 
 /* Thoughts List */
@@ -928,4 +948,243 @@ footer {
     .view-all:hover {
         gap: 0.4rem;
     }
+}
+
+/* Shared permalink arrival: briefly highlight the targeted thought entry */
+@keyframes thought-highlight {
+    from { background-color: var(--focus-ring-shadow); }
+    to   { background-color: transparent; }
+}
+
+.thought-entry--highlight {
+    animation: thought-highlight 1.8s ease-out;
+    border-radius: 8px;
+}
+
+/* The global reduce block above doesn't reach view-transition pseudo-elements,
+   so opt them out explicitly for users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+    /* No fade for reduced-motion users, but still mark the arrived-at entry. */
+    .thought-entry--highlight {
+        animation: none;
+        background-color: var(--focus-ring-shadow);
+    }
+
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation: none !important;
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* Command palette (⌘K / Ctrl-K)                                      */
+/* ------------------------------------------------------------------ */
+.cmdk-launcher {
+    position: absolute;
+    top: 1.2rem;
+    right: 4.75rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--toggle-bg);
+    border: none;
+    color: var(--header-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: background var(--transition-speed) ease, transform var(--transition-speed) ease;
+}
+
+.cmdk-launcher:hover {
+    background: var(--toggle-hover);
+    transform: scale(1.1);
+}
+
+.cmdk-launcher:active {
+    transform: scale(0.95);
+}
+
+.cmdk-launcher:focus-visible {
+    background: var(--toggle-hover);
+    outline-offset: 4px;
+}
+
+.cmdk {
+    position: fixed;
+    inset: 0 0 auto 0;
+    width: min(92vw, 560px);
+    max-height: 70vh;
+    margin: 12vh auto 0;
+    padding: 0;
+    border: 1px solid rgba(128, 128, 128, 0.25);
+    border-radius: 14px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+}
+
+.cmdk::backdrop {
+    background: rgba(10, 10, 15, 0.5);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+}
+
+.cmdk__box {
+    display: flex;
+    flex-direction: column;
+    max-height: 70vh;
+}
+
+.cmdk__search {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.cmdk__search-icon {
+    font-size: 1rem;
+    opacity: 0.7;
+}
+
+.cmdk__input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-family: 'Doto', sans-serif;
+    font-size: 1.05rem;
+    outline: none;
+}
+
+.cmdk__input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.85;
+}
+
+.cmdk__list {
+    list-style: none;
+    margin: 0;
+    padding: 0.4rem;
+    overflow-y: auto;
+}
+
+.cmdk__item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.7rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Doto', sans-serif;
+}
+
+.cmdk__icon {
+    font-size: 1.1rem;
+    width: 1.5rem;
+    text-align: center;
+    flex: 0 0 auto;
+}
+
+.cmdk__label {
+    flex: 1 1 auto;
+    color: var(--text-primary);
+    font-size: 0.98rem;
+}
+
+.cmdk__label mark {
+    background: transparent;
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.cmdk__tag {
+    flex: 0 0 auto;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.8;
+}
+
+.cmdk__item.is-active {
+    background: var(--focus-ring-shadow);
+}
+
+.cmdk__item.is-active .cmdk__tag {
+    color: var(--text-primary);
+    opacity: 1;
+}
+
+/* On the tinted active row, accent marks drop below AA — keep the match legible. */
+.cmdk__item.is-active .cmdk__label mark {
+    color: var(--text-primary);
+    text-decoration: underline;
+}
+
+.cmdk__empty {
+    margin: 0;
+    padding: 1.4rem 1rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.cmdk__foot {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0.6rem 1rem;
+    border-top: 1px solid rgba(128, 128, 128, 0.2);
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+}
+
+.cmdk__foot kbd {
+    font-family: inherit;
+    background: var(--bg-secondary);
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    border-radius: 4px;
+    padding: 0.05rem 0.35rem;
+    margin-right: 0.15rem;
+}
+
+.cmdk[open] {
+    animation: cmdk-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cmdk[open]::backdrop {
+    animation: cmdk-fade 180ms ease-out;
+}
+
+@keyframes cmdk-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: none; }
+}
+
+@keyframes cmdk-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+html.cmdk-open,
+html.cmdk-open body {
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .cmdk-launcher { top: 0.8rem; right: 3.95rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cmdk[open],
+    .cmdk[open]::backdrop { animation: none; }
+    .cmdk-launcher:hover { transform: none; }
 }
