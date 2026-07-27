@@ -188,6 +188,14 @@ if (typingEl) {
             .slice(0, 3);
         container.innerHTML = featured.map(buildCard).join('');
         container.setAttribute('aria-busy', 'false');
+        // On the homepage there's no #all-projects grid, so renderAll() bails and never
+        // announces. Announce the featured count here so the #projects-status live region
+        // isn't silent for screen-reader users on a successful load.
+        if (document.getElementById('projects-status') && !document.getElementById('all-projects')) {
+            announceProjects(featured.length
+                ? featured.length + ' featured project' + (featured.length === 1 ? '' : 's') + ' loaded.'
+                : 'Projects are available on GitHub.');
+        }
     }
 
     function formatRelativeTime(date) {
@@ -278,7 +286,7 @@ if (typingEl) {
             : 'No projects match your search.');
     }
 
-    function showFallback(message) {
+    function showFallback(message, announcement) {
         var containers = [
             document.getElementById('featured-projects'),
             document.getElementById('all-projects')
@@ -292,7 +300,7 @@ if (typingEl) {
         var buildingContainer = document.getElementById('currently-building');
         var buildingSection = buildingContainer && buildingContainer.closest('.currently-building-teaser');
         if (buildingSection) buildingSection.hidden = true;
-        announceProjects('Projects could not be loaded right now. Visit github.com/Manaiakalani to view them.');
+        announceProjects(announcement || 'Projects could not be loaded right now. Visit github.com/Manaiakalani to view them.');
     }
 
     function parseLinkHeader(header) {
@@ -354,7 +362,12 @@ if (typingEl) {
                         renderAll();
                         renderCurrentlyBuilding(cachedRepos);
                     } else {
-                        showFallback('Projects are loading from GitHub — <a href="https://github.com/Manaiakalani" style="color:var(--accent)">view them directly</a>.');
+                        // A valid-but-empty response isn't an error — say so consistently
+                        // in both the visible message and the screen-reader announcement.
+                        showFallback(
+                            'No public projects to show right now — <a href="https://github.com/Manaiakalani" style="color:var(--accent)">view them on GitHub</a>.',
+                            'No public projects to show right now. Visit github.com/Manaiakalani to view them.'
+                        );
                     }
                     return;
                 }

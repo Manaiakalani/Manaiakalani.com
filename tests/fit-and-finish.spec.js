@@ -569,6 +569,56 @@ test('projects: live region announces result count on search', async ({ page }) 
   await expect(page.locator('#projects-status')).toHaveText(/1 project found/i);
 });
 
+test('index: projects status live region is announced after featured load', async ({ page }) => {
+  await page.goto('/');
+  // Wait for the featured grid to render real cards, then the live region must not be empty.
+  await page.waitForSelector('#featured-projects .project-card', { timeout: 10000 });
+  await expect(page.locator('#projects-status')).toHaveText(/featured project/i);
+});
+
+// ── Projects: valid-but-empty API response uses a consistent empty state ──
+test('projects: empty GitHub response shows a consistent empty state (not a loading/error message)', async ({ page }) => {
+  await page.unrouteAll({ behavior: 'ignoreErrors' });
+  await page.route('**/analytics.manaiakalani.info/**', route => route.abort());
+  await page.route('**/cdn.jsdelivr.net/npm/web-vitals**', route => route.abort());
+  await page.route('**/api.github.com/users/*/repos*', route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' })
+  );
+  await page.addInitScript(() => { try { localStorage.removeItem('mnk:gh_repos_cache'); } catch (e) {} });
+  await page.goto('/projects.html');
+  await page.waitForSelector('.projects-fallback', { timeout: 10000 });
+  await expect(page.locator('.projects-fallback')).toContainText(/No public projects/i);
+  // Visible message and the screen-reader announcement must agree (no "loading"/"failed" mismatch).
+  await expect(page.locator('#projects-status')).toHaveText(/No public projects/i);
+  await expect(page.locator('.projects-fallback')).not.toContainText(/loading/i);
+});
+
+// ── No-JS: dynamic skeleton loaders are hidden so they don't spin forever ──
+for (const { path, sel } of [
+  { path: '/projects.html', sel: '#all-projects' },
+  { path: '/', sel: '#featured-projects' },
+]) {
+  test(`${path}: <noscript> hides the dynamic loader (${sel})`, async ({ page }) => {
+    // page.content() serialises the DOM including the (inert-with-JS) <noscript> text,
+    // so we can assert the no-JS hide rule ships without needing a JS-disabled context.
+    await page.goto(path);
+    const html = await page.content();
+    const noscriptBlocks = html.match(/<noscript>[\s\S]*?<\/noscript>/gi) || [];
+    const joined = noscriptBlocks.join('\n');
+    expect(joined).toContain(sel);
+    expect(joined).toMatch(/display:\s*none/i);
+  });
+}
+
+// ── GeoCities assets are referenced root-relative so retro mode works on deep 404 URLs ──
+test('boot.js references GeoCities assets root-relative', async ({ page }) => {
+  const res = await page.request.get('/boot.js?v=5');
+  expect(res.status()).toBe(200);
+  const body = await res.text();
+  expect(body).toContain('"/geocities.css?v=2"');
+  expect(body).toContain('"/geocities.js?v=4"');
+});
+
 // ── Accessibility: aria-busy is cleared once content loads ──
 test('projects: grid clears aria-busy after cards render', async ({ page }) => {
   await page.goto('/projects.html');
