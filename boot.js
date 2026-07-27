@@ -11,8 +11,8 @@
     }
   } catch (e) { /* localStorage unavailable */ }
 
-  var GEO_CSS_HREF = "/geocities.css?v=2";
-  var GEO_JS_HREF = "/geocities.js?v=4";
+  var GEO_CSS_HREF = "/geocities.css?v=4";
+  var GEO_JS_HREF = "/geocities.js?v=6";
   var GEO_KEY = "mnk:geocities";
   var geoCssPromise;
   var geoJsPromise;
@@ -106,7 +106,11 @@
     });
   }
 
-  var t = localStorage.getItem("mnk:theme");
+  var t = null, geocitiesEnabled = false;
+  try {
+    t = localStorage.getItem("mnk:theme");
+    geocitiesEnabled = localStorage.getItem(GEO_KEY) === "true";
+  } catch (e) { /* storage unavailable — fall back to defaults */ }
   if (
     t === "dark" ||
     (!t && window.matchMedia("(prefers-color-scheme: dark)").matches)
@@ -114,7 +118,6 @@
     document.documentElement.setAttribute("data-theme", "dark");
   }
 
-  var geocitiesEnabled = localStorage.getItem(GEO_KEY) === "true";
   if (geocitiesEnabled) {
     document.documentElement.setAttribute("data-geocities", "true");
     loadGeoCitiesStyles();

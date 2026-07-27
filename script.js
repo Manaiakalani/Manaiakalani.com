@@ -2,7 +2,8 @@
 (function() {
     const toggle = document.querySelector('.theme-toggle');
     const root = document.documentElement;
-    const stored = localStorage.getItem('mnk:theme');
+    let stored = null;
+    try { stored = localStorage.getItem('mnk:theme'); } catch (e) { /* storage unavailable */ }
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     function updateToggleState(isDark) {
@@ -414,6 +415,31 @@ if (typingEl) {
         });
     }
 
+    // Random project button (projects page). Mirrors the thoughts-page shuffle:
+    // clears any active search, then scrolls to and focuses a random project card.
+    var randomProjectBtn = document.getElementById('random-project-btn');
+    if (randomProjectBtn) {
+        randomProjectBtn.addEventListener('click', function () {
+            if (searchInput && searchInput.value) {
+                searchInput.value = '';
+                renderAll();
+            }
+            var grid = document.getElementById('all-projects');
+            if (!grid) return;
+            var cards = grid.querySelectorAll('.project-card');
+            if (!cards.length) return;
+            var pick = cards[Math.floor(Math.random() * cards.length)];
+            cards.forEach(function (c) { c.classList.remove('project-card--highlight'); });
+            void pick.offsetWidth; // restart the highlight animation if the same card is re-picked
+            pick.classList.add('project-card--highlight');
+            var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            pick.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+            pick.focus({ preventScroll: true });
+            var title = pick.querySelector('h2');
+            announceProjects('Showing a random project' + (title ? ': ' + title.textContent : '') + '.');
+        });
+    }
+
     // Only run if any target container exists
     if (document.getElementById('featured-projects') || document.getElementById('all-projects') || document.getElementById('currently-building')) {
         loadRepos();
@@ -550,6 +576,20 @@ if (typingEl) {
             pick.focus({ preventScroll: true });
         });
     }
+
+    // When arriving via a shared permalink (#entry-id), briefly highlight the
+    // target so the reader can see where the link landed them.
+    function highlightFromHash() {
+        var id = window.location.hash.slice(1);
+        if (!id) return;
+        var target = document.getElementById(id);
+        if (!target || entries.indexOf(target) === -1) return;
+        entries.forEach(function (e) { e.classList.remove('thought-entry--highlight'); });
+        void target.offsetWidth; // restart the animation on repeat visits
+        target.classList.add('thought-entry--highlight');
+    }
+    window.addEventListener('hashchange', highlightFromHash);
+    highlightFromHash();
 })();
 
 // --- 404 page: show attempted path + table-flip easter egg ---
@@ -572,4 +612,54 @@ if (typingEl) {
             }
         });
     }
+})();
+
+// --- Prefetch internal pages on hover / focus / touch intent (all pages) ---
+(function () {
+    var conn = navigator.connection;
+    if (conn) {
+        if (conn.saveData) return;                          // respect Data Saver
+        if (/(^|-)2g$/.test(conn.effectiveType || '')) return; // skip slow connections
+    }
+
+    var link = document.createElement('link');
+    if (!(link.relList && link.relList.supports && link.relList.supports('prefetch'))) return;
+
+    var seen = {};
+
+    function prefetchable(a) {
+        if (!a || a.target === '_blank' || a.hasAttribute('download')) return false;
+        var url;
+        try { url = new URL(a.href, location.href); } catch (e) { return false; }
+        if (url.origin !== location.origin) return false;          // external
+        if (url.pathname === location.pathname) return false;      // same page / hash
+        return url.pathname === '/' || /\.html$/.test(url.pathname); // documents only
+    }
+
+    function warm(e) {
+        var a = e.target.closest && e.target.closest('a[href]');
+        if (!a || !prefetchable(a)) return;
+        var u = new URL(a.href, location.href);
+        var href = u.origin + u.pathname + u.search; // drop hash so #a and #b de-dupe
+        if (seen[href]) return;
+        seen[href] = true;
+        var l = document.createElement('link');
+        l.rel = 'prefetch';
+        l.href = href;
+        l.as = 'document';
+        document.head.appendChild(l);
+    }
+
+    document.addEventListener('pointerover', warm, { passive: true });
+    document.addEventListener('focusin', warm, { passive: true });
+    document.addEventListener('touchstart', warm, { capture: true, passive: true });
+})();
+
+// --- Register the service worker for offline support (all pages) ---
+(function () {
+    if (!('serviceWorker' in navigator)) return;
+    window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
+            .catch(function () { /* offline support simply unavailable */ });
+    });
 })();

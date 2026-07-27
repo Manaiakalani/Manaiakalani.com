@@ -612,11 +612,11 @@ for (const { path, sel } of [
 
 // ── GeoCities assets are referenced root-relative so retro mode works on deep 404 URLs ──
 test('boot.js references GeoCities assets root-relative', async ({ page }) => {
-  const res = await page.request.get('/boot.js?v=5');
+  const res = await page.request.get('/boot.js');
   expect(res.status()).toBe(200);
   const body = await res.text();
-  expect(body).toContain('"/geocities.css?v=2"');
-  expect(body).toContain('"/geocities.js?v=4"');
+  expect(body).toContain('"/geocities.css?v=4"');
+  expect(body).toContain('"/geocities.js?v=6"');
 });
 
 // ── Accessibility: aria-busy is cleared once content loads ──
@@ -637,18 +637,26 @@ for (const path of ['/projects.html', '/thoughts.html', '/404.html']) {
 }
 
 // ── GeoCities retro mode: CSP-safe handlers (no inline onclick / javascript: URLs) ──
-test('geocities: guestbook link works via addEventListener under strict CSP', async ({ page }) => {
+test('geocities: guestbook opens a real persistent dialog and saves entries (CSP-safe)', async ({ page }) => {
   await page.goto('/');
   await page.locator('.geocities-toggle').click();
   await expect(page.locator('.gc-bottom-links')).toBeVisible();
 
-  let dialogMessage = null;
-  page.once('dialog', async dialog => {
-    dialogMessage = dialog.message();
-    await dialog.dismiss();
-  });
   await page.locator('[data-gc-action="sign-guestbook"]').click();
-  await expect.poll(() => dialogMessage).toContain('guestbook');
+  const dlg = page.locator('.gc-guestbook-dialog');
+  await expect(dlg).toBeVisible();
+
+  await dlg.locator('input[name="name"]').fill('TestVisitor');
+  await dlg.locator('textarea[name="message"]').fill('hello from the suite');
+  await dlg.locator('.gc-gb-sign').click();
+
+  const first = dlg.locator('.gc-gb-entry').first();
+  await expect(first).toContainText('TestVisitor');
+  await expect(first).toContainText('hello from the suite');
+
+  // Persists to localStorage under the namespaced key.
+  const saved = await page.evaluate(() => localStorage.getItem('mnk:guestbook'));
+  expect(saved).toContain('TestVisitor');
 });
 
 test('geocities: no inline event handlers or javascript: URLs in retro DOM', async ({ page }) => {
@@ -681,4 +689,81 @@ test('manifest.json declares accurate icon sizes', async ({ page }) => {
   expect(sizes).toContain('32x32');
   // The old manifest lied about a non-existent 512x512 icon — guard against regressing.
   expect(sizes).not.toContain('512x512');
+});
+
+// ── Command palette (⌘K / Ctrl-K) ──
+test('command palette: opens with Ctrl+K and lists page + action commands', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.cmdk-launcher')).toBeVisible();
+  await page.keyboard.press('Control+KeyK');
+  const dlg = page.locator('.cmdk');
+  await expect(dlg).toBeVisible();
+  await expect(dlg.locator('.cmdk__label', { hasText: 'Projects' })).toBeVisible();
+  await expect(dlg.locator('.cmdk__label', { hasText: 'Toggle light / dark theme' })).toBeVisible();
+});
+
+test('command palette: filtering then Enter runs the active command', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.cmdk-launcher').click();
+  const dlg = page.locator('.cmdk');
+  await expect(dlg).toBeVisible();
+  await page.locator('.cmdk__input').fill('projects');
+  await expect(dlg.locator('.cmdk__item').first()).toContainText('Projects');
+  await page.keyboard.press('Enter');
+  // `serve` strips the .html extension (clean URLs); Azure SWA keeps it.
+  await expect(page).toHaveURL(/\/projects(\.html)?$/);
+});
+
+test('command palette: launcher is present on every page', async ({ page }) => {
+  for (const pg of PAGES) {
+    await page.goto(pg.path);
+    await expect(page.locator('.cmdk-launcher')).toBeVisible();
+  }
+});
+
+// ── Prefetch on intent ──
+test('prefetch: hovering an internal link injects a document prefetch hint', async ({ page }) => {
+  await page.goto('/');
+  const link = page.locator('nav a[href="projects.html"], nav a[href="/projects.html"]').first();
+  await link.hover();
+  await expect.poll(() => page.locator('head link[rel="prefetch"]').count()).toBeGreaterThan(0);
+  const hrefs = await page.locator('head link[rel="prefetch"]').evaluateAll(els => els.map(e => e.getAttribute('href')));
+  expect(hrefs.join(' ')).toContain('projects');
+});
+
+// ── Service worker registration ──
+test('service worker: registers and activates for offline support', async ({ page }) => {
+  await page.goto('/');
+  const state = await page.evaluate(async () => {
+    if (!('serviceWorker' in navigator)) return 'no-sw-api';
+    const timeout = new Promise(res => setTimeout(() => res('timeout'), 8000));
+    const ready = navigator.serviceWorker.ready.then(reg => (reg && reg.active) ? 'active' : 'no-active');
+    return Promise.race([ready, timeout]);
+  });
+  expect(state).toBe('active');
+});
+
+// ── Cross-document view transitions opt-in ──
+test('view transitions: cross-document navigation opt-in is present', async ({ page }) => {
+  const res = await page.request.get('/style.css');
+  expect(res.status()).toBe(200);
+  const css = await res.text();
+  expect(css).toMatch(/@view-transition\s*\{\s*navigation:\s*auto/);
+});
+
+// ── Per-thought permalink arrival highlight ──
+test('thoughts: arriving via a permalink highlights the target entry', async ({ page }) => {
+  await page.goto('/thoughts.html');
+  const id = await page.locator('.thought-entry[id]').first().getAttribute('id');
+  expect(id).toBeTruthy();
+  await page.goto('/thoughts.html#' + id);
+  await expect(page.locator('#' + id)).toHaveClass(/thought-entry--highlight/);
+});
+
+test('thoughts: every entry has a copy-link button', async ({ page }) => {
+  await page.goto('/thoughts.html');
+  const entries = await page.locator('.thought-entry[id]').count();
+  const buttons = await page.locator('.thought-entry .copy-link-btn').count();
+  expect(entries).toBeGreaterThan(0);
+  expect(buttons).toBe(entries);
 });
