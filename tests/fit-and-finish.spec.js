@@ -527,3 +527,108 @@ test('uses: has JSON-LD structured data', async ({ page }) => {
   const data = JSON.parse(content);
   expect(data['@type']).toBe('WebPage');
 });
+
+// ── Accessibility: skip-link target is focusable ──
+const A11Y_PAGES = ['/', '/projects.html', '/thoughts.html', '/uses.html', '/404.html'];
+for (const path of A11Y_PAGES) {
+  test(`${path}: <main> is focusable so the skip link lands`, async ({ page }) => {
+    await page.goto(path);
+    const main = page.locator('main#main');
+    await expect(main).toHaveAttribute('tabindex', '-1');
+    // Programmatic focus should stick on the main element itself.
+    await main.evaluate(el => el.focus());
+    const focusedId = await page.evaluate(() => document.activeElement && document.activeElement.id);
+    expect(focusedId).toBe('main');
+  });
+}
+
+// ── Accessibility: live regions announce dynamic state ──
+test('index: projects status live region exists and is polite', async ({ page }) => {
+  await page.goto('/');
+  const region = page.locator('#projects-status');
+  await expect(region).toHaveCount(1);
+  await expect(region).toHaveAttribute('aria-live', 'polite');
+  await expect(region).toHaveAttribute('role', 'status');
+});
+
+test('thoughts: status live region exists and announces filtered count', async ({ page }) => {
+  await page.goto('/thoughts.html');
+  const region = page.locator('#thoughts-status');
+  await expect(region).toHaveCount(1);
+  await expect(region).toHaveAttribute('aria-live', 'polite');
+  await page.locator('#thought-search').fill('zzz-no-match-zzz');
+  await page.waitForTimeout(300);
+  await expect(region).toHaveText(/No thoughts match/i);
+});
+
+test('projects: live region announces result count on search', async ({ page }) => {
+  await page.goto('/projects.html');
+  await page.waitForSelector('.project-card', { timeout: 10000 });
+  await page.locator('#project-search').fill('alpha');
+  await page.waitForTimeout(300);
+  await expect(page.locator('#projects-status')).toHaveText(/1 project found/i);
+});
+
+// ── Accessibility: aria-busy is cleared once content loads ──
+test('projects: grid clears aria-busy after cards render', async ({ page }) => {
+  await page.goto('/projects.html');
+  await page.waitForSelector('.project-card', { timeout: 10000 });
+  await expect(page.locator('#all-projects')).toHaveAttribute('aria-busy', 'false');
+});
+
+// ── Analytics coverage on every page ──
+for (const path of ['/projects.html', '/thoughts.html', '/404.html']) {
+  test(`${path}: analytics script is present`, async ({ page }) => {
+    await page.goto(path);
+    const analytics = page.locator('script[src="https://analytics.manaiakalani.info/api/script.js"]');
+    await expect(analytics).toHaveCount(1);
+    await expect(analytics).toHaveAttribute('data-site-id', 'c24b6c864956');
+  });
+}
+
+// ── GeoCities retro mode: CSP-safe handlers (no inline onclick / javascript: URLs) ──
+test('geocities: guestbook link works via addEventListener under strict CSP', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.geocities-toggle').click();
+  await expect(page.locator('.gc-bottom-links')).toBeVisible();
+
+  let dialogMessage = null;
+  page.once('dialog', async dialog => {
+    dialogMessage = dialog.message();
+    await dialog.dismiss();
+  });
+  await page.locator('[data-gc-action="sign-guestbook"]').click();
+  await expect.poll(() => dialogMessage).toContain('guestbook');
+});
+
+test('geocities: no inline event handlers or javascript: URLs in retro DOM', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.geocities-toggle').click();
+  await expect(page.locator('.gc-construction-banner')).toBeVisible();
+  const violations = await page.evaluate(() => {
+    const nodes = Array.from(document.querySelectorAll('[class^="gc-"], [class*=" gc-"]'));
+    let inlineHandlers = 0;
+    let jsUrls = 0;
+    nodes.forEach(el => {
+      for (const attr of el.attributes) {
+        if (/^on/i.test(attr.name)) inlineHandlers++;
+      }
+      if (el.tagName === 'A' && (el.getAttribute('href') || '').trim().toLowerCase().startsWith('javascript:')) jsUrls++;
+    });
+    return { inlineHandlers, jsUrls };
+  });
+  expect(violations.inlineHandlers).toBe(0);
+  expect(violations.jsUrls).toBe(0);
+});
+
+// ── PWA manifest declares real icon sizes ──
+test('manifest.json declares accurate icon sizes', async ({ page }) => {
+  const res = await page.request.get('/manifest.json');
+  expect(res.status()).toBe(200);
+  const manifest = await res.json();
+  const sizes = manifest.icons.map(i => i.sizes);
+  expect(sizes).toContain('180x180');
+  expect(sizes).toContain('32x32');
+  // The old manifest lied about a non-existent 512x512 icon — guard against regressing.
+  expect(sizes).not.toContain('512x512');
+});

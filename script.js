@@ -92,6 +92,45 @@ if (typingEl) {
         return div.innerHTML.replace(/"/g, '&quot;');
     }
 
+    // Announce dynamic project state changes to assistive tech (polite live region).
+    function announceProjects(msg) {
+        var s = document.getElementById('projects-status');
+        if (s) s.textContent = msg;
+    }
+
+    // Boundary validation: GitHub API responses (and cached copies) are untrusted.
+    // Coerce each repo to a known shape and drop anything malformed so one bad
+    // entry can't break rendering or sorting.
+    function normalizeRepo(raw) {
+        if (!raw || typeof raw !== 'object') return null;
+        if (typeof raw.name !== 'string' || typeof raw.html_url !== 'string') return null;
+        var pushed = null;
+        if (raw.pushed_at) {
+            var t = new Date(raw.pushed_at);
+            if (!isNaN(t.getTime())) pushed = raw.pushed_at;
+        }
+        return {
+            name: raw.name,
+            html_url: raw.html_url,
+            description: typeof raw.description === 'string' ? raw.description : null,
+            language: typeof raw.language === 'string' ? raw.language : null,
+            fork: raw.fork === true,
+            stargazers_count: (typeof raw.stargazers_count === 'number' && raw.stargazers_count >= 0) ? raw.stargazers_count : 0,
+            forks_count: (typeof raw.forks_count === 'number' && raw.forks_count >= 0) ? raw.forks_count : 0,
+            pushed_at: pushed
+        };
+    }
+
+    function normalizeRepos(list) {
+        if (!Array.isArray(list)) return [];
+        var out = [];
+        for (var i = 0; i < list.length; i++) {
+            var n = normalizeRepo(list[i]);
+            if (n) out.push(n);
+        }
+        return out;
+    }
+
     function buildCard(repo) {
         if (!repo || typeof repo.name !== 'string' || typeof repo.html_url !== 'string') return '';
         var name = escapeHtml(repo.name);
@@ -148,6 +187,7 @@ if (typingEl) {
             .sort(byImpact)
             .slice(0, 3);
         container.innerHTML = featured.map(buildCard).join('');
+        container.setAttribute('aria-busy', 'false');
     }
 
     function formatRelativeTime(date) {
@@ -173,6 +213,7 @@ if (typingEl) {
         var container = document.getElementById('currently-building');
         if (!container) return;
         var section = container.closest('.currently-building-teaser');
+        container.setAttribute('aria-busy', 'false');
         var candidates = repos
             .filter(function (r) { return !r.fork && EXCLUDE.indexOf(r.name) === -1; })
             .sort(function (a, b) { return new Date(b.pushed_at || 0) - new Date(a.pushed_at || 0); });
@@ -230,6 +271,11 @@ if (typingEl) {
         }
         // The note describes the "impact" sort specifically, so only show it when that's active.
         if (note) note.hidden = !(filtered.length && currentSort === 'impact');
+        container.setAttribute('aria-busy', 'false');
+        var hasQuery = searchInput && searchInput.value.trim();
+        announceProjects(filtered.length
+            ? filtered.length + ' project' + (filtered.length === 1 ? '' : 's') + (hasQuery ? ' found' : ' shown')
+            : 'No projects match your search.');
     }
 
     function showFallback(message) {
@@ -238,11 +284,15 @@ if (typingEl) {
             document.getElementById('all-projects')
         ];
         containers.forEach(function (el) {
-            if (el) el.innerHTML = '<p class="projects-fallback" style="text-align:center;color:var(--text-secondary);padding:2rem;">' + message + '</p>';
+            if (el) {
+                el.innerHTML = '<p class="projects-fallback" style="text-align:center;color:var(--text-secondary);padding:2rem;">' + message + '</p>';
+                el.setAttribute('aria-busy', 'false');
+            }
         });
         var buildingContainer = document.getElementById('currently-building');
         var buildingSection = buildingContainer && buildingContainer.closest('.currently-building-teaser');
         if (buildingSection) buildingSection.hidden = true;
+        announceProjects('Projects could not be loaded right now. Visit github.com/Manaiakalani to view them.');
     }
 
     function parseLinkHeader(header) {
@@ -258,13 +308,15 @@ if (typingEl) {
     function loadRepos() {
         // Check cache first
         var cached;
+        var cachedRepos = [];
         try {
             cached = JSON.parse(localStorage.getItem(CACHE_KEY));
-            if (cached && (Date.now() - cached.ts < CACHE_TTL)) {
-                allLoadedRepos = cached.data;
-                renderFeatured(cached.data);
+            cachedRepos = cached ? normalizeRepos(cached.data) : [];
+            if (cachedRepos.length && (Date.now() - cached.ts < CACHE_TTL)) {
+                allLoadedRepos = cachedRepos;
+                renderFeatured(cachedRepos);
                 renderAll();
-                renderCurrentlyBuilding(cached.data);
+                renderCurrentlyBuilding(cachedRepos);
                 return;
             }
         } catch (e) { /* ignore */ }
@@ -292,20 +344,33 @@ if (typingEl) {
 
         fetchPage(API_URL, 1)
             .then(function () {
-                if (!allRepos.length) return;
-                try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: allRepos })); } catch (e) { /* quota */ }
-                allLoadedRepos = allRepos;
-                renderFeatured(allRepos);
+                var normalized = normalizeRepos(allRepos);
+                if (!normalized.length) {
+                    // API responded but returned nothing usable — use stale cache or show a message
+                    // rather than leaving skeleton placeholders on screen indefinitely.
+                    if (cachedRepos.length) {
+                        allLoadedRepos = cachedRepos;
+                        renderFeatured(cachedRepos);
+                        renderAll();
+                        renderCurrentlyBuilding(cachedRepos);
+                    } else {
+                        showFallback('Projects are loading from GitHub — <a href="https://github.com/Manaiakalani" style="color:var(--accent)">view them directly</a>.');
+                    }
+                    return;
+                }
+                try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: normalized })); } catch (e) { /* quota */ }
+                allLoadedRepos = normalized;
+                renderFeatured(normalized);
                 renderAll();
-                renderCurrentlyBuilding(allRepos);
+                renderCurrentlyBuilding(normalized);
             })
             .catch(function (err) {
                 // Use stale cache if available, otherwise show fallback
-                if (cached && Array.isArray(cached.data)) {
-                    allLoadedRepos = cached.data;
-                    renderFeatured(cached.data);
+                if (cachedRepos.length) {
+                    allLoadedRepos = cachedRepos;
+                    renderFeatured(cachedRepos);
                     renderAll();
-                    renderCurrentlyBuilding(cached.data);
+                    renderCurrentlyBuilding(cachedRepos);
                 } else {
                     var msg = err && err.message === 'rate-limited'
                         ? 'GitHub API rate limit reached — projects will reload shortly. <a href="https://github.com/Manaiakalani" style="color:var(--accent)">View them directly</a>.'
@@ -399,6 +464,7 @@ if (typingEl) {
     // Search/filter over existing entries (no re-fetch — content is static).
     var searchInput = document.getElementById('thought-search');
     var noResults = document.getElementById('thoughts-no-results');
+    var thoughtsStatus = document.getElementById('thoughts-status');
 
     function applyFilter() {
         var query = searchInput ? searchInput.value.trim().toLowerCase() : '';
@@ -410,6 +476,11 @@ if (typingEl) {
             if (match) visibleCount++;
         });
         if (noResults) noResults.hidden = visibleCount !== 0;
+        if (thoughtsStatus) {
+            thoughtsStatus.textContent = query
+                ? (visibleCount ? visibleCount + ' thought' + (visibleCount === 1 ? '' : 's') + ' found' : 'No thoughts match your search.')
+                : '';
+        }
     }
 
     function clearFilter() {
