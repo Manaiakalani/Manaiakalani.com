@@ -50,7 +50,7 @@
       rel="stylesheet"
     />
     <!-- External CSS -->
-    <link rel="stylesheet" href="style.css?v=6" />
+    <link rel="stylesheet" href="style.css?v=7" />
 
     <!-- RSS Feed -->
     <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml" />
@@ -59,7 +59,7 @@
     <link rel="manifest" href="/manifest.json" />
 
     <!-- Prevent flash: apply saved theme/geocities before paint -->
-    <script src="boot.js?v=3"></script>
+    <script src="boot.js?v=4"></script>
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -124,7 +124,8 @@
       </button>
     </header>
 
-    <main id="main">
+    <main id="main" tabindex="-1">
+      <div id="projects-status" class="visually-hidden" role="status" aria-live="polite"></div>
       <!-- About Me Section -->
     <section id="about">
       <div class="container">
@@ -173,7 +174,7 @@
     <!-- Currently Building (dynamic from GitHub) -->
     <section class="currently-building-teaser">
       <div class="container">
-        <div id="currently-building">
+        <div id="currently-building" aria-busy="true">
           <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div></div>
         </div>
       </div>
@@ -183,7 +184,7 @@
     <section class="featured-teaser">
       <div class="container">
         <h2>Featured Projects</h2>
-        <div class="featured-grid" id="featured-projects">
+        <div class="featured-grid" id="featured-projects" aria-busy="true">
           <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div><div class="skeleton-line medium"></div><div class="skeleton-line badge"></div></div>
           <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div><div class="skeleton-line medium"></div><div class="skeleton-line badge"></div></div>
           <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div><div class="skeleton-line medium"></div><div class="skeleton-line badge"></div></div>
@@ -201,7 +202,7 @@
     </footer>
 
     <!-- External JavaScript -->
-    <script src="script.js?v=8"></script>
+    <script src="script.js?v=9"></script>
 
     <!-- ASCII Cube -->
     <script type="importmap">

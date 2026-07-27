@@ -13,9 +13,9 @@
     --text-footer: #ffffff;
     --text-footer-muted: #bbbbbb;
     --header-text: #ffffff;
-    --accent: #d14836;
-    --focus-ring: #d14836;
-    --focus-ring-shadow: rgba(209, 72, 54, 0.25);
+    --accent: #c84534;
+    --focus-ring: #c84534;
+    --focus-ring-shadow: rgba(200, 69, 52, 0.25);
     --toggle-bg: rgba(255, 255, 255, 0.2);
     --toggle-hover: rgba(255, 255, 255, 0.35);
     --transition-speed: 0.3s;
@@ -58,6 +58,11 @@
     top: 0;
     outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
+}
+
+/* Dark theme: accent is a lighter coral, so use dark ink for the skip link to keep >=4.5:1 */
+[data-theme="dark"] .skip-link {
+    color: #121218;
 }
 
 /* General Styles */
@@ -139,10 +144,10 @@ p {
 header {
     background: linear-gradient(-45deg, 
         #0f4c81, /* Classic Blue */
-        #d14836, /* Accessible Coral */
+        #c84534, /* Accessible Coral */
         #6b7280, /* Deep Gray */
         #8a6f00, /* Rich Gold */
-        #5d7f3d  /* Deep Green */
+        #5a7b3b  /* Deep Green */
     );
     background-size: 400% 400%;
     animation: gradient 15s ease infinite;
@@ -312,7 +317,7 @@ footer {
 }
 
 .site-nav a {
-    color: rgba(255, 255, 255, 0.9);
+    color: #ffffff;
     text-decoration: none;
     font-size: 1rem;
     font-weight: 700;
@@ -348,7 +353,6 @@ footer {
 .header-subtitle {
     font-size: 1.1rem;
     margin-top: 0.5rem;
-    opacity: 0.9;
     font-weight: 400;
 }
 

@@ -77,15 +77,30 @@
     const div = document.createElement('div');
     div.className = 'gc-bottom-links';
     div.innerHTML =
-      '📖 <a href="javascript:void(0)" onclick="alert(\'Thanks for signing my guestbook! 📖\')">Sign My Guestbook!</a>' +
+      '📖 <a href="#" data-gc-action="sign-guestbook">Sign My Guestbook!</a>' +
       ' <span class="gc-separator">|</span> ' +
-      '📖 <a href="javascript:void(0)" onclick="alert(\'Guestbook entries:\\n\\n' +
-        'CoolDude99: Great site dude!!!\\n' +
-        'xX_ShadowWolf_Xx: awesome page, check out mine!\\n' +
-        'SurfGirl2000: LoVe ThE fLaMeS!!1!\\n' +
-        'WebMaster_Joe: Nice HTML skills!\')">View Guestbook</a>' +
+      '📖 <a href="#" data-gc-action="view-guestbook">View Guestbook</a>' +
       ' <span class="gc-separator">|</span> ' +
       '✉️ <a href="mailto:webmaster@manaiakalani.com">Email the Webmaster</a>';
+    // CSP-safe handlers (no inline onclick / javascript: URLs)
+    var sign = div.querySelector('[data-gc-action="sign-guestbook"]');
+    if (sign) {
+      sign.addEventListener('click', function (e) {
+        e.preventDefault();
+        alert('Thanks for signing my guestbook! 📖');
+      });
+    }
+    var viewBook = div.querySelector('[data-gc-action="view-guestbook"]');
+    if (viewBook) {
+      viewBook.addEventListener('click', function (e) {
+        e.preventDefault();
+        alert('Guestbook entries:\n\n' +
+          'CoolDude99: Great site dude!!!\n' +
+          'xX_ShadowWolf_Xx: awesome page, check out mine!\n' +
+          'SurfGirl2000: LoVe ThE fLaMeS!!1!\n' +
+          'WebMaster_Joe: Nice HTML skills!');
+      });
+    }
     return div;
   }
 
@@ -153,7 +168,7 @@
       '<div class="gc-midi-body">' +
         '<div class="gc-midi-controls">' +
           '<button class="gc-midi-btn" title="Previous" aria-label="Previous track">⏮</button>' +
-          '<button class="gc-midi-btn" title="Play" aria-label="Play" onclick="alert(\'🎵 Now playing: canyon.mid\\n\\nJust kidding — your 28.8k modem can\\u0027t handle audio AND graphics!\')">▶</button>' +
+          '<button class="gc-midi-btn" title="Play" aria-label="Play" data-gc-action="play-midi">▶</button>' +
           '<button class="gc-midi-btn" title="Stop" aria-label="Stop">⏹</button>' +
           '<button class="gc-midi-btn" title="Next" aria-label="Next track">⏭</button>' +
         '</div>' +
@@ -166,6 +181,13 @@
           '<div class="gc-midi-eq-bar" style="height:10px"></div>' +
         '</div>' +
       '</div>';
+    // CSP-safe play handler (no inline onclick)
+    var play = div.querySelector('[data-gc-action="play-midi"]');
+    if (play) {
+      play.addEventListener('click', function () {
+        alert('🎵 Now playing: canyon.mid\n\nJust kidding — your 28.8k modem can\u0027t handle audio AND graphics!');
+      });
+    }
     return div;
   }
 
