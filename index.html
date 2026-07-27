@@ -59,7 +59,7 @@
     <link rel="manifest" href="/manifest.json" />
 
     <!-- Prevent flash: apply saved theme/geocities before paint -->
-    <script src="boot.js?v=4"></script>
+    <script src="boot.js?v=5"></script>
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -172,6 +172,13 @@
     </section>
 
     <!-- Currently Building (dynamic from GitHub) -->
+    <noscript>
+      <style>
+        /* No-JS: hide the dynamic teasers so animated skeletons don't spin forever. */
+        .currently-building-teaser { display: none; }
+        #featured-projects { display: none; }
+      </style>
+    </noscript>
     <section class="currently-building-teaser">
       <div class="container">
         <div id="currently-building" aria-busy="true">
