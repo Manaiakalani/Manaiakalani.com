@@ -165,11 +165,13 @@
         return r.json().then(function (d) {
           var list = readServerList(d);
           if (list) return { ok: true, list: list };
-          // entries:null — either no backend configured (local save stands) or a
-          // backend error (shared sync didn't happen); only the latter is a miss.
-          if (d && d.backend === 'error') return { ok: false, reason: 'failed' };
-          return { ok: true };
-        }, function () { return { ok: true }; });
+          // No list came back. Only a positively-recognized 'unconfigured' backend
+          // means there's no shared book yet and the local save legitimately stands;
+          // anything else (backend:'error', an unexpected shape, a proxy's stray 200)
+          // means the shared sync didn't happen, so don't claim a cheerful success.
+          if (d && d.backend === 'unconfigured') return { ok: true };
+          return { ok: false, reason: 'failed' };
+        }, function () { return { ok: false, reason: 'failed' }; });
       })
       .catch(function () { return { ok: false, reason: 'failed' }; });
   }
@@ -198,10 +200,31 @@
     });
   }
 
+  // Union two entry lists, keeping `primary` order first and dropping duplicate
+  // signatures, capped at 100. Shared by the shared-list reconcile and file import.
+  function mergeEntries(primary, secondary) {
+    var seen = Object.create(null);
+    var merged = [];
+    primary.concat(secondary).forEach(function (e) {
+      var key = e.name + '|' + e.message + '|' + e.date;
+      if (seen[key]) return;
+      seen[key] = true;
+      merged.push(e);
+    });
+    if (merged.length > 100) merged.length = 100;
+    return merged;
+  }
+
   function renderGuestbookEntries(listEl, countEl) {
     paintEntries(listEl, countEl, loadGuestbook());        // instant local paint
     apiGet().then(function (server) {                      // then reconcile with the shared list
-      if (server) { saveGuestbook(server); paintEntries(listEl, countEl, server); }
+      if (server) {
+        // Union the shared list with local so an entry the backend hasn't accepted
+        // yet is never silently dropped when the shared list comes back.
+        var merged = mergeEntries(server, loadGuestbook());
+        saveGuestbook(merged);
+        paintEntries(listEl, countEl, merged);
+      }
     });
   }
 
@@ -234,15 +257,7 @@
         return;
       }
       // Merge imported over existing, de-duping identical signatures, cap 100.
-      var seen = Object.create(null);
-      var merged = [];
-      incoming.concat(loadGuestbook()).forEach(function (e) {
-        var key = e.name + '|' + e.message + '|' + e.date;
-        if (seen[key]) return;
-        seen[key] = true;
-        merged.push(e);
-      });
-      if (merged.length > 100) merged.length = 100;
+      var merged = mergeEntries(incoming, loadGuestbook());
       saveGuestbook(merged);
       paintEntries(listEl, countEl, merged);
       if (listEl) listEl.scrollTop = 0;
@@ -325,7 +340,7 @@
             ? 'Saved locally! The shared guestbook is busy — try again in ' + res.retryAfter + 's. \u23F3'
             : 'Saved locally! The shared guestbook is busy — try again shortly. \u23F3';
         } else if (res.reason === 'failed') {
-          status.textContent = 'Saved locally \u2014 we\u2019ll sync to the shared book later. \uD83D\uDCBE';
+          status.textContent = 'Saved to this browser \u2014 the shared guestbook is unavailable right now. \uD83D\uDCBE';
         }
         // res.ok without a list = no shared backend yet: the local save stands and
         // the "Thanks for signing!" message already shown is accurate.
