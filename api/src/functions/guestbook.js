@@ -61,7 +61,7 @@ async function readRows(client) {
   const page = (first && first.value) || [];
   const rows = [];
   for (const e of page) {
-    rows.push({ name: e.name, message: e.message, date: e.date, seq: e.seq });
+    rows.push(core.projectRow(e));
   }
   return rows;
 }
@@ -109,6 +109,7 @@ async function respond(request, context) {
       name: incoming.name,
       message: incoming.message,
       date: core.today(),
+      id: incoming.id,
       seq: now
     });
     return { status: 201, jsonBody: { entries: core.toPublic(await readRows(client)) } };
