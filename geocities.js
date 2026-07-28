@@ -216,7 +216,7 @@
         return;
       }
       // Merge imported over existing, de-duping identical signatures, cap 100.
-      var seen = {};
+      var seen = Object.create(null);
       var merged = [];
       incoming.concat(loadGuestbook()).forEach(function (e) {
         var key = e.name + '|' + e.message + '|' + e.date;

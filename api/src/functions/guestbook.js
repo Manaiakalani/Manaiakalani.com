@@ -18,6 +18,19 @@ const core = require('../lib/guestbook-core');
 
 const TABLE_NAME = 'guestbook';
 const PARTITION = 'entries';
+// Upper bound on rows pulled into memory per request. toPublic caps the public
+// list to 100; 200 gives sorting headroom while stopping a spam flood from
+// forcing an unbounded full-partition scan on every read.
+const MAX_READ = 200;
+// RowKeys store an inverted timestamp so Table Storage's ascending RowKey order
+// yields newest-first. Base stays above Date.now() (keeping the value positive
+// and, after padStart, a fixed 16-digit width so lexicographic order matches
+// reverse-chronological order) until roughly the year 65,000 — no practical limit.
+const ROWKEY_BASE = 2e15;
+
+// Table creation is idempotent but costs a round-trip; cache success for the
+// lifetime of this warm function instance.
+let tableReady = false;
 
 function getClient() {
   const cs = process.env.TABLES_CONNECTION_STRING || process.env.AzureWebJobsStorage || '';
@@ -26,16 +39,34 @@ function getClient() {
 }
 
 async function ensureTable(client) {
-  try { await client.createTable(); } catch (e) { /* already exists — fine */ }
+  if (tableReady) return;
+  // The SDK resolves createTable() when the table already exists (409 +
+  // TableAlreadyExists) and rethrows every other error — including the rare
+  // 409 TableBeingDeleted. So a clean resolve means the table is usable and we
+  // can cache it; a throw propagates to the handler's catch (graceful degrade)
+  // and leaves tableReady false so the next request retries.
+  await client.createTable();
+  tableReady = true;
 }
 
 async function readRows(client) {
+  // Fetch a single page capped at MAX_READ so a spam flood can't force a
+  // full-partition scan. Newest-first RowKey ordering means this page holds the
+  // newest rows; toPublic() then sorts by seq and caps the public list to 100.
+  const iter = client
+    .listEntities({ queryOptions: { filter: odata`PartitionKey eq ${PARTITION}` } })
+    .byPage({ maxPageSize: MAX_READ });
+  const first = await iter.next();
+  const page = (first && first.value) || [];
   const rows = [];
-  const iter = client.listEntities({ queryOptions: { filter: odata`PartitionKey eq ${PARTITION}` } });
-  for await (const e of iter) {
+  for (const e of page) {
     rows.push({ name: e.name, message: e.message, date: e.date, seq: e.seq });
   }
   return rows;
+}
+
+function newRowKey(now) {
+  return String(ROWKEY_BASE - now).padStart(16, '0') + '-' + Math.random().toString(36).slice(2, 8);
 }
 
 app.http('guestbook', {
@@ -67,7 +98,7 @@ app.http('guestbook', {
       const now = Date.now();
       await client.createEntity({
         partitionKey: PARTITION,
-        rowKey: String(now) + '-' + Math.random().toString(36).slice(2, 8),
+        rowKey: newRowKey(now),
         name: incoming.name,
         message: incoming.message,
         date: core.today(),
