@@ -13,7 +13,7 @@ var MAX_COUNT = 1e12;
 
 // Coerce any stored value into a whole number in [0, MAX_COUNT].
 function toCount(raw) {
-  var n = typeof raw === 'number' ? raw : parseInt(raw, 10);
+  var n = typeof raw === 'number' ? raw : Number(raw);
   if (!isFinite(n) || n < 0) return 0;
   if (n > MAX_COUNT) return MAX_COUNT;
   return Math.floor(n);

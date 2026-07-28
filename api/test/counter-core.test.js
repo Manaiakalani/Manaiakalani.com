@@ -36,6 +36,9 @@ test('toCount coerces garbage to zero', function () {
   assert.strictEqual(core.toCount(NaN), 0);
   assert.strictEqual(core.toCount(Infinity), 0);
 });
+test('toCount parses exponent-notation strings (Number, not parseInt)', function () {
+  assert.strictEqual(core.toCount('1e6'), 1000000);
+});
 test('toCount saturates at the cap', function () {
   assert.strictEqual(core.toCount(core.MAX_COUNT + 1000), core.MAX_COUNT);
 });
