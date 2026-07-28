@@ -9,11 +9,13 @@
  *     a new URL and never serves stale content).
  *   - Unversioned assets (favicon, manifest, og-image): network-first so they can't
  *     get locked to a stale copy until the cache name is bumped.
+ *   - Same-origin API calls (/api/*): never intercepted — always go straight to the
+ *     network so a live count / guestbook can never be served from a stale cache.
  *   - Cross-origin requests (fonts, CDN, analytics, GitHub API): left to the
  *     network — the worker never intercepts them.
  * Bump CACHE on every deploy so the activate step purges the previous cache.
  */
-var CACHE = 'mnk-cache-v3';
+var CACHE = 'mnk-cache-v4';
 var CORE = [
     '/',
     '/projects.html',
@@ -55,6 +57,7 @@ self.addEventListener('fetch', function (event) {
     var url;
     try { url = new URL(req.url); } catch (e) { return; }
     if (url.origin !== self.location.origin) return; // never touch cross-origin
+    if (url.pathname.indexOf('/api/') === 0) return; // never cache API calls — always hit the network
 
     // Treat HTML documents (real navigations AND prefetched documents, which are
     // NOT req.mode==='navigate') as network-first so a new deploy is picked up and
