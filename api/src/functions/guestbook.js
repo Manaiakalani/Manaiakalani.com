@@ -71,8 +71,8 @@ function newRowKey(now) {
 }
 
 async function respond(request, context) {
-  const client = getClient();
   try {
+    const client = getClient();
     if (request.method === 'GET') {
       if (!client) return { jsonBody: { entries: [], backend: 'unconfigured' } };
       await ensureTable(client);
