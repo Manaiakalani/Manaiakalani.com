@@ -1076,6 +1076,22 @@ footer {
     overflow-y: auto;
 }
 
+/* Section header dividing content matches from command matches. */
+.cmdk__group {
+    padding: 0.55rem 0.7rem 0.3rem;
+    font-family: 'Doto', sans-serif;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    border-top: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.cmdk__group:first-child {
+    border-top: 0;
+    padding-top: 0.3rem;
+}
+
 .cmdk__item {
     display: flex;
     align-items: center;

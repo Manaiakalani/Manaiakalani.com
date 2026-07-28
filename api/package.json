@@ -1,0 +1,18 @@
+{
+  "name": "manaiakalani-api",
+  "version": "1.0.0",
+  "description": "Shared guestbook API for manaiakalani.com — an Azure Static Web Apps managed function backed by Azure Table Storage. Degrades gracefully: if no storage connection string is set, the site's guestbook simply stays local (localStorage) and nothing breaks.",
+  "private": true,
+  "main": "src/functions/*.js",
+  "scripts": {
+    "start": "func start",
+    "test": "node test/guestbook-core.test.js"
+  },
+  "dependencies": {
+    "@azure/data-tables": "^13.3.0",
+    "@azure/functions": "^4.5.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

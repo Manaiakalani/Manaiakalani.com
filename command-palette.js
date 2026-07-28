@@ -35,6 +35,12 @@
 
     add({ icon: '\uD83D\uDD17', title: 'Copy link to this page', hint: 'Action', keys: 'url share clipboard permalink', run: copyPageLink });
 
+    // Native share sheet — only offered where the browser supports it; elsewhere
+    // the copy-link command above covers the same need.
+    if (typeof navigator.share === 'function') {
+        add({ icon: '\uD83D\uDCE4', title: 'Share this page\u2026', hint: 'Action', keys: 'share send native sheet url social', run: sharePage });
+    }
+
     var randThought = doc.getElementById('random-thought-btn');
     add({ icon: '\uD83C\uDFB2', title: 'Random thought', hint: randThought ? 'Action' : 'Thoughts', keys: 'shuffle surprise lucky', run: function () { randThought ? randThought.click() : go('/thoughts.html'); } });
 
@@ -63,6 +69,52 @@
         } else {
             fallback();
         }
+    }
+
+    function sharePage() {
+        // navigator.share must run inside the originating user gesture (runIndex
+        // calls this synchronously before closing). Fall back to copy on failure.
+        try {
+            var p = navigator.share({ title: doc.title, url: window.location.href });
+            if (p && p.catch) p.catch(function () { /* cancelled or unsupported target */ });
+        } catch (e) {
+            copyPageLink();
+        }
+    }
+
+    // ---- Page content index (lazy) ----------------------------------------
+    // Beyond command names, the palette searches real page text (thoughts,
+    // uses, about) via a committed search.json. Fetched once on first open;
+    // any failure is non-fatal — command matching keeps working regardless.
+    var contentCmds = null;    // null = not loaded yet
+    var contentLoading = false;
+
+    function iconFor(kind) {
+        return { Thought: '\uD83D\uDCAD', Uses: '\uD83D\uDEE0\uFE0F', About: '\uD83D\uDC64' }[kind] || '\uD83D\uDCC4';
+    }
+
+    function loadContent() {
+        if (contentCmds || contentLoading) return;
+        contentLoading = true;
+        fetch('/search.json', { credentials: 'same-origin' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (data) {
+                var arr = (data && Array.isArray(data.items)) ? data.items : [];
+                contentCmds = arr.map(function (it) {
+                    var url = String(it.u || '');
+                    return {
+                        icon: iconFor(it.s),
+                        title: String(it.t || ''),
+                        hint: String(it.s || 'Page'),
+                        keys: String(it.b || '') + ' ' + String(it.d || ''),
+                        _content: true,
+                        run: function () { go(url); }
+                    };
+                }).filter(function (c) { return c.title && c.keys; });
+                if (dialog.open) render();  // surface results that arrived mid-search
+            })
+            .catch(function () { contentCmds = []; })  // fail closed
+            .finally(function () { contentLoading = false; });
     }
 
     // ---- Fuzzy matching ----------------------------------------------------
@@ -119,7 +171,7 @@
         '<div class="cmdk__box">' +
             '<div class="cmdk__search">' +
                 '<span class="cmdk__search-icon" aria-hidden="true">\uD83D\uDD0D</span>' +
-                '<input type="text" class="cmdk__input" role="combobox" aria-expanded="true" aria-controls="cmdk-list" aria-autocomplete="list" placeholder="Search pages and actions\u2026" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search pages and actions" />' +
+                '<input type="text" class="cmdk__input" role="combobox" aria-expanded="true" aria-controls="cmdk-list" aria-autocomplete="list" placeholder="Search pages, actions, and writing\u2026" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search pages, actions, and writing" />' +
             '</div>' +
             '<ul class="cmdk__list" id="cmdk-list" role="listbox" aria-label="Commands"></ul>' +
             '<p class="cmdk__empty" hidden>No matches. Try &ldquo;theme&rdquo; or &ldquo;projects&rdquo;.</p>' +
@@ -135,21 +187,45 @@
     var list = dialog.querySelector('.cmdk__list');
     var empty = dialog.querySelector('.cmdk__empty');
 
-    var results = [];   // current filtered command objects
+    var results = [];   // current runnable results (commands then content)
+    var itemEls = [];   // parallel <li> refs (excludes non-interactive separators)
     var activeIdx = 0;
 
     function render() {
         var q = input.value.toLowerCase().replace(/\s+/g, '');
-        var scored = [];
+
+        var cmdScored = [];
         commands.forEach(function (cmd) {
             var r = evaluate(cmd, q);
-            if (r.ok) scored.push({ cmd: cmd, score: r.score, marks: r.marks });
+            if (r.ok) cmdScored.push({ cmd: cmd, score: r.score, marks: r.marks });
         });
-        scored.sort(function (a, b) { return b.score - a.score; });
-        results = scored;
+        cmdScored.sort(function (a, b) { return b.score - a.score; });
+
+        // Content matches rank below commands, need >=2 chars, and are capped.
+        var contentScored = [];
+        if (q.length >= 2 && contentCmds && contentCmds.length) {
+            contentCmds.forEach(function (cmd) {
+                var r = evaluate(cmd, q);
+                if (r.ok) contentScored.push({ cmd: cmd, score: r.score, marks: r.marks });
+            });
+            contentScored.sort(function (a, b) { return b.score - a.score; });
+            if (contentScored.length > 6) contentScored = contentScored.slice(0, 6);
+        }
+
+        results = cmdScored.concat(contentScored);
+        itemEls = [];
         list.innerHTML = '';
-        empty.hidden = scored.length !== 0;
-        scored.forEach(function (item, i) {
+        empty.hidden = results.length !== 0;
+
+        var contentStart = cmdScored.length;
+        results.forEach(function (item, i) {
+            if (i === contentStart && contentScored.length) {
+                var sep = doc.createElement('li');
+                sep.className = 'cmdk__group';
+                sep.setAttribute('role', 'presentation');
+                sep.textContent = 'From your pages';
+                list.appendChild(sep);
+            }
             var li = doc.createElement('li');
             li.className = 'cmdk__item';
             li.id = 'cmdk-opt-' + i;
@@ -162,6 +238,7 @@
             li.addEventListener('click', function () { runIndex(i); });
             li.addEventListener('pointermove', function () { setActive(i); });
             list.appendChild(li);
+            itemEls.push(li);
         });
         setActive(0);
     }
@@ -169,14 +246,13 @@
     function setActive(i) {
         if (!results.length) { input.removeAttribute('aria-activedescendant'); return; }
         activeIdx = (i + results.length) % results.length;
-        var items = list.children;
-        for (var n = 0; n < items.length; n++) {
+        for (var n = 0; n < itemEls.length; n++) {
             var on = n === activeIdx;
-            items[n].classList.toggle('is-active', on);
-            items[n].setAttribute('aria-selected', on ? 'true' : 'false');
+            itemEls[n].classList.toggle('is-active', on);
+            itemEls[n].setAttribute('aria-selected', on ? 'true' : 'false');
         }
         input.setAttribute('aria-activedescendant', 'cmdk-opt-' + activeIdx);
-        var el = items[activeIdx];
+        var el = itemEls[activeIdx];
         if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' });
     }
 
@@ -190,6 +266,7 @@
 
     function open(prefill) {
         if (dialog.open) { input.focus(); return; } // idempotent: showModal() twice throws
+        loadContent();
         input.value = prefill || '';
         render();
         dialog.showModal();

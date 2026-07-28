@@ -615,8 +615,8 @@ test('boot.js references GeoCities assets root-relative', async ({ page }) => {
   const res = await page.request.get('/boot.js');
   expect(res.status()).toBe(200);
   const body = await res.text();
-  expect(body).toContain('"/geocities.css?v=4"');
-  expect(body).toContain('"/geocities.js?v=6"');
+  expect(body).toContain('"/geocities.css?v=5"');
+  expect(body).toContain('"/geocities.js?v=7"');
 });
 
 // ── Accessibility: aria-busy is cleared once content loads ──
@@ -767,3 +767,99 @@ test('thoughts: every entry has a copy-link button', async ({ page }) => {
   expect(entries).toBeGreaterThan(0);
   expect(buttons).toBe(entries);
 });
+
+// ── Round 5: palette content search (search.json) ──
+test('search index: search.json is served with thoughts, uses, and about entries', async ({ page }) => {
+  const res = await page.request.get('/search.json');
+  expect(res.status()).toBe(200);
+  const data = await res.json();
+  expect(Array.isArray(data.items)).toBe(true);
+  const kinds = new Set(data.items.map(i => i.s));
+  expect(kinds.has('Thought')).toBe(true);
+  expect(kinds.has('Uses')).toBe(true);
+  expect(kinds.has('About')).toBe(true);
+  // Content deep-links to permalinks / section anchors.
+  expect(data.items.find(i => i.s === 'Thought').u).toMatch(/\/thoughts\.html#/);
+  expect(data.items.find(i => i.s === 'Uses').u).toMatch(/\/uses\.html#/);
+});
+
+test('uses: each section has a deep-link anchor id', async ({ page }) => {
+  await page.goto('/uses.html');
+  const ids = await page.locator('.uses-section[id]').evaluateAll(els => els.map(e => e.id));
+  expect(ids).toEqual(expect.arrayContaining([
+    'editor-terminal', 'hardware', 'productivity', 'development', 'creative-media', 'homelab-self-hosting'
+  ]));
+});
+
+test('command palette: content search surfaces page text under a group and navigates to a permalink', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.cmdk-launcher').click();
+  const dlg = page.locator('.cmdk');
+  await expect(dlg).toBeVisible();
+  await page.locator('.cmdk__input').fill('geocities');
+  // The content group appears once search.json has loaded (fetched on first open).
+  await expect(dlg.locator('.cmdk__group')).toContainText('From your pages');
+  const contentItem = dlg.locator('.cmdk__item', { hasText: 'GeoCities Mode Exists' });
+  await expect(contentItem).toBeVisible();
+  await contentItem.click();
+  await expect(page).toHaveURL(/thoughts(\.html)?#/);
+});
+
+test('command palette: content results are gated to queries of 2+ characters', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.cmdk-launcher').click();
+  const dlg = page.locator('.cmdk');
+  await expect(dlg).toBeVisible();
+  await page.locator('.cmdk__input').fill('ge');
+  await expect(dlg.locator('.cmdk__group')).toBeVisible();   // 2 chars → content shows
+  await page.locator('.cmdk__input').fill('g');
+  await expect(dlg.locator('.cmdk__group')).toHaveCount(0);   // 1 char → content hidden
+});
+
+// ── Round 5: Web Share command (feature-detected) ──
+test('command palette: Web Share command is offered when supported and invokes navigator.share', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__shared = null;
+    navigator.share = (data) => { window.__shared = data; return Promise.resolve(); };
+  });
+  await page.goto('/');
+  await page.locator('.cmdk-launcher').click();
+  const dlg = page.locator('.cmdk');
+  await expect(dlg).toBeVisible();
+  await page.locator('.cmdk__input').fill('share');
+  const shareItem = dlg.locator('.cmdk__item', { hasText: 'Share this page' });
+  await expect(shareItem).toBeVisible();
+  await shareItem.click();
+  const shared = await page.evaluate(() => window.__shared);
+  expect(shared).toBeTruthy();
+  expect(typeof shared.url).toBe('string');
+});
+
+// ── Round 5: guestbook export / import ──
+test('geocities: guestbook exposes export/import tools and import restores entries', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.geocities-toggle').click();
+  await page.locator('[data-gc-action="sign-guestbook"]').click();
+  const dlg = page.locator('.gc-guestbook-dialog');
+  await expect(dlg).toBeVisible();
+  await expect(dlg.locator('[data-gc-gb="export"]')).toBeVisible();
+  await expect(dlg.locator('[data-gc-gb="import"]')).toBeVisible();
+  // Importing a crafted backup prepends its entries (client degrades to localStorage; no API locally).
+  const payload = JSON.stringify([{ name: 'ImportedPal', message: 'restored from backup', date: 'Jan 01, 2000' }]);
+  await dlg.locator('.gc-gb-file').setInputFiles({ name: 'guestbook.json', mimeType: 'application/json', buffer: Buffer.from(payload) });
+  await expect(dlg.locator('.gc-gb-entry').first()).toContainText('ImportedPal');
+  await expect(dlg.locator('.gc-gb-status')).toContainText('Imported');
+});
+
+// ── Round 5: deploy config for the shared backend + Web Share ──
+test('config: web-share is allowed, api runtime is pinned, and the api build is wired', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const root = path.join(__dirname, '..');
+  const cfg = fs.readFileSync(path.join(root, 'staticwebapp.config.json'), 'utf8');
+  expect(cfg).toContain('web-share=(self)');
+  expect(cfg).toContain('"apiRuntime": "node:20"');
+  const wf = fs.readFileSync(path.join(root, '.github', 'workflows', 'azure-static-web-apps-gray-smoke-07ceed71e.yml'), 'utf8');
+  expect(wf).toMatch(/api_location:\s*"api"/);
+});
+
