@@ -37,6 +37,16 @@ function today() {
   return new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' });
 }
 
+// Project a raw Table entity down to the minimal stored shape toPublic consumes.
+// Kept here (pure + unit-tested) so the field set — crucially including the `id`
+// the client needs to reconcile its pending copy — can't silently drop a column
+// in the Function wrapper's read path. toPublic re-sanitizes the visible fields;
+// `seq` drives newest-first ordering.
+function projectRow(e) {
+  e = e || {};
+  return { name: e.name, message: e.message, date: e.date, id: e.id, seq: e.seq };
+}
+
 // Validate + sanitize an inbound POST body. Returns a clean {name, message, id}
 // or null when either required field is missing/blank after sanitization. `id` is
 // an optional opaque client token (may be '') used only for idempotent reconcile.
@@ -71,6 +81,7 @@ module.exports = {
   cleanStr: cleanStr,
   cleanId: cleanId,
   today: today,
+  projectRow: projectRow,
   sanitizeIncoming: sanitizeIncoming,
   toPublic: toPublic,
   MAX_NAME: MAX_NAME,

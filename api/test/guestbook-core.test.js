@@ -113,4 +113,20 @@ test('toPublic tolerates non-array input', function () {
   assert.deepStrictEqual(core.toPublic('nope'), []);
 });
 
+// ---- projectRow (guards the read-path field set) ----
+test('projectRow keeps the fields toPublic needs, including id and seq', function () {
+  var row = core.projectRow({ name: 'A', message: 'b', date: 'd', id: 'keep-me', seq: 7, partitionKey: 'p', rowKey: 'r', odata: {} });
+  assert.deepStrictEqual(Object.keys(row).sort(), ['date', 'id', 'message', 'name', 'seq']);
+  assert.strictEqual(row.id, 'keep-me');
+  assert.strictEqual(row.seq, 7);
+});
+test('projectRow tolerates a null/undefined entity', function () {
+  assert.deepStrictEqual(core.projectRow(null), { name: undefined, message: undefined, date: undefined, id: undefined, seq: undefined });
+  assert.deepStrictEqual(core.projectRow(undefined), { name: undefined, message: undefined, date: undefined, id: undefined, seq: undefined });
+});
+test('projectRow output flows its id through toPublic (read-path integration)', function () {
+  var out = core.toPublic([core.projectRow({ name: 'A', message: 'b', date: 'Jan 01, 2000', id: 'abc-123', seq: 1 })]);
+  assert.strictEqual(out[0].id, 'abc-123');
+});
+
 console.log('\n' + passed + ' checks passed.');
