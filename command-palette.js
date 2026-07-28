@@ -174,7 +174,7 @@
                 '<input type="text" class="cmdk__input" role="combobox" aria-expanded="true" aria-controls="cmdk-list" aria-autocomplete="list" placeholder="Search pages, actions, and writing\u2026" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search pages, actions, and writing" />' +
             '</div>' +
             '<ul class="cmdk__list" id="cmdk-list" role="listbox" aria-label="Commands"></ul>' +
-            '<p class="cmdk__empty" hidden>No matches. Try &ldquo;theme&rdquo; or &ldquo;projects&rdquo;.</p>' +
+            '<p class="cmdk__empty" role="status" aria-live="polite"></p>' +
             '<div class="cmdk__foot">' +
                 '<span><kbd>\u2191</kbd><kbd>\u2193</kbd> navigate</span>' +
                 '<span><kbd>\u21B5</kbd> select</span>' +
@@ -215,7 +215,7 @@
         results = cmdScored.concat(contentScored);
         itemEls = [];
         list.innerHTML = '';
-        empty.hidden = results.length !== 0;
+        empty.textContent = results.length === 0 ? 'No matches. Try \u201Ctheme\u201D or \u201Cprojects\u201D.' : '';
 
         var contentStart = cmdScored.length;
         results.forEach(function (item, i) {

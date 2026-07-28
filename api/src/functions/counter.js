@@ -85,36 +85,45 @@ async function incrementCount(client) {
   return await readCount(client);
 }
 
+async function respond(request, context) {
+  try {
+    const client = getClient();
+    if (!client) return { jsonBody: { count: null, backend: 'unconfigured' } };
+    if (request.method === 'POST') {
+      // Only the increment is throttled; reads (GET) stay open so a returning
+      // visitor always sees the number. The limiter fails open on any error.
+      const limit = await checkRateLimit('counter', request);
+      if (!limit.allowed) {
+        return {
+          status: 429,
+          headers: { 'Retry-After': String(limit.retryAfterSec) },
+          jsonBody: { count: null, backend: 'rate_limited' }
+        };
+      }
+    }
+    const count = request.method === 'POST'
+      ? await incrementCount(client)
+      : await readCount(client);
+    return { jsonBody: { count: count } };
+  } catch (e) {
+    context.error('counter handler failed', e);
+    // Never turn a backend hiccup (or a malformed connection string, which the
+    // SDK throws on synchronously) into a broken page: the client hides the
+    // counter when count is null.
+    return { status: 200, jsonBody: { count: null, backend: 'error' } };
+  }
+}
+
 app.http('counter', {
   methods: ['GET', 'POST'],
   authLevel: 'anonymous',
   route: 'counter',
   handler: async (request, context) => {
-    try {
-      const client = getClient();
-      if (!client) return { jsonBody: { count: null, backend: 'unconfigured' } };
-      if (request.method === 'POST') {
-        // Only the increment is throttled; reads (GET) stay open so a returning
-        // visitor always sees the number. The limiter fails open on any error.
-        const limit = await checkRateLimit('counter', request);
-        if (!limit.allowed) {
-          return {
-            status: 429,
-            headers: { 'Retry-After': String(limit.retryAfterSec) },
-            jsonBody: { count: null, backend: 'rate_limited' }
-          };
-        }
-      }
-      const count = request.method === 'POST'
-        ? await incrementCount(client)
-        : await readCount(client);
-      return { jsonBody: { count: count } };
-    } catch (e) {
-      context.error('counter handler failed', e);
-      // Never turn a backend hiccup (or a malformed connection string, which the
-      // SDK throws on synchronously) into a broken page: the client hides the
-      // counter when count is null.
-      return { status: 200, jsonBody: { count: null, backend: 'error' } };
-    }
+    const res = await respond(request, context);
+    // Every reply is a live count or a rate-limit verdict — per-visitor and
+    // per-moment. Stamp no-store at this one choke point so neither the browser,
+    // the SWA CDN, nor Cloudflare ever serves a stale count.
+    res.headers = { ...(res.headers || {}), 'Cache-Control': 'no-store' };
+    return res;
   }
 });

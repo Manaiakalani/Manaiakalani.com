@@ -144,16 +144,34 @@
       .catch(function () { return null; });
   }
 
+  // Returns a typed outcome so the signer gets honest feedback instead of a
+  // silent success: 'ok' with a list = the shared backend accepted and returned
+  // the merged guestbook; 'ok' without a list = there's simply no shared backend
+  // yet, so the local save stands; 'rate_limited'/'failed' = the local copy is
+  // safe but the shared sync didn't happen.
   function apiPost(entry) {
-    if (typeof fetch !== 'function') return Promise.resolve(null);
+    if (typeof fetch !== 'function') return Promise.resolve({ ok: false, reason: 'failed' });
     return fetch(GB_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(entry)
     })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (d) { return readServerList(d); })
-      .catch(function () { return null; });
+      .then(function (r) {
+        if (r.status === 429) {
+          var ra = parseInt(r.headers.get('Retry-After'), 10);
+          return { ok: false, reason: 'rate_limited', retryAfter: isFinite(ra) && ra > 0 ? ra : null };
+        }
+        if (!r.ok) return { ok: false, reason: 'failed' };
+        return r.json().then(function (d) {
+          var list = readServerList(d);
+          if (list) return { ok: true, list: list };
+          // entries:null — either no backend configured (local save stands) or a
+          // backend error (shared sync didn't happen); only the latter is a miss.
+          if (d && d.backend === 'error') return { ok: false, reason: 'failed' };
+          return { ok: true };
+        }, function () { return { ok: true }; });
+      })
+      .catch(function () { return { ok: false, reason: 'failed' }; });
   }
 
   function paintEntries(listEl, countEl, entries) {
@@ -294,9 +312,23 @@
       status.textContent = 'Thanks for signing! 📖✨';
       paintEntries(listEl, countEl, entries);
       listEl.scrollTop = 0;
-      // Sync to the shared backend when present; failure keeps the local entry.
-      apiPost(entry).then(function (server) {
-        if (server) { saveGuestbook(server); paintEntries(listEl, countEl, server); }
+      // Sync to the shared backend when present, then tell the signer the truth.
+      // The entry is already saved and shown locally; keep the cheerful thanks
+      // only when it's safely stored (locally when there's no shared backend yet,
+      // or shared when the backend accepted). Otherwise say what really happened.
+      apiPost(entry).then(function (res) {
+        if (res.ok && res.list) {
+          saveGuestbook(res.list);
+          paintEntries(listEl, countEl, res.list);
+        } else if (res.reason === 'rate_limited') {
+          status.textContent = res.retryAfter
+            ? 'Saved locally! The shared guestbook is busy — try again in ' + res.retryAfter + 's. \u23F3'
+            : 'Saved locally! The shared guestbook is busy — try again shortly. \u23F3';
+        } else if (res.reason === 'failed') {
+          status.textContent = 'Saved locally \u2014 we\u2019ll sync to the shared book later. \uD83D\uDCBE';
+        }
+        // res.ok without a list = no shared backend yet: the local save stands and
+        // the "Thanks for signing!" message already shown is accurate.
       });
     });
 

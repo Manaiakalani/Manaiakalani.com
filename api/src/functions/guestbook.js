@@ -70,57 +70,66 @@ function newRowKey(now) {
   return String(ROWKEY_BASE - now).padStart(16, '0') + '-' + Math.random().toString(36).slice(2, 8);
 }
 
+async function respond(request, context) {
+  const client = getClient();
+  try {
+    if (request.method === 'GET') {
+      if (!client) return { jsonBody: { entries: [], backend: 'unconfigured' } };
+      await ensureTable(client);
+      return { jsonBody: { entries: core.toPublic(await readRows(client)) } };
+    }
+
+    // POST — append a signature. Throttle first so a flood is shed before we
+    // touch storage; the limiter fails open, so a legit signer is never blocked
+    // by a backend hiccup.
+    const limit = await checkRateLimit('guestbook', request);
+    if (!limit.allowed) {
+      return {
+        status: 429,
+        headers: { 'Retry-After': String(limit.retryAfterSec) },
+        jsonBody: { error: 'Too many signatures — please wait a moment and try again.' }
+      };
+    }
+    let raw = {};
+    try { raw = await request.json(); } catch (e) { raw = {}; }
+    const incoming = core.sanitizeIncoming(raw);
+    if (!incoming) {
+      return { status: 400, jsonBody: { error: 'name and message are required' } };
+    }
+    if (!client) {
+      // No storage configured: acknowledge without persisting; entries:null tells
+      // the client to keep the entry it already saved to localStorage.
+      return { status: 200, jsonBody: { entries: null, backend: 'unconfigured' } };
+    }
+    await ensureTable(client);
+    const now = Date.now();
+    await client.createEntity({
+      partitionKey: PARTITION,
+      rowKey: newRowKey(now),
+      name: incoming.name,
+      message: incoming.message,
+      date: core.today(),
+      seq: now
+    });
+    return { status: 201, jsonBody: { entries: core.toPublic(await readRows(client)) } };
+  } catch (e) {
+    context.error('guestbook handler failed', e);
+    // Never turn a backend hiccup into a broken guestbook: 200 + entries:null
+    // keeps the client on its localStorage copy.
+    return { status: 200, jsonBody: { entries: null, backend: 'error' } };
+  }
+}
+
 app.http('guestbook', {
   methods: ['GET', 'POST'],
   authLevel: 'anonymous',
   route: 'guestbook',
   handler: async (request, context) => {
-    const client = getClient();
-    try {
-      if (request.method === 'GET') {
-        if (!client) return { jsonBody: { entries: [], backend: 'unconfigured' } };
-        await ensureTable(client);
-        return { jsonBody: { entries: core.toPublic(await readRows(client)) } };
-      }
-
-      // POST — append a signature. Throttle first so a flood is shed before we
-      // touch storage; the limiter fails open, so a legit signer is never blocked
-      // by a backend hiccup.
-      const limit = await checkRateLimit('guestbook', request);
-      if (!limit.allowed) {
-        return {
-          status: 429,
-          headers: { 'Retry-After': String(limit.retryAfterSec) },
-          jsonBody: { error: 'Too many signatures — please wait a moment and try again.' }
-        };
-      }
-      let raw = {};
-      try { raw = await request.json(); } catch (e) { raw = {}; }
-      const incoming = core.sanitizeIncoming(raw);
-      if (!incoming) {
-        return { status: 400, jsonBody: { error: 'name and message are required' } };
-      }
-      if (!client) {
-        // No storage configured: acknowledge without persisting; entries:null tells
-        // the client to keep the entry it already saved to localStorage.
-        return { status: 200, jsonBody: { entries: null, backend: 'unconfigured' } };
-      }
-      await ensureTable(client);
-      const now = Date.now();
-      await client.createEntity({
-        partitionKey: PARTITION,
-        rowKey: newRowKey(now),
-        name: incoming.name,
-        message: incoming.message,
-        date: core.today(),
-        seq: now
-      });
-      return { status: 201, jsonBody: { entries: core.toPublic(await readRows(client)) } };
-    } catch (e) {
-      context.error('guestbook handler failed', e);
-      // Never turn a backend hiccup into a broken guestbook: 200 + entries:null
-      // keeps the client on its localStorage copy.
-      return { status: 200, jsonBody: { entries: null, backend: 'error' } };
-    }
+    const res = await respond(request, context);
+    // The signature list and rate-limit verdicts are per-visitor and per-moment.
+    // Stamp no-store at this one choke point so neither the browser, the SWA CDN,
+    // nor Cloudflare serves a cached guestbook.
+    res.headers = { ...(res.headers || {}), 'Cache-Control': 'no-store' };
+    return res;
   }
 });
