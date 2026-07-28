@@ -89,8 +89,8 @@ app.http('counter', {
   authLevel: 'anonymous',
   route: 'counter',
   handler: async (request, context) => {
-    const client = getClient();
     try {
+      const client = getClient();
       if (!client) return { jsonBody: { count: null, backend: 'unconfigured' } };
       const count = request.method === 'POST'
         ? await incrementCount(client)
@@ -98,7 +98,8 @@ app.http('counter', {
       return { jsonBody: { count: count } };
     } catch (e) {
       context.error('counter handler failed', e);
-      // Never turn a backend hiccup into a broken page: the client hides the
+      // Never turn a backend hiccup (or a malformed connection string, which the
+      // SDK throws on synchronously) into a broken page: the client hides the
       // counter when count is null.
       return { status: 200, jsonBody: { count: null, backend: 'error' } };
     }
