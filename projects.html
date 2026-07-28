@@ -27,17 +27,15 @@
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
     <link rel="manifest" href="/manifest.json">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://api.github.com">
-    <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=11">
+    <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="style.css?v=12">
 
     <!-- RSS Feed -->
     <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml">
 
-    <script src="boot.js?v=9"></script>
+    <script src="boot.js?v=10"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -128,7 +126,7 @@
         <div class="container" id="footer-content"></div>
     </footer>
 
-    <script src="script.js?v=11"></script>
+    <script defer src="script.js?v=11"></script>
     <script type="importmap">
     {
         "imports": {
@@ -137,8 +135,8 @@
         }
     }
     </script>
-    <script src="components.js?v=6"></script>
-    <script defer src="command-palette.js?v=3"></script>
+    <script defer src="components.js?v=6"></script>
+    <script defer src="command-palette.js?v=4"></script>
     <script type="module" src="web-vitals-report.js?v=1"></script>
 </body>
 </html>

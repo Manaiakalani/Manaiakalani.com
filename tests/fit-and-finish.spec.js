@@ -615,8 +615,8 @@ test('boot.js references GeoCities assets root-relative', async ({ page }) => {
   const res = await page.request.get('/boot.js');
   expect(res.status()).toBe(200);
   const body = await res.text();
-  expect(body).toContain('"/geocities.css?v=5"');
-  expect(body).toContain('"/geocities.js?v=8"');
+  expect(body).toContain('"/geocities.css?v=6"');
+  expect(body).toContain('"/geocities.js?v=9"');
 });
 
 // ── Accessibility: aria-busy is cleared once content loads ──
