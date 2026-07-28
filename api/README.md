@@ -21,6 +21,32 @@ missing, unconfigured, or failing backend never breaks the guestbook.
 All input is sanitized and length-capped server-side (`name` ≤ 40,
 `message` ≤ 200, ≤ 100 entries returned). See `src/lib/guestbook-core.js`.
 
+> The visitor **hit counter** (`GET|POST /api/counter`) shares the same
+> `TABLES_CONNECTION_STRING`, so completing the setup below activates both.
+
+## Abuse protection (rate limiting)
+
+Both anonymous `POST` endpoints are throttled per client IP by a shared,
+Table Storage-backed limiter (`src/lib/rate-limit.js`, decision logic in the
+pure `src/lib/rate-limit-core.js`).
+
+- **Defaults:** guestbook **5 posts / 10 min**, counter **20 increments / 5 min**
+  per IP. Only writes are limited — guestbook/counter `GET` reads stay open.
+- **Privacy-first:** the client IP (from `cf-connecting-ip`, else the first
+  `x-forwarded-for` hop) is **salted-hashed** into an opaque key — raw visitor
+  IPs are never written to storage. Set `RATE_LIMIT_SALT` to rotate the hash.
+- **Fail-open:** if storage is unconfigured or errors, requests are allowed. A
+  cosmetic guestbook/counter must never break because the limiter hiccuped.
+- **Tune without a redeploy** via app settings:
+  `RL_GUESTBOOK_LIMIT`, `RL_GUESTBOOK_WINDOW_MS`,
+  `RL_COUNTER_LIMIT`, `RL_COUNTER_WINDOW_MS`.
+- A `ratelimit` table is created automatically on first throttled write.
+
+**Recommended edge backstop:** because the limiter fails open, also add a
+[Cloudflare rate-limiting rule](https://developers.cloudflare.com/waf/rate-limiting-rules/)
+on `POST /api/*` (e.g. 30 requests/min per IP). Cloudflare enforces it before
+traffic ever reaches Azure, covering the fail-open window.
+
 ## One-time Azure setup (to activate shared mode)
 
 You need an Azure Storage account and one app setting. The Function and the

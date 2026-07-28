@@ -17,6 +17,7 @@
 const { app } = require('@azure/functions');
 const { TableClient } = require('@azure/data-tables');
 const core = require('../lib/counter-core');
+const { checkRateLimit } = require('../lib/rate-limit');
 
 const TABLE_NAME = 'counter';
 const PARTITION = 'site';
@@ -92,6 +93,18 @@ app.http('counter', {
     try {
       const client = getClient();
       if (!client) return { jsonBody: { count: null, backend: 'unconfigured' } };
+      if (request.method === 'POST') {
+        // Only the increment is throttled; reads (GET) stay open so a returning
+        // visitor always sees the number. The limiter fails open on any error.
+        const limit = await checkRateLimit('counter', request);
+        if (!limit.allowed) {
+          return {
+            status: 429,
+            headers: { 'Retry-After': String(limit.retryAfterSec) },
+            jsonBody: { count: null, backend: 'rate_limited' }
+          };
+        }
+      }
       const count = request.method === 'POST'
         ? await incrementCount(client)
         : await readCount(client);

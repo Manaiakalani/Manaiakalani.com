@@ -15,6 +15,7 @@
 const { app } = require('@azure/functions');
 const { TableClient, odata } = require('@azure/data-tables');
 const core = require('../lib/guestbook-core');
+const { checkRateLimit } = require('../lib/rate-limit');
 
 const TABLE_NAME = 'guestbook';
 const PARTITION = 'entries';
@@ -82,7 +83,17 @@ app.http('guestbook', {
         return { jsonBody: { entries: core.toPublic(await readRows(client)) } };
       }
 
-      // POST — append a signature.
+      // POST — append a signature. Throttle first so a flood is shed before we
+      // touch storage; the limiter fails open, so a legit signer is never blocked
+      // by a backend hiccup.
+      const limit = await checkRateLimit('guestbook', request);
+      if (!limit.allowed) {
+        return {
+          status: 429,
+          headers: { 'Retry-After': String(limit.retryAfterSec) },
+          jsonBody: { error: 'Too many signatures — please wait a moment and try again.' }
+        };
+      }
       let raw = {};
       try { raw = await request.json(); } catch (e) { raw = {}; }
       const incoming = core.sanitizeIncoming(raw);
