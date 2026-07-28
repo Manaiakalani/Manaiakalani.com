@@ -216,13 +216,17 @@
   }
 
   // Reconcile the shared server list with local entries so a signature the backend
-  // hasn't accepted yet is never lost: local-only ("pending") entries come first so
-  // the 100-entry cap trims the oldest shared entries, not the visitor's own.
+  // hasn't accepted yet is never lost: genuine local-only ("pending") submissions
+  // come first so the 100-entry cap trims the oldest shared entries, not the
+  // visitor's own. The server list is authoritative and the 1998 seed entries are
+  // decorative placeholders for the empty state, so neither is treated as pending —
+  // real shared entries are never evicted just to keep a seed entry on top.
   function reconcileEntries(server, local) {
-    var onServer = Object.create(null);
-    server.forEach(function (e) { onServer[e.name + '|' + e.message + '|' + e.date] = true; });
+    var known = Object.create(null);
+    server.forEach(function (e) { known[e.name + '|' + e.message + '|' + e.date] = true; });
+    sanitizeEntries(GB_SEED).forEach(function (e) { known[e.name + '|' + e.message + '|' + e.date] = true; });
     var pending = local.filter(function (e) {
-      return !onServer[e.name + '|' + e.message + '|' + e.date];
+      return !known[e.name + '|' + e.message + '|' + e.date];
     });
     return mergeEntries(pending, server);
   }
