@@ -12,7 +12,7 @@
   } catch (e) { /* localStorage unavailable */ }
 
   var GEO_CSS_HREF = "/geocities.css?v=5";
-  var GEO_JS_HREF = "/geocities.js?v=7";
+  var GEO_JS_HREF = "/geocities.js?v=8";
   var GEO_KEY = "mnk:geocities";
   var geoCssPromise;
   var geoJsPromise;
