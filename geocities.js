@@ -93,11 +93,17 @@
       var name = typeof e.name === 'string' ? e.name : '';
       var message = typeof e.message === 'string' ? e.message : '';
       if (!name && !message) continue;
-      out.push({
+      var rec = {
         name: name.slice(0, 40),
         message: message.slice(0, 200),
         date: typeof e.date === 'string' ? e.date.slice(0, 40) : ''
-      });
+      };
+      // Preserve the client-only "pending" marker (an entry this browser created
+      // that the shared backend hasn't confirmed yet) so it round-trips through
+      // localStorage. The server never sends this field, so server entries stay
+      // unmarked and authoritative.
+      if (e.pending === true) rec.pending = true;
+      out.push(rec);
     }
     return out;
   }
@@ -216,17 +222,20 @@
   }
 
   // Reconcile the shared server list with local entries so a signature the backend
-  // hasn't accepted yet is never lost: genuine local-only ("pending") submissions
-  // come first so the 100-entry cap trims the oldest shared entries, not the
-  // visitor's own. The server list is authoritative and the 1998 seed entries are
-  // decorative placeholders for the empty state, so neither is treated as pending —
-  // real shared entries are never evicted just to keep a seed entry on top.
+  // hasn't accepted yet is never lost. "Pending" is an explicit client-set marker on
+  // entries this browser created and POSTed but the backend hasn't confirmed — NOT
+  // merely "absent from the current server list". That distinction matters: a shared
+  // entry that ages out of the server's top 100 (or a decorative 1998 seed) must
+  // yield to the authoritative server list, whereas a genuine unsynced submission is
+  // placed first so the 100-entry cap trims the oldest SHARED entry, never the
+  // visitor's own. Once the backend confirms a pending entry it appears in `server`,
+  // so it drops out of `pending` here and its unmarked server copy wins — the marker
+  // clears itself.
   function reconcileEntries(server, local) {
-    var known = Object.create(null);
-    server.forEach(function (e) { known[e.name + '|' + e.message + '|' + e.date] = true; });
-    sanitizeEntries(GB_SEED).forEach(function (e) { known[e.name + '|' + e.message + '|' + e.date] = true; });
+    var onServer = Object.create(null);
+    server.forEach(function (e) { onServer[e.name + '|' + e.message + '|' + e.date] = true; });
     var pending = local.filter(function (e) {
-      return !known[e.name + '|' + e.message + '|' + e.date];
+      return e.pending === true && !onServer[e.name + '|' + e.message + '|' + e.date];
     });
     return mergeEntries(pending, server);
   }
@@ -272,8 +281,14 @@
         if (status) status.textContent = 'No valid entries in that file.';
         return;
       }
+      // Imported entries are user-asserted local restores the shared backend hasn't
+      // seen, so mark them pending too — a later reconcile keeps them until (if ever)
+      // the backend confirms them, instead of dropping them as stale shared data.
+      var pendingIncoming = incoming.map(function (e) {
+        return { name: e.name, message: e.message, date: e.date, pending: true };
+      });
       // Merge imported over existing, de-duping identical signatures, cap 100.
-      var merged = mergeEntries(incoming, loadGuestbook());
+      var merged = mergeEntries(pendingIncoming, loadGuestbook());
       saveGuestbook(merged);
       paintEntries(listEl, countEl, merged);
       if (listEl) listEl.scrollTop = 0;
@@ -336,7 +351,9 @@
       }
       var entry = { name: name.slice(0, 40), message: message.slice(0, 200), date: guestbookToday() };
       var entries = loadGuestbook();
-      entries.unshift(entry);
+      // Store a pending-marked local copy so a later reconcile preserves it until the
+      // backend confirms it; the POST body below stays clean (the marker is client-only).
+      entries.unshift({ name: entry.name, message: entry.message, date: entry.date, pending: true });
       if (entries.length > 100) entries.length = 100;
       saveGuestbook(entries);
       form.reset();
