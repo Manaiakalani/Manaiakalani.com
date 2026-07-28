@@ -21,6 +21,10 @@ const core = require('./rate-limit-core');
 const { clientIpFrom } = require('./client-ip');
 
 const TABLE_NAME = 'ratelimit';
+// Optimistic-concurrency retry budget, mirroring the counter's read-modify-write
+// loop. Azure Tables has no atomic increment, so a burst against one IP can lose
+// the etag race; we re-read and retry rather than clobber a concurrent write.
+const MAX_ATTEMPTS = 5;
 
 function intEnv(name, fallback) {
   const n = Number(process.env[name]);
@@ -80,11 +84,61 @@ function headerGetter(request) {
 async function readRecord(client, partition, row) {
   try {
     const e = await client.getEntity(partition, row);
-    return { windowStart: Number(e.windowStart) || 0, count: Number(e.count) || 0 };
+    // Keep the etag so the write can use If-Match optimistic concurrency.
+    return { windowStart: Number(e.windowStart) || 0, count: Number(e.count) || 0, etag: e.etag };
   } catch (e) {
     if (e && e.statusCode === 404) return null;
     throw e;
   }
+}
+
+/*
+ * Read-modify-write the window record under optimistic concurrency, mirroring
+ * counter.js. Returns { allowed, retryAfterSec }. Assumes the table exists.
+ *
+ * Two correctness properties the plain last-write-wins upsert lacked:
+ *   1. Denied requests never write — the stored window/count is already right,
+ *      so a flood costs zero storage writes and can't keep resetting the row.
+ *   2. Allowed writes are guarded by If-Match (updates) or create-if-absent, so
+ *      concurrent requests can't both read count=N-1 and both commit N; the
+ *      loser gets a 409/412, re-reads, and re-counts against the fresh value.
+ */
+async function commit(client, partition, row, policy, t) {
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    const prev = await readRecord(client, partition, row);
+    const decision = core.evaluate(prev, t, policy);
+
+    if (!decision.allowed) {
+      return { allowed: false, retryAfterSec: decision.retryAfterSec };
+    }
+
+    const entity = {
+      partitionKey: partition,
+      rowKey: row,
+      windowStart: decision.record.windowStart,
+      count: decision.record.count
+    };
+    try {
+      if (!prev) {
+        // No row yet: create it, but if a concurrent request created it first
+        // (409) re-read and retry so we count against its window.
+        await client.createEntity(entity);
+      } else {
+        // Row exists: commit only if nobody moved it since we read (If-Match);
+        // a 412 means we lost the race → re-read and retry.
+        await client.updateEntity(entity, 'Replace', { etag: prev.etag });
+      }
+      return { allowed: true, retryAfterSec: 0 };
+    } catch (e) {
+      if (e && (e.statusCode === 409 || e.statusCode === 412)) continue;
+      throw e;
+    }
+  }
+
+  // Storage is healthy but this one key is under heavy write contention — i.e.
+  // a burst/flood against a single IP, which a genuine visitor never generates.
+  // Throttle rather than fail open, so contention can't be used to slip through.
+  return { allowed: false, retryAfterSec: Math.ceil(policy.windowMs / 1000) };
 }
 
 /*
@@ -102,21 +156,7 @@ async function checkRateLimit(bucket, request, now) {
     if (!ip) return { allowed: true, retryAfterSec: 0 }; // no IP to bucket by -> fail open
 
     await ensureTable(client);
-    const partition = 'rl-' + bucket;
-    const row = hashIp(ip);
-    const prev = await readRecord(client, partition, row);
-    const decision = core.evaluate(prev, t, policy);
-
-    // Persist the new window/count. Last-write-wins is acceptable for a rate
-    // limiter: a rare concurrent race lets at most a couple extra requests slip.
-    await client.upsertEntity({
-      partitionKey: partition,
-      rowKey: row,
-      windowStart: decision.record.windowStart,
-      count: decision.record.count
-    }, 'Replace');
-
-    return { allowed: decision.allowed, retryAfterSec: decision.retryAfterSec };
+    return await commit(client, 'rl-' + bucket, hashIp(ip), policy, t);
   } catch (e) {
     return { allowed: true, retryAfterSec: 0 }; // fail open: never break the endpoint
   }
@@ -125,5 +165,8 @@ async function checkRateLimit(bucket, request, now) {
 module.exports = {
   checkRateLimit: checkRateLimit,
   hashIp: hashIp,
-  POLICIES: POLICIES
+  POLICIES: POLICIES,
+  // Exported for tests: the concurrency-controlled read-modify-write against an
+  // injected client, isolated from env/IP resolution.
+  _commit: commit
 };
