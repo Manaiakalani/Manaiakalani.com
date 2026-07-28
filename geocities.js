@@ -122,8 +122,41 @@
     return new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' });
   }
 
-  function renderGuestbookEntries(listEl, countEl) {
-    var entries = loadGuestbook();
+  // ---- Shared backend (optional) ----------------------------------------
+  // When an Azure Function + Table Storage backend is configured, the
+  // guestbook becomes shared across visitors. It is same-origin (/api/*), so
+  // CSP connect-src 'self' already covers it. Every call fails soft: if the
+  // backend is absent or errors, the guestbook silently stays local-only.
+  var GB_API = '/api/guestbook';
+
+  function readServerList(data) {
+    var arr = Array.isArray(data) ? data : (data && Array.isArray(data.entries) ? data.entries : null);
+    if (!arr) return null;
+    var clean = sanitizeEntries(arr);
+    return clean.length ? clean : null;
+  }
+
+  function apiGet() {
+    if (typeof fetch !== 'function') return Promise.resolve(null);
+    return fetch(GB_API, { headers: { 'Accept': 'application/json' } })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { return readServerList(d); })
+      .catch(function () { return null; });
+  }
+
+  function apiPost(entry) {
+    if (typeof fetch !== 'function') return Promise.resolve(null);
+    return fetch(GB_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(entry)
+    })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { return readServerList(d); })
+      .catch(function () { return null; });
+  }
+
+  function paintEntries(listEl, countEl, entries) {
     listEl.textContent = '';
     if (countEl) {
       countEl.textContent = '~ ' + entries.length + (entries.length === 1 ? ' soul has' : ' souls have') + ' signed ~';
@@ -145,6 +178,60 @@
       li.appendChild(msg);
       listEl.appendChild(li);
     });
+  }
+
+  function renderGuestbookEntries(listEl, countEl) {
+    paintEntries(listEl, countEl, loadGuestbook());        // instant local paint
+    apiGet().then(function (server) {                      // then reconcile with the shared list
+      if (server) { saveGuestbook(server); paintEntries(listEl, countEl, server); }
+    });
+  }
+
+  function exportGuestbook() {
+    var data = JSON.stringify(loadGuestbook(), null, 2);
+    var blob = new Blob([data], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'guestbook.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function importGuestbook(file, listEl, countEl, status) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var incoming;
+      try {
+        var parsed = JSON.parse(String(reader.result));
+        incoming = sanitizeEntries(Array.isArray(parsed) ? parsed : (parsed && parsed.entries) || []);
+      } catch (e) {
+        if (status) status.textContent = 'That file isn\u2019t valid guestbook JSON.';
+        return;
+      }
+      if (!incoming.length) {
+        if (status) status.textContent = 'No valid entries in that file.';
+        return;
+      }
+      // Merge imported over existing, de-duping identical signatures, cap 100.
+      var seen = {};
+      var merged = [];
+      incoming.concat(loadGuestbook()).forEach(function (e) {
+        var key = e.name + '|' + e.message + '|' + e.date;
+        if (seen[key]) return;
+        seen[key] = true;
+        merged.push(e);
+      });
+      if (merged.length > 100) merged.length = 100;
+      saveGuestbook(merged);
+      paintEntries(listEl, countEl, merged);
+      if (listEl) listEl.scrollTop = 0;
+      if (status) status.textContent = 'Imported ' + incoming.length + ' entr' + (incoming.length === 1 ? 'y' : 'ies') + '! \uD83D\uDCC2';
+    };
+    reader.onerror = function () { if (status) status.textContent = 'Could not read that file.'; };
+    reader.readAsText(file);
   }
 
   function buildGuestbookDialog() {
@@ -171,6 +258,11 @@
           '</div>' +
         '</form>' +
         '<hr class="gc-hr-rainbow" aria-hidden="true">' +
+        '<div class="gc-gb-tools">' +
+          '<button type="button" class="gc-gb-tool" data-gc-gb="export">\uD83D\uDCBE Export</button>' +
+          '<button type="button" class="gc-gb-tool" data-gc-gb="import">\uD83D\uDCC2 Import</button>' +
+          '<input type="file" class="gc-gb-file" accept="application/json,.json" hidden aria-hidden="true" tabindex="-1">' +
+        '</div>' +
         '<div class="gc-gb-count" aria-live="polite"></div>' +
         '<ul class="gc-gb-list"></ul>' +
       '</div>';
@@ -180,6 +272,9 @@
     var form = dlg.querySelector('.gc-gb-form');
     var status = dlg.querySelector('.gc-gb-status');
     var closeBtn = dlg.querySelector('.gc-gb-close');
+    var exportBtn = dlg.querySelector('[data-gc-gb="export"]');
+    var importBtn = dlg.querySelector('[data-gc-gb="import"]');
+    var fileInput = dlg.querySelector('.gc-gb-file');
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -190,14 +285,31 @@
         status.textContent = 'Please fill in both fields!';
         return;
       }
+      var entry = { name: name.slice(0, 40), message: message.slice(0, 200), date: guestbookToday() };
       var entries = loadGuestbook();
-      entries.unshift({ name: name.slice(0, 40), message: message.slice(0, 200), date: guestbookToday() });
+      entries.unshift(entry);
       if (entries.length > 100) entries.length = 100;
       saveGuestbook(entries);
       form.reset();
       status.textContent = 'Thanks for signing! 📖✨';
-      renderGuestbookEntries(listEl, countEl);
+      paintEntries(listEl, countEl, entries);
       listEl.scrollTop = 0;
+      // Sync to the shared backend when present; failure keeps the local entry.
+      apiPost(entry).then(function (server) {
+        if (server) { saveGuestbook(server); paintEntries(listEl, countEl, server); }
+      });
+    });
+
+    exportBtn.addEventListener('click', function () {
+      exportGuestbook();
+      status.textContent = 'Guestbook exported! 💾';
+    });
+    importBtn.addEventListener('click', function () { fileInput.click(); });
+    fileInput.addEventListener('change', function () {
+      if (fileInput.files && fileInput.files[0]) {
+        importGuestbook(fileInput.files[0], listEl, countEl, status);
+      }
+      fileInput.value = ''; // allow re-importing the same file
     });
 
     closeBtn.addEventListener('click', function () { dlg.close(); });

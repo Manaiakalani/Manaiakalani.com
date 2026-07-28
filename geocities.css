@@ -1053,6 +1053,28 @@ html[data-geocities="true"] .github-link:hover {
   border-style: inset;
 }
 
+.gc-gb-tools {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 6px 0 2px;
+}
+
+.gc-gb-tool {
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  font-weight: 700;
+  background: #c0c0c0;
+  border: 2px outset #ffffff;
+  padding: 3px 12px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: #000080;
+}
+
+.gc-gb-tool:active {
+  border-style: inset;
+}
+
 .gc-gb-status {
   font-size: 0.8rem;
   color: #004d00;

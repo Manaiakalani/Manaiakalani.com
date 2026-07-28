@@ -1,11 +1,14 @@
 {
   "globalHeaders": {
     "Content-Security-Policy": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'sha256-BphLCwsL2YGbH7fpRGMsqZUeq/To4YyljkP/5YhJZSU=' 'sha256-WC1PnDRKaxZYA9i2cYZ1ZhPmN9tQnqBGVoavdNPvd9I=' 'sha256-ldTCL11wfSi8VRdpgNeHTMPmUKnbpdipzRdjZo23U2Y=' 'sha256-6jKOON7pW0xLacvYakfdiEu7ust7mveoJNZ+DZ8Iqek=' 'sha256-Z5JBo+o0XdHc7H+9NEOkcr188jwHJd8LSxVSqQZ8RTE=' https://cdn.jsdelivr.net https://analytics.manaiakalani.info; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://analytics.manaiakalani.info; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://analytics.manaiakalani.info https://api.github.com https://cdn.jsdelivr.net; manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests",
-    "Permissions-Policy": "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), clipboard-read=(), clipboard-write=(self), display-capture=(), encrypted-media=(), geolocation=(), gyroscope=(), hid=(), magnetometer=(), microphone=(), midi=(), payment=(), publickey-credentials-get=(), serial=(), usb=(), web-share=(), xr-spatial-tracking=()",
+    "Permissions-Policy": "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), clipboard-read=(), clipboard-write=(self), display-capture=(), encrypted-media=(), geolocation=(), gyroscope=(), hid=(), magnetometer=(), microphone=(), midi=(), payment=(), publickey-credentials-get=(), serial=(), usb=(), web-share=(self), xr-spatial-tracking=()",
     "X-Frame-Options": "DENY",
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload"
+  },
+  "platform": {
+    "apiRuntime": "node:20"
   },
   "routes": [
     { "route": "/tests/*", "rewrite": "/404.html" },
@@ -14,12 +17,17 @@
     { "route": "/playwright.config.js", "rewrite": "/404.html" },
     { "route": "/lighthouserc.json", "rewrite": "/404.html" },
     { "route": "/compute-hashes.js", "rewrite": "/404.html" },
+    { "route": "/build-search-index.js", "rewrite": "/404.html" },
     { "route": "/node_modules/*", "rewrite": "/404.html" },
     { "route": "/.github/*", "rewrite": "/404.html" },
     { "route": "/README.md", "rewrite": "/404.html" },
     { "route": "/.gitignore", "rewrite": "/404.html" },
     {
       "route": "/feed.xml",
+      "headers": { "Cache-Control": "public, max-age=3600" }
+    },
+    {
+      "route": "/search.json",
       "headers": { "Cache-Control": "public, max-age=3600" }
     },
     {
