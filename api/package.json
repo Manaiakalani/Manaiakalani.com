@@ -6,7 +6,7 @@
   "main": "src/functions/*.js",
   "scripts": {
     "start": "func start",
-    "test": "node test/guestbook-core.test.js"
+    "test": "node --test"
   },
   "dependencies": {
     "@azure/data-tables": "^13.3.0",

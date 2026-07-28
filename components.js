@@ -12,6 +12,10 @@
             <a href="https://bsky.app/profile/did:plc:kurxpumma6piictgpr424wcj" target="_blank" rel="noopener noreferrer me" aria-label="Bluesky"><svg aria-hidden="true" width="1em" height="1em" fill="currentColor" viewBox="0 0 24 24"><path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078a8.741 8.741 0 0 1-.415-.056c.14.017.279.036.415.056 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.206-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8Z"/></svg></a>
         </div>
         <p class="footer-text">Made with <span class="heart-beat" aria-hidden="true">❤️</span> in Seattle, WA</p>
+        <p class="footer-visits" hidden>
+            <span class="visits-odometer" aria-label="Visitor count"></span>
+            <span class="visits-label">Visitors</span>
+        </p>
     `;
 
     function ensureCubeLoader() {
@@ -27,6 +31,65 @@
         document.body.appendChild(moduleScript);
     }
 
+    // Retro visitor hit counter. Progressive enhancement over the shared
+    // guestbook backend: increments once per browser session, otherwise reads.
+    // If the backend isn't configured (or errors, or we're offline) the panel
+    // simply stays hidden — the footer is never broken by a missing count.
+    var COUNTER_ENDPOINT = '/api/counter';
+    var COUNTER_MIN_DIGITS = 6;
+    var COUNTER_SESSION_KEY = 'mnk:counted';
+
+    function padCount(n) {
+        var s = String(n);
+        while (s.length < COUNTER_MIN_DIGITS) {
+            s = '0' + s;
+        }
+        return s;
+    }
+
+    function renderVisitorCount(panel, count) {
+        var odometer = panel.querySelector('.visits-odometer');
+        if (!odometer) {
+            return;
+        }
+        var digits = padCount(count);
+        var cells = '';
+        for (var i = 0; i < digits.length; i++) {
+            cells += '<span class="visits-digit" aria-hidden="true">' + digits.charAt(i) + '</span>';
+        }
+        odometer.innerHTML = cells;
+        odometer.setAttribute('aria-label', Number(count).toLocaleString('en-US') + ' visitors');
+        panel.hidden = false;
+        // Enhance the already-visible panel with a one-shot entrance; if the
+        // animation never runs (reduced motion, headless) it stays visible.
+        requestAnimationFrame(function () { panel.classList.add('is-visible'); });
+    }
+
+    function initVisitorCounter() {
+        var panel = document.querySelector('.footer-visits');
+        if (!panel || panel.dataset.done === 'true' || typeof fetch !== 'function') {
+            return;
+        }
+        panel.dataset.done = 'true';
+
+        var counted = false;
+        try { counted = sessionStorage.getItem(COUNTER_SESSION_KEY) === '1'; } catch (e) {}
+        var method = counted ? 'GET' : 'POST';
+
+        fetch(COUNTER_ENDPOINT, { method: method, headers: { 'accept': 'application/json' } })
+            .then(function (res) { return res.ok ? res.json() : null; })
+            .then(function (data) {
+                if (!data || typeof data.count !== 'number' || !isFinite(data.count)) {
+                    return; // unconfigured / error backend → leave the panel hidden
+                }
+                if (!counted) {
+                    try { sessionStorage.setItem(COUNTER_SESSION_KEY, '1'); } catch (e) {}
+                }
+                renderVisitorCount(panel, Math.max(0, Math.floor(data.count)));
+            })
+            .catch(function () { /* offline or no backend → stay hidden */ });
+    }
+
     function injectFooter() {
         var footerContent = document.getElementById('footer-content');
         if (!footerContent || footerContent.dataset.injected === 'true') {
@@ -36,6 +99,7 @@
         footerContent.innerHTML = footerHtml;
         footerContent.dataset.injected = 'true';
         ensureCubeLoader();
+        initVisitorCounter();
     }
 
     window.injectFooter = injectFooter;

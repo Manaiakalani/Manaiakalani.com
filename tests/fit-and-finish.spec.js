@@ -863,3 +863,86 @@ test('config: web-share is allowed, api runtime is pinned, and the api build is 
   expect(wf).toMatch(/api_location:\s*"api"/);
 });
 
+// ── Round 6: retro visitor hit counter ──
+test('counter: footer counter stays hidden when no backend is configured', async ({ page }) => {
+  // Local `serve` returns 404 for /api/*, so the counter must degrade to hidden.
+  await page.goto('/');
+  const panel = page.locator('.footer-visits');
+  await expect(panel).toHaveCount(1);
+  await page.waitForTimeout(600); // let the fetch fail and settle
+  await expect(panel).toBeHidden();
+});
+
+test('counter: reveals an amber odometer with the count when the backend responds', async ({ page }) => {
+  // Neutralize the SW so the counter fetch hits the route mock, not the SW's
+  // network-first passthrough to the (mock-less) real dev server.
+  await page.addInitScript(() => {
+    try { navigator.serviceWorker.register = () => Promise.reject(new Error('sw blocked in test')); } catch (e) {}
+  });
+  await page.route('**/api/counter', route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ count: 12483 }) })
+  );
+  await page.goto('/');
+  const panel = page.locator('.footer-visits');
+  await expect(panel).toBeVisible();
+  const odo = panel.locator('.visits-odometer');
+  await expect(odo).toHaveAttribute('aria-label', /12,483 visitors/);
+  await expect(panel.locator('.visits-digit')).toHaveCount(6); // fixed-width odometer
+  await expect(odo).toContainText('012483');
+});
+
+test('counter: increments once per session (POST first visit, GET thereafter)', async ({ page }) => {
+  // Neutralize the SW so both navigations reach the route mock deterministically.
+  await page.addInitScript(() => {
+    try { navigator.serviceWorker.register = () => Promise.reject(new Error('sw blocked in test')); } catch (e) {}
+  });
+  const methods = [];
+  await page.route('**/api/counter', route => {
+    methods.push(route.request().method());
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ count: 7 }) });
+  });
+  await page.goto('/');
+  await expect(page.locator('.footer-visits')).toBeVisible();
+  await page.goto('/uses.html'); // same tab → sessionStorage guard is set
+  await expect(page.locator('.footer-visits')).toBeVisible();
+  expect(methods[0]).toBe('POST');
+  expect(methods.slice(1)).not.toContain('POST');
+});
+
+// ── Round 6: richer per-page social cards ──
+const OG_CARDS = [
+  { path: '/', img: 'og-home.png', alt: 'Maximilian Stein — Community Strategy Lead' },
+  { path: '/thoughts.html', img: 'og-thoughts.png', alt: 'Maximilian Stein — Thoughts' },
+  { path: '/uses.html', img: 'og-uses.png', alt: 'Maximilian Stein — Uses' },
+  { path: '/projects.html', img: 'og-projects.png', alt: 'Maximilian Stein — Projects' },
+];
+for (const o of OG_CARDS) {
+  test(`${o.path}: ships a per-page social card with dimensions and alt text`, async ({ page }) => {
+    await page.goto(o.path);
+    const meta = (p) => page.locator(`head meta[property="${p}"]`).getAttribute('content');
+    expect(await meta('og:site_name')).toBe('Maximilian Stein');
+    expect(await meta('og:image')).toBe(`https://manaiakalani.com/${o.img}`);
+    expect(await meta('og:image:width')).toBe('1200');
+    expect(await meta('og:image:height')).toBe('630');
+    expect(await meta('og:image:alt')).toBe(o.alt);
+    expect(await meta('twitter:image')).toBe(`https://manaiakalani.com/${o.img}`);
+    expect(await meta('twitter:image:alt')).toBe(o.alt);
+  });
+}
+
+test('404: carries social card tags and stays noindex', async ({ page }) => {
+  await page.goto('/404.html');
+  const meta = (sel) => page.locator(`head ${sel}`).getAttribute('content');
+  expect(await meta('meta[property="og:image"]')).toContain('/og-home.png');
+  expect(await meta('meta[property="og:site_name"]')).toBe('Maximilian Stein');
+  expect(await meta('meta[name="robots"]')).toContain('noindex');
+});
+
+test('social cards: every per-page OG image is served as a PNG', async ({ page }) => {
+  for (const img of ['og-home.png', 'og-thoughts.png', 'og-uses.png', 'og-projects.png']) {
+    const res = await page.request.get('/' + img);
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type']).toContain('image/png');
+  }
+});
+
