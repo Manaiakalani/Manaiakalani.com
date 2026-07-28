@@ -109,6 +109,7 @@ async function respond(request, context) {
       name: incoming.name,
       message: incoming.message,
       date: core.today(),
+      id: incoming.id,
       seq: now
     });
     return { status: 201, jsonBody: { entries: core.toPublic(await readRows(client)) } };

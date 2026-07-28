@@ -103,6 +103,10 @@
       // localStorage. The server never sends this field, so server entries stay
       // unmarked and authoritative.
       if (e.pending === true) rec.pending = true;
+      // Preserve the opaque entry id (allow-listed token) so a local pending copy
+      // can be matched to its backend-stored row regardless of how the server later
+      // normalizes the visible name/message/date. Server rows carry it too.
+      if (typeof e.id === 'string' && e.id) rec.id = e.id.replace(/[^A-Za-z0-9-]/g, '').slice(0, 36);
       out.push(rec);
     }
     return out;
@@ -126,6 +130,18 @@
 
   function guestbookToday() {
     return new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' });
+  }
+
+  // Mint an opaque, collision-resistant id for a locally-created entry. It is
+  // round-tripped by the backend so a pending local copy can be matched to its
+  // stored row by identity (not by the visible text/date, which the server
+  // normalizes). crypto.randomUUID when available; a time+random fallback
+  // otherwise. Always within the server's allow-listed charset and length.
+  function newEntryId() {
+    try {
+      if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
+    } catch (e) { /* fall through */ }
+    return ('e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10)).slice(0, 36);
   }
 
   // ---- Shared backend (optional) ----------------------------------------
@@ -223,19 +239,20 @@
 
   // Reconcile the shared server list with local entries so a signature the backend
   // hasn't accepted yet is never lost. "Pending" is an explicit client-set marker on
-  // entries this browser created and POSTed but the backend hasn't confirmed — NOT
-  // merely "absent from the current server list". That distinction matters: a shared
-  // entry that ages out of the server's top 100 (or a decorative 1998 seed) must
-  // yield to the authoritative server list, whereas a genuine unsynced submission is
-  // placed first so the 100-entry cap trims the oldest SHARED entry, never the
-  // visitor's own. Once the backend confirms a pending entry it appears in `server`,
-  // so it drops out of `pending` here and its unmarked server copy wins — the marker
-  // clears itself.
+  // entries this browser created but the backend hasn't confirmed. Matching is by the
+  // opaque entry id, NOT the visible text/date — the server normalizes whitespace and
+  // regenerates the date, so a name|message|date key would desync and leave a pending
+  // ghost beside its server duplicate. By id: an aged-out shared entry (no marker) and
+  // a 1998 seed (no marker/id) correctly yield to the authoritative server list; a
+  // genuine unsynced submission is placed first so the 100-entry cap trims the oldest
+  // SHARED entry, never the visitor's own. Once the backend stores a pending entry its
+  // id appears in `server` — even if the POST ack was lost — so it drops out of
+  // `pending` and its canonical server copy wins: idempotent, self-clearing, no dupes.
   function reconcileEntries(server, local) {
-    var onServer = Object.create(null);
-    server.forEach(function (e) { onServer[e.name + '|' + e.message + '|' + e.date] = true; });
+    var onServerId = Object.create(null);
+    server.forEach(function (e) { if (e.id) onServerId[e.id] = true; });
     var pending = local.filter(function (e) {
-      return e.pending === true && !onServer[e.name + '|' + e.message + '|' + e.date];
+      return e.pending === true && e.id && !onServerId[e.id];
     });
     return mergeEntries(pending, server);
   }
@@ -282,10 +299,11 @@
         return;
       }
       // Imported entries are user-asserted local restores the shared backend hasn't
-      // seen, so mark them pending too — a later reconcile keeps them until (if ever)
-      // the backend confirms them, instead of dropping them as stale shared data.
+      // seen, so mark them pending and give each a stable id (reuse a valid one from
+      // the file, else mint one) — a later reconcile keeps them by identity until (if
+      // ever) the backend confirms them, instead of dropping them as stale shared data.
       var pendingIncoming = incoming.map(function (e) {
-        return { name: e.name, message: e.message, date: e.date, pending: true };
+        return { name: e.name, message: e.message, date: e.date, id: e.id || newEntryId(), pending: true };
       });
       // Merge imported over existing, de-duping identical signatures, cap 100.
       var merged = mergeEntries(pendingIncoming, loadGuestbook());
@@ -349,11 +367,12 @@
         status.textContent = 'Please fill in both fields!';
         return;
       }
-      var entry = { name: name.slice(0, 40), message: message.slice(0, 200), date: guestbookToday() };
+      var id = newEntryId();
+      var entry = { name: name.slice(0, 40), message: message.slice(0, 200), date: guestbookToday(), id: id };
       var entries = loadGuestbook();
-      // Store a pending-marked local copy so a later reconcile preserves it until the
-      // backend confirms it; the POST body below stays clean (the marker is client-only).
-      entries.unshift({ name: entry.name, message: entry.message, date: entry.date, pending: true });
+      // Store a pending-marked local copy carrying the same id, so a later reconcile
+      // matches it to the backend row by identity and preserves it until confirmed.
+      entries.unshift({ name: entry.name, message: entry.message, date: entry.date, id: id, pending: true });
       if (entries.length > 100) entries.length = 100;
       saveGuestbook(entries);
       form.reset();
