@@ -13,7 +13,7 @@
  *     network — the worker never intercepts them.
  * Bump CACHE on every deploy so the activate step purges the previous cache.
  */
-var CACHE = 'mnk-cache-v2';
+var CACHE = 'mnk-cache-v3';
 var CORE = [
     '/',
     '/projects.html',
