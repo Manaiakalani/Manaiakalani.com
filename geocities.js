@@ -215,13 +215,25 @@
     return merged;
   }
 
+  // Reconcile the shared server list with local entries so a signature the backend
+  // hasn't accepted yet is never lost: local-only ("pending") entries come first so
+  // the 100-entry cap trims the oldest shared entries, not the visitor's own.
+  function reconcileEntries(server, local) {
+    var onServer = Object.create(null);
+    server.forEach(function (e) { onServer[e.name + '|' + e.message + '|' + e.date] = true; });
+    var pending = local.filter(function (e) {
+      return !onServer[e.name + '|' + e.message + '|' + e.date];
+    });
+    return mergeEntries(pending, server);
+  }
+
   function renderGuestbookEntries(listEl, countEl) {
     paintEntries(listEl, countEl, loadGuestbook());        // instant local paint
     apiGet().then(function (server) {                      // then reconcile with the shared list
       if (server) {
-        // Union the shared list with local so an entry the backend hasn't accepted
-        // yet is never silently dropped when the shared list comes back.
-        var merged = mergeEntries(server, loadGuestbook());
+        // Keep any local-only entry the backend hasn't accepted yet; the shared
+        // list stays authoritative for everything it already knows about.
+        var merged = reconcileEntries(server, loadGuestbook());
         saveGuestbook(merged);
         paintEntries(listEl, countEl, merged);
       }
@@ -333,8 +345,11 @@
       // or shared when the backend accepted). Otherwise say what really happened.
       apiPost(entry).then(function (res) {
         if (res.ok && res.list) {
-          saveGuestbook(res.list);
-          paintEntries(listEl, countEl, res.list);
+          // Merge so any earlier local-only entry survives the shared list replacing
+          // local storage (the just-signed entry is already in res.list).
+          var merged = reconcileEntries(res.list, loadGuestbook());
+          saveGuestbook(merged);
+          paintEntries(listEl, countEl, merged);
         } else if (res.reason === 'rate_limited') {
           status.textContent = res.retryAfter
             ? 'Saved locally! The shared guestbook is busy — try again in ' + res.retryAfter + 's. \u23F3'
