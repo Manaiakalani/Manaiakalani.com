@@ -503,11 +503,14 @@ test('projects: shows fallback when GitHub API fails', async ({ page }) => {
 test('index: has JSON-LD structured data', async ({ page }) => {
   await page.goto('/');
   const jsonLd = page.locator('script[type="application/ld+json"]');
-  await expect(jsonLd).toHaveCount(1);
-  const content = await jsonLd.textContent();
-  const data = JSON.parse(content);
-  expect(data['@type']).toBe('Person');
-  expect(data.name).toBe('Maximilian Stein');
+  const blocks = await jsonLd.allTextContents();
+  expect(blocks.length).toBeGreaterThanOrEqual(1);
+  const data = blocks.map(b => JSON.parse(b));
+  const types = data.map(d => d['@type']);
+  expect(types).toContain('Person');
+  const person = data.find(d => d['@type'] === 'Person');
+  expect(person.name).toBe('Maximilian Stein');
+  expect(types).toContain('WebSite');
 });
 
 test('projects: has JSON-LD structured data', async ({ page }) => {
