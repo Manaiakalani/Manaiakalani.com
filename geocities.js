@@ -158,6 +158,13 @@
   // backend is absent or errors, the guestbook silently stays local-only.
   var GB_API = '/api/guestbook';
 
+  // Monotonic counter for shared-list syncs. A GET captures it before issuing the
+  // request and discards its response if a newer sync (a confirmed POST or an
+  // import) landed in the meantime. Without this, a slow GET issued before a
+  // signature was accepted can resolve afterwards and reconcile the just-confirmed
+  // entry — which is no longer marked pending — straight back out of local storage.
+  var syncGeneration = 0;
+
   function readServerList(data) {
     // A positively-unconfigured or errored backend means there is no shared book
     // to reconcile against, so the caller must stay on its local copy. This has to
@@ -273,14 +280,15 @@
 
   function renderGuestbookEntries(listEl, countEl) {
     paintEntries(listEl, countEl, loadGuestbook());        // instant local paint
+    var gen = syncGeneration;
     apiGet().then(function (server) {                      // then reconcile with the shared list
-      if (server) {
-        // Keep any local-only entry the backend hasn't accepted yet; the shared
-        // list stays authoritative for everything it already knows about.
-        var merged = reconcileEntries(server, loadGuestbook());
-        saveGuestbook(merged);
-        paintEntries(listEl, countEl, merged);
-      }
+      if (!server) return;
+      if (gen !== syncGeneration) return;                  // a newer sync already won
+      // Keep any local-only entry the backend hasn't accepted yet; the shared
+      // list stays authoritative for everything it already knows about.
+      var merged = reconcileEntries(server, loadGuestbook());
+      saveGuestbook(merged);
+      paintEntries(listEl, countEl, merged);
     });
   }
 
@@ -320,6 +328,7 @@
         return { name: e.name, message: e.message, date: e.date, id: e.id || newEntryId(), pending: true };
       });
       // Merge imported over existing, de-duping identical signatures, cap 100.
+      syncGeneration++;
       var merged = mergeEntries(pendingIncoming, loadGuestbook());
       saveGuestbook(merged);
       paintEntries(listEl, countEl, merged);
@@ -401,6 +410,7 @@
         if (res.ok && res.list) {
           // Merge so any earlier local-only entry survives the shared list replacing
           // local storage (the just-signed entry is already in res.list).
+          syncGeneration++;
           var merged = reconcileEntries(res.list, loadGuestbook());
           saveGuestbook(merged);
           paintEntries(listEl, countEl, merged);

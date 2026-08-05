@@ -662,6 +662,102 @@ test('geocities: guestbook opens a real persistent dialog and saves entries (CSP
   expect(saved).toContain('TestVisitor');
 });
 
+// ── Round 9: the shared guestbook reconcile must not lose confirmed entries ──
+// A GET issued before a signature is accepted can resolve *after* the POST has
+// been confirmed. The confirmed entry is no longer marked pending, so replaying
+// that stale (and legitimately empty) shared list would reconcile it straight
+// back out of local storage. A sync generation counter discards the late GET.
+test('geocities: a slow GET cannot roll back a signature the backend already confirmed', async ({ page }) => {
+  await page.addInitScript(() => {
+    try { navigator.serviceWorker.register = () => Promise.reject(new Error('sw blocked in test')); } catch (e) {}
+  });
+
+  let releaseGet;
+  const getHeld = new Promise(resolve => { releaseGet = resolve; });
+
+  await page.route('**/api/guestbook', async route => {
+    if (route.request().method() === 'POST') {
+      // The backend accepted the signature and echoes the authoritative list.
+      const body = JSON.parse(route.request().postData() || '{}');
+      return route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          entries: [{ name: body.name, message: body.message, date: '2026 Aug 05', id: body.id }]
+        })
+      });
+    }
+    // The GET is a configured backend that is still empty, held open until after
+    // the POST has been confirmed.
+    await getHeld;
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ entries: [] })
+    });
+  });
+
+  await page.goto('/');
+  await page.locator('.geocities-toggle').click();
+  await page.locator('[data-gc-action="sign-guestbook"]').click();
+  const dlg = page.locator('.gc-guestbook-dialog');
+  await expect(dlg).toBeVisible();
+
+  await dlg.locator('input[name="name"]').fill('RaceVisitor');
+  await dlg.locator('textarea[name="message"]').fill('confirmed before the slow GET landed');
+  await dlg.locator('.gc-gb-sign').click();
+
+  // Wait for the POST to be applied (the entry is rendered from the server list).
+  await expect(dlg.locator('.gc-gb-entry').first()).toContainText('RaceVisitor');
+
+  // Now let the stale GET resolve; it must be discarded, not replayed.
+  releaseGet();
+  await page.waitForTimeout(500);
+
+  await expect(dlg.locator('.gc-gb-entry').first()).toContainText('RaceVisitor');
+  const saved = await page.evaluate(() => localStorage.getItem('mnk:guestbook'));
+  expect(saved).toContain('RaceVisitor');
+});
+
+// An empty list from a *configured* backend is authoritative — the shared book is
+// genuinely empty, so the 1998 seed entries must clear. An `unconfigured` backend
+// also answers with `entries: []`, and that one must leave local entries alone.
+test('geocities: an empty configured backend clears seed entries, but unconfigured does not', async ({ page }) => {
+  await page.addInitScript(() => {
+    try { navigator.serviceWorker.register = () => Promise.reject(new Error('sw blocked in test')); } catch (e) {}
+  });
+
+  // 1. Configured but empty → authoritative, seeds clear.
+  await page.route('**/api/guestbook', route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ entries: [] }) })
+  );
+  await page.goto('/');
+  await page.locator('.geocities-toggle').click();
+  await page.locator('[data-gc-action="sign-guestbook"]').click();
+  await expect(page.locator('.gc-guestbook-dialog')).toBeVisible();
+  await expect.poll(
+    () => page.locator('.gc-guestbook-dialog .gc-gb-entry').count(),
+    { timeout: 5000 }
+  ).toBe(0);
+
+  // 2. Unconfigured → not authoritative, the local seed entries stay.
+  await page.unroute('**/api/guestbook');
+  await page.route('**/api/guestbook', route =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ entries: [], backend: 'unconfigured' })
+    })
+  );
+  await page.evaluate(() => { try { localStorage.removeItem('mnk:guestbook'); } catch (e) {} });
+  await page.goto('/');
+  await page.locator('[data-gc-action="sign-guestbook"]').click();
+  const dlg2 = page.locator('.gc-guestbook-dialog');
+  await expect(dlg2).toBeVisible();
+  await page.waitForTimeout(500);
+  expect(await dlg2.locator('.gc-gb-entry').count()).toBeGreaterThan(0);
+});
+
 test('geocities: no inline event handlers or javascript: URLs in retro DOM', async ({ page }) => {
   await page.goto('/');
   await page.locator('.geocities-toggle').click();

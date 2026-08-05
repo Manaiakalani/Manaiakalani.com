@@ -36,8 +36,10 @@ for (const file of htmlFiles) {
     const attrs = match[1];
     const content = match[2];
     
-    // Skip external scripts (those with src attribute)
-    if (/\bsrc\s*=/i.test(attrs)) continue;
+    // Skip external scripts (those with a real src attribute). The leading
+    // boundary keeps `data-src` and similar from matching, which would silently
+    // drop a genuinely inline script from the check.
+    if (/(^|\s)src\s*=/i.test(attrs)) continue;
     
     // Only hash non-empty inline scripts
     if (!content.trim()) continue;
@@ -65,7 +67,9 @@ if (checkMode) {
     console.error('ERROR: no Content-Security-Policy in staticwebapp.config.json globalHeaders.');
     process.exit(1);
   }
-  const scriptSrc = (csp.split(';').find((d) => d.trim().startsWith('script-src')) || '').trim();
+  // Match the directive token exactly so `script-src-elem` / `script-src-attr`
+  // can never be picked up in place of `script-src`.
+  const scriptSrc = (csp.split(';').find((d) => /^script-src(\s|$)/i.test(d.trim())) || '').trim();
   const allowed = new Set(scriptSrc.match(/'sha256-[^']+'/g) || []);
 
   const missing = [...allHashes].filter((h) => !allowed.has(h));
