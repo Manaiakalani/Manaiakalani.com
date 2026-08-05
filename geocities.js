@@ -327,18 +327,22 @@
     return mergeEntries(pending, server);
   }
 
-  // Apply a server list on top of whatever is in storage right now.
+  // Apply a server list on top of the current local list.
   //
-  // The change token is re-read immediately before the write, so a signature
-  // confirmed by another tab after our read is not silently overwritten by the
-  // list we reconciled against the older snapshot. On a mismatch we discard,
-  // which is always the safe direction: the entry stays pending and the next
-  // sync confirms it. Returns the merged list, or null when the write was
-  // discarded.
-  function applyServerList(server) {
-    var tokenAtRead = guestbookToken();
+  // `expectedToken` is the change token sampled when the request was *issued*,
+  // the same one isLatestSync checked. Re-reading it immediately before the
+  // write means nothing may have been written, by any tab, between issuing the
+  // request and storing its result — so a list reconciled against a snapshot
+  // that has since moved on is never saved over a newer one. Sampling a fresh
+  // token here instead would defeat that, by adopting another tab's write as
+  // the baseline rather than detecting it.
+  //
+  // On a mismatch we discard, which is always the safe direction: the entry
+  // stays pending and the next sync confirms it. Returns the merged list, or
+  // null when the write was discarded.
+  function applyServerList(server, expectedToken) {
     var merged = reconcileEntries(server, loadGuestbook());
-    if (guestbookToken() !== tokenAtRead) return null;
+    if (guestbookToken() !== expectedToken) return null;
     saveGuestbook(merged);
     return merged;
   }
@@ -352,7 +356,7 @@
       if (!isLatestSync(seq, token)) return;               // superseded by a newer sync or another tab
       // Keep any local-only entry the backend hasn't accepted yet; the shared
       // list stays authoritative for everything it already knows about.
-      var merged = applyServerList(server);
+      var merged = applyServerList(server, token);
       if (!merged) return;                                 // another tab wrote while we reconciled
       paintEntries(listEl, countEl, merged);
     });
@@ -485,7 +489,7 @@
           if (!isLatestSync(postSeq, postToken)) return;
           // Merge so any earlier local-only entry survives the shared list replacing
           // local storage (the just-signed entry is already in res.list).
-          var merged = applyServerList(res.list);
+          var merged = applyServerList(res.list, postToken);
           if (!merged) return;                             // another tab wrote while we reconciled
           paintEntries(listEl, countEl, merged);
         } else if (res.reason === 'rate_limited') {
