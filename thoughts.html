@@ -48,7 +48,7 @@
     <link rel="manifest" href="/manifest.json">
     
     <!-- Prevent flash: apply saved theme/geocities before paint -->
-    <script src="boot.js?v=16"></script>
+    <script src="boot.js?v=17"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -136,9 +136,12 @@
       }
     </script>
 
-    <!-- Analytics — self-hosted Rybbit. No SRI: the endpoint serves a mutable,
-         auto-updating script and sends no Access-Control-Allow-Origin, so an
-         integrity/crossorigin pair would block it outright. CSP script-src pins
+    <!-- Analytics — self-hosted Rybbit on our own subdomain. Deliberately no
+         SRI: /api/script.js is a rolling endpoint that changes whenever the
+         instance is upgraded, so a pinned hash would silently break analytics
+         on every upgrade. The endpoint does send Access-Control-Allow-Origin
+         when a request carries an Origin header, so a crossorigin pair would in
+         fact work — the reason is update cadence, not CORS. CSP script-src pins
          the origin instead. -->
     <script
       src="https://analytics.manaiakalani.info/api/script.js"
