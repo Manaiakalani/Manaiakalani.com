@@ -33,8 +33,8 @@ self.addEventListener('install', function (event) {
     self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE).then(function (cache) {
-            // Require the essential shell so a flaky update can't leave an empty v6
-            // cache after activate deletes the old one; if it fails, the install
+            // Require the essential shell so a flaky update can't leave an empty
+            // new cache after activate deletes the old one; if it fails, the install
             // rejects and the previous worker (and its cache) stays in place.
             return cache.addAll(CORE_ESSENTIAL).then(function () {
                 // Extras added individually so one missing file can't abort the update.
