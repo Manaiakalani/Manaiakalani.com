@@ -627,7 +627,13 @@ for (const { path, sel } of [
 
 // ── GeoCities assets are referenced root-relative so retro mode works on deep 404 URLs ──
 test('boot.js references GeoCities assets root-relative', async ({ page }) => {
-  const res = await page.request.get('/boot.js');
+  await page.goto('/');
+  // Fetch the exact URL the page loads. A bare /boot.js is a separate cache key
+  // and, being served immutable, an edge cache can pin an old copy there that no
+  // visitor ever receives — so asserting against it says nothing useful.
+  const src = await page.locator('script[src*="boot.js"]').first().getAttribute('src');
+  expect(src).toBeTruthy();
+  const res = await page.request.get(src);
   expect(res.status()).toBe(200);
   const body = await res.text();
   expect(body).toContain('"/geocities.css?v=6"');
