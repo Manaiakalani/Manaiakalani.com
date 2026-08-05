@@ -758,6 +758,67 @@ test('geocities: an empty configured backend clears seed entries, but unconfigur
   expect(await dlg2.locator('.gc-gb-entry').count()).toBeGreaterThan(0);
 });
 
+// Two signatures in flight at once: the second POST is confirmed first, then the
+// first POST's older list (which predates the second entry) arrives. Sequencing at
+// request-issue time means that stale list is discarded instead of replayed, so the
+// second signature is not rolled back out of the UI and local storage.
+test('geocities: an out-of-order POST response cannot roll back a newer signature', async ({ page }) => {
+  await page.addInitScript(() => {
+    try { navigator.serviceWorker.register = () => Promise.reject(new Error('sw blocked in test')); } catch (e) {}
+  });
+
+  let releaseFirstPost;
+  const firstPostHeld = new Promise(resolve => { releaseFirstPost = resolve; });
+  let postCount = 0;
+  const accepted = [];
+
+  await page.route('**/api/guestbook', async route => {
+    if (route.request().method() !== 'POST') {
+      return route.fulfill({
+        status: 200, contentType: 'application/json',
+        body: JSON.stringify({ entries: [] })
+      });
+    }
+    const body = JSON.parse(route.request().postData() || '{}');
+    accepted.unshift({ name: body.name, message: body.message, date: '2026 Aug 05', id: body.id });
+    // Snapshot the list as it stood when this POST was accepted.
+    const snapshot = accepted.slice();
+    postCount += 1;
+    if (postCount === 1) await firstPostHeld;   // first response lands last
+    return route.fulfill({
+      status: 201, contentType: 'application/json',
+      body: JSON.stringify({ entries: snapshot })
+    });
+  });
+
+  await page.goto('/');
+  await page.locator('.geocities-toggle').click();
+  await page.locator('[data-gc-action="sign-guestbook"]').click();
+  const dlg = page.locator('.gc-guestbook-dialog');
+  await expect(dlg).toBeVisible();
+
+  const sign = async (name, msg) => {
+    await dlg.locator('input[name="name"]').fill(name);
+    await dlg.locator('textarea[name="message"]').fill(msg);
+    await dlg.locator('.gc-gb-sign').click();
+  };
+
+  await sign('FirstSigner', 'held open');
+  await sign('SecondSigner', 'confirmed first');
+
+  // The second POST resolves immediately and its list contains both entries.
+  await expect(dlg.locator('.gc-gb-entry').first()).toContainText('SecondSigner');
+
+  // Now let the first POST's stale one-entry list arrive. It must be discarded.
+  releaseFirstPost();
+  await page.waitForTimeout(500);
+
+  await expect(dlg.locator('.gc-gb-entry').first()).toContainText('SecondSigner');
+  const saved = await page.evaluate(() => localStorage.getItem('mnk:guestbook'));
+  expect(saved).toContain('SecondSigner');
+  expect(saved).toContain('FirstSigner');
+});
+
 test('geocities: no inline event handlers or javascript: URLs in retro DOM', async ({ page }) => {
   await page.goto('/');
   await page.locator('.geocities-toggle').click();

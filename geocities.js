@@ -158,12 +158,26 @@
   // backend is absent or errors, the guestbook silently stays local-only.
   var GB_API = '/api/guestbook';
 
-  // Monotonic counter for shared-list syncs. A GET captures it before issuing the
-  // request and discards its response if a newer sync (a confirmed POST or an
-  // import) landed in the meantime. Without this, a slow GET issued before a
-  // signature was accepted can resolve afterwards and reconcile the just-confirmed
-  // entry — which is no longer marked pending — straight back out of local storage.
-  var syncGeneration = 0;
+  // Ordering guard for shared-list syncs. Responses can arrive out of order, and
+  // whichever one is applied last overwrites local storage — so applying a stale
+  // one silently rolls back entries the backend has already accepted.
+  //
+  // Every sync claims a sequence number when its request is *issued*, and a
+  // response is applied only if no later-issued sync has already been applied.
+  // Sequencing at issue time (rather than at arrival) is what makes this correct
+  // for two concurrent POSTs: if the second signature's response comes back first,
+  // the first one's older list must not be replayed over it.
+  var syncSeq = 0;      // last sequence handed out
+  var appliedSeq = 0;   // highest sequence whose response has been applied
+
+  function nextSyncSeq() { return ++syncSeq; }
+
+  // Returns false when a later sync already won, meaning this response is stale.
+  function claimSync(seq) {
+    if (seq < appliedSeq) return false;
+    appliedSeq = seq;
+    return true;
+  }
 
   function readServerList(data) {
     // A positively-unconfigured or errored backend means there is no shared book
@@ -280,10 +294,10 @@
 
   function renderGuestbookEntries(listEl, countEl) {
     paintEntries(listEl, countEl, loadGuestbook());        // instant local paint
-    var gen = syncGeneration;
+    var seq = nextSyncSeq();
     apiGet().then(function (server) {                      // then reconcile with the shared list
       if (!server) return;
-      if (gen !== syncGeneration) return;                  // a newer sync already won
+      if (!claimSync(seq)) return;                         // a later sync already won
       // Keep any local-only entry the backend hasn't accepted yet; the shared
       // list stays authoritative for everything it already knows about.
       var merged = reconcileEntries(server, loadGuestbook());
@@ -328,7 +342,9 @@
         return { name: e.name, message: e.message, date: e.date, id: e.id || newEntryId(), pending: true };
       });
       // Merge imported over existing, de-duping identical signatures, cap 100.
-      syncGeneration++;
+      // Claim the newest sequence so any sync still in flight is discarded rather
+      // than overwriting the freshly imported entries.
+      claimSync(nextSyncSeq());
       var merged = mergeEntries(pendingIncoming, loadGuestbook());
       saveGuestbook(merged);
       paintEntries(listEl, countEl, merged);
@@ -406,11 +422,14 @@
       // The entry is already saved and shown locally; keep the cheerful thanks
       // only when it's safely stored (locally when there's no shared backend yet,
       // or shared when the backend accepted). Otherwise say what really happened.
+      var postSeq = nextSyncSeq();
       apiPost(entry).then(function (res) {
         if (res.ok && res.list) {
+          // A rapid second signature can be confirmed first; its list already
+          // contains this entry, so replaying this older one would drop it.
+          if (!claimSync(postSeq)) return;
           // Merge so any earlier local-only entry survives the shared list replacing
           // local storage (the just-signed entry is already in res.list).
-          syncGeneration++;
           var merged = reconcileEntries(res.list, loadGuestbook());
           saveGuestbook(merged);
           paintEntries(listEl, countEl, merged);
