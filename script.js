@@ -22,7 +22,7 @@
             const isDark = root.getAttribute('data-theme') === 'dark';
             const next = isDark ? 'light' : 'dark';
             root.setAttribute('data-theme', next);
-            localStorage.setItem('mnk:theme', next);
+            try { localStorage.setItem('mnk:theme', next); } catch (e) { /* storage unavailable */ }
             updateToggleState(!isDark);
         });
     }

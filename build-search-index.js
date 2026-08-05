@@ -63,6 +63,27 @@ if (items.filter(function (i) { return i.s === 'Thought'; }).length === 0) {
 }
 
 const out = { v: 1, generated: new Date().toISOString(), items: items };
+
+// `--check` verifies the committed index still matches the markup without
+// rewriting it, so CI can fail on a stale search.json. The `generated`
+// timestamp is ignored — only the indexed content is compared.
+if (process.argv.includes('--check')) {
+  let current;
+  try {
+    current = JSON.parse(read('search.json'));
+  } catch (e) {
+    console.error('ERROR: search.json is missing or unreadable. Run `node build-search-index.js`.');
+    process.exit(1);
+  }
+  const same = JSON.stringify(current.items) === JSON.stringify(items) && current.v === out.v;
+  if (!same) {
+    console.error('ERROR: search.json is stale — it does not match the current HTML. Run `node build-search-index.js` and commit the result.');
+    process.exit(1);
+  }
+  console.log('search.json is up to date — ' + items.length + ' items.');
+  process.exit(0);
+}
+
 fs.writeFileSync(path.join(ROOT, 'search.json'), JSON.stringify(out) + '\n');
 console.log('Wrote search.json — ' + items.length + ' items (' +
   items.filter(function (i) { return i.s === 'Thought'; }).length + ' thoughts, ' +

@@ -15,10 +15,17 @@
 
   // ---- Visitor counter (increment once per page load, not per toggle) ----
   const visitorCount = (function () {
-    let count = parseInt(localStorage.getItem('gc-visitors') || '0', 10);
-    count += 1;
-    localStorage.setItem('gc-visitors', String(count));
-    return count;
+    try {
+      let count = parseInt(localStorage.getItem('gc-visitors') || '0', 10);
+      if (!isFinite(count) || count < 0) count = 0;
+      count += 1;
+      localStorage.setItem('gc-visitors', String(count));
+      return count;
+    } catch (e) {
+      // Storage unavailable (private mode / blocked cookies): the decorative
+      // counter must never stop GeoCities mode from initialising.
+      return 1;
+    }
   })();
 
   // ---- Helper: create element with aria-hidden for decorative content ----
@@ -152,10 +159,17 @@
   var GB_API = '/api/guestbook';
 
   function readServerList(data) {
+    // A positively-unconfigured or errored backend means there is no shared book
+    // to reconcile against, so the caller must stay on its local copy. This has to
+    // be checked first: an unconfigured GET also answers with `entries: []`, and
+    // treating that as an authoritative empty list would wipe the local entries.
+    if (data && (data.backend === 'unconfigured' || data.backend === 'error')) return null;
     var arr = Array.isArray(data) ? data : (data && Array.isArray(data.entries) ? data.entries : null);
     if (!arr) return null;
-    var clean = sanitizeEntries(arr);
-    return clean.length ? clean : null;
+    // An empty array from a configured backend IS authoritative — the shared book
+    // really is empty. Returning null here would strand every visitor on the local
+    // seed entries until someone happened to sign.
+    return sanitizeEntries(arr);
   }
 
   function apiGet() {
@@ -782,13 +796,15 @@
   toggle.addEventListener('click', function () {
     var isActive = root.getAttribute('data-geocities') === 'true';
     var next = !isActive;
-    localStorage.setItem(GC_KEY, next ? 'true' : 'false');
+    try { localStorage.setItem(GC_KEY, next ? 'true' : 'false'); } catch (e) { /* storage unavailable */ }
     toggle.setAttribute('aria-pressed', String(next));
     applyGeoCities(next);
   });
 
   // ---- Initialize from stored state ----
-  if (localStorage.getItem(GC_KEY) === 'true') {
+  var storedGeo = null;
+  try { storedGeo = localStorage.getItem(GC_KEY); } catch (e) { /* storage unavailable */ }
+  if (storedGeo === 'true') {
     applyGeoCities(true);
   }
 })();

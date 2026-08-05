@@ -27,7 +27,7 @@
         var moduleScript = document.createElement('script');
         moduleScript.type = 'module';
         moduleScript.dataset.cubeLoader = 'true';
-        moduleScript.src = 'cube-loader.js?v=1';
+        moduleScript.src = 'cube-loader.js?v=2';
         document.body.appendChild(moduleScript);
     }
 

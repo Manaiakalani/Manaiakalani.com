@@ -14,8 +14,8 @@ A lightweight, static personal site built with vanilla HTML, CSS, and JavaScript
 | ------------ | --------------------------------------- |
 | Markup       | HTML5 with semantic elements            |
 | Styling      | CSS3 (custom properties, gradient animation) |
-| Typography   | [Doto](https://fonts.google.com/specimen/Doto) via Google Fonts |
-| Icons        | [Font Awesome 6](https://fontawesome.com/) |
+| Typography   | [Doto](https://fonts.google.com/specimen/Doto), self-hosted as WOFF2 in `fonts/` |
+| Icons        | Inline SVG (no icon font or third-party icon library) |
 | Hosting      | Azure Static Web Apps                   |
 | CI/CD        | GitHub Actions                          |
 | Analytics    | Self-hosted analytics (Rybbit) + real-user Web Vitals |
