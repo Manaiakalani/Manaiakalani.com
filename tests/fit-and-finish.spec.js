@@ -888,6 +888,78 @@ test('geocities: reversed backend processing order cannot drop a signature', asy
   await expect(dlg.locator('.gc-gb-entry').filter({ hasText: 'Gamma' })).toHaveCount(1);
 });
 
+// localStorage is shared across tabs but the sync sequence is per-document, so a
+// GET held open in one tab can outlive another tab confirming a signature. The
+// storage event supersedes the in-flight sync so the stale empty list is not
+// reconciled over the entry the other tab just confirmed.
+test('geocities: a held GET in one tab cannot wipe an entry another tab confirmed', async ({ context }) => {
+  const block = p => p.addInitScript(() => {
+    try { navigator.serviceWorker.register = () => Promise.reject(new Error('sw blocked in test')); } catch (e) {}
+  });
+
+  let releaseTabAGet;
+  const tabAGetHeld = new Promise(resolve => { releaseTabAGet = resolve; });
+
+  const tabA = await context.newPage();
+  await block(tabA);
+  await tabA.route('**/api/guestbook', async route => {
+    await tabAGetHeld;                       // an empty snapshot, held open
+    return route.fulfill({
+      status: 200, contentType: 'application/json', body: JSON.stringify({ entries: [] })
+    });
+  });
+
+  // GeoCities mode is itself persisted in the shared localStorage, so the second
+  // tab loads with it already enabled — only toggle when it is actually off.
+  const ensureGeocities = async (p) => {
+    const toggle = p.locator('.geocities-toggle');
+    await expect(toggle).toBeVisible();
+    if ((await toggle.getAttribute('aria-pressed')) !== 'true') await toggle.click();
+    await expect(p.locator('.gc-bottom-links')).toBeVisible();
+  };
+
+  await tabA.goto('/');
+  await ensureGeocities(tabA);
+  await tabA.locator('[data-gc-action="sign-guestbook"]').click();
+  await expect(tabA.locator('.gc-guestbook-dialog')).toBeVisible();
+
+  // Second tab, same origin and therefore the same localStorage, signs and is
+  // confirmed by the backend while tab A's GET is still outstanding.
+  const tabB = await context.newPage();
+  await block(tabB);
+  await tabB.route('**/api/guestbook', route => {
+    if (route.request().method() === 'POST') {
+      const body = JSON.parse(route.request().postData() || '{}');
+      return route.fulfill({
+        status: 201, contentType: 'application/json',
+        body: JSON.stringify({ entries: [{ name: body.name, message: body.message, date: '2026 Aug 05', id: body.id }] })
+      });
+    }
+    return route.fulfill({
+      status: 200, contentType: 'application/json', body: JSON.stringify({ entries: [] })
+    });
+  });
+  await tabB.goto('/');
+  await ensureGeocities(tabB);
+  await tabB.locator('[data-gc-action="sign-guestbook"]').click();
+  const dlgB = tabB.locator('.gc-guestbook-dialog');
+  await expect(dlgB).toBeVisible();
+  await dlgB.locator('input[name="name"]').fill('CrossTabSigner');
+  await dlgB.locator('textarea[name="message"]').fill('confirmed in the other tab');
+  await dlgB.locator('.gc-gb-sign').click();
+  await expect(dlgB.locator('.gc-gb-entry').first()).toContainText('CrossTabSigner');
+
+  // Now let tab A's stale empty list arrive.
+  releaseTabAGet();
+  await tabA.waitForTimeout(600);
+
+  const saved = await tabA.evaluate(() => localStorage.getItem('mnk:guestbook'));
+  expect(saved).toContain('CrossTabSigner');
+
+  await tabA.close();
+  await tabB.close();
+});
+
 test('geocities: no inline event handlers or javascript: URLs in retro DOM', async ({ page }) => {
   await page.goto('/');
   await page.locator('.geocities-toggle').click();

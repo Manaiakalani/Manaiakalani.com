@@ -179,6 +179,19 @@
   // True only while no newer sync has been issued since this one started.
   function isLatestSync(seq) { return seq === syncSeq; }
 
+  // The sequence above is per-document, but localStorage is shared across tabs, so
+  // another tab confirming a signature is just as invalidating as one of our own
+  // syncs: our in-flight response predates its write and would reconcile the
+  // now-confirmed entry straight back out. The storage event fires only in *other*
+  // documents, so treating it as a new sync supersedes whatever we have in flight.
+  // It cannot starve the guestbook — the event only fires on a real cross-tab
+  // write, and the next sync starts from the bumped sequence.
+  try {
+    window.addEventListener('storage', function (e) {
+      if (e && e.key === GB_KEY) nextSyncSeq();
+    });
+  } catch (e) { /* no storage events available; single-tab behaviour is unaffected */ }
+
   function readServerList(data) {
     // A positively-unconfigured or errored backend means there is no shared book
     // to reconcile against, so the caller must stay on its local copy. This has to
