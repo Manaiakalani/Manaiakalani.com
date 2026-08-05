@@ -59,7 +59,12 @@ log(`\nTotal unique: ${allHashes.size}`);
 
 if (checkMode) {
   const configPath = path.join(dir, 'staticwebapp.config.json');
-  const csp = JSON.parse(fs.readFileSync(configPath, 'utf8')).globalHeaders['Content-Security-Policy'];
+  const headers = JSON.parse(fs.readFileSync(configPath, 'utf8')).globalHeaders || {};
+  const csp = headers['Content-Security-Policy'];
+  if (!csp) {
+    console.error('ERROR: no Content-Security-Policy in staticwebapp.config.json globalHeaders.');
+    process.exit(1);
+  }
   const scriptSrc = (csp.split(';').find((d) => d.trim().startsWith('script-src')) || '').trim();
   const allowed = new Set(scriptSrc.match(/'sha256-[^']+'/g) || []);
 
