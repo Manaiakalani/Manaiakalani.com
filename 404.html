@@ -30,7 +30,7 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/style.css?v=13">
-    <script src="/boot.js?v=16"></script>
+    <script src="/boot.js?v=17"></script>
     <style>
         .four-oh-four {
             --gradient: linear-gradient(-45deg, #0f4c81, #c84534, #6a4c93, #8a6f00, #5a7b3b);
@@ -167,9 +167,12 @@
         }
     </style>
 
-    <!-- Analytics — self-hosted Rybbit. No SRI: the endpoint serves a mutable,
-         auto-updating script and sends no Access-Control-Allow-Origin, so an
-         integrity/crossorigin pair would block it outright. CSP script-src pins
+    <!-- Analytics — self-hosted Rybbit on our own subdomain. Deliberately no
+         SRI: /api/script.js is a rolling endpoint that changes whenever the
+         instance is upgraded, so a pinned hash would silently break analytics
+         on every upgrade. The endpoint does send Access-Control-Allow-Origin
+         when a request carries an Origin header, so a crossorigin pair would in
+         fact work — the reason is update cadence, not CORS. CSP script-src pins
          the origin instead. -->
     <script
       src="https://analytics.manaiakalani.info/api/script.js"

@@ -192,14 +192,19 @@
   // returns. Where localStorage is unavailable this reads null both times and the
   // guard reduces to the sequence check.
   // Known limitation: this is a check-then-act, and localStorage offers no
-  // cross-document transaction, so it cannot be made strictly atomic. The window
-  // is however the synchronous block below — check, read, reconcile, write, with
-  // no await or other yield point — so a competing write has to come from a tab
-  // running JS genuinely concurrently in a separate process. Closing that would
-  // mean serialising on Web Locks and making the whole reconcile path async, with
-  // a fallback that would still race on browsers lacking it. Given the backend
-  // stays authoritative and any lost entry reappears on the next sync, the
-  // residual window is not worth that trade.
+  // cross-document transaction, so it cannot be made strictly atomic. The token
+  // is re-read immediately before each write (see applyServerList), which leaves
+  // only the gap between that read and the write itself — no await or other
+  // yield point — so a competing write has to come from a tab running JS
+  // genuinely concurrently in a separate process. Closing it entirely would mean
+  // serialising on Web Locks and making the whole reconcile path async, with a
+  // fallback that would still race on browsers lacking it.
+  //
+  // Worst case if it does happen: an entry the backend has already accepted
+  // simply reappears on the next sync, since the backend stays authoritative.
+  // An entry still pending — one whose POST later fails or is rate-limited — is
+  // not recoverable that way, because the backend never received it. That is the
+  // real residual risk, and it is accepted as proportionate here.
   function guestbookToken() {
     try { return localStorage.getItem(GB_KEY); } catch (e) { return null; }
   }
@@ -322,6 +327,26 @@
     return mergeEntries(pending, server);
   }
 
+  // Apply a server list on top of the current local list.
+  //
+  // `expectedToken` is the change token sampled when the request was *issued*,
+  // the same one isLatestSync checked. Re-reading it immediately before the
+  // write means nothing may have been written, by any tab, between issuing the
+  // request and storing its result — so a list reconciled against a snapshot
+  // that has since moved on is never saved over a newer one. Sampling a fresh
+  // token here instead would defeat that, by adopting another tab's write as
+  // the baseline rather than detecting it.
+  //
+  // On a mismatch we discard, which is always the safe direction: the entry
+  // stays pending and the next sync confirms it. Returns the merged list, or
+  // null when the write was discarded.
+  function applyServerList(server, expectedToken) {
+    var merged = reconcileEntries(server, loadGuestbook());
+    if (guestbookToken() !== expectedToken) return null;
+    saveGuestbook(merged);
+    return merged;
+  }
+
   function renderGuestbookEntries(listEl, countEl) {
     paintEntries(listEl, countEl, loadGuestbook());        // instant local paint
     var seq = nextSyncSeq();
@@ -331,8 +356,8 @@
       if (!isLatestSync(seq, token)) return;               // superseded by a newer sync or another tab
       // Keep any local-only entry the backend hasn't accepted yet; the shared
       // list stays authoritative for everything it already knows about.
-      var merged = reconcileEntries(server, loadGuestbook());
-      saveGuestbook(merged);
+      var merged = applyServerList(server, token);
+      if (!merged) return;                                 // another tab wrote while we reconciled
       paintEntries(listEl, countEl, merged);
     });
   }
@@ -464,8 +489,8 @@
           if (!isLatestSync(postSeq, postToken)) return;
           // Merge so any earlier local-only entry survives the shared list replacing
           // local storage (the just-signed entry is already in res.list).
-          var merged = reconcileEntries(res.list, loadGuestbook());
-          saveGuestbook(merged);
+          var merged = applyServerList(res.list, postToken);
+          if (!merged) return;                             // another tab wrote while we reconciled
           paintEntries(listEl, countEl, merged);
         } else if (res.reason === 'rate_limited') {
           status.textContent = res.retryAfter
