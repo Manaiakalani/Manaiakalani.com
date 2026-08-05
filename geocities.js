@@ -191,6 +191,15 @@
   // after the last write records the current value and still matches when it
   // returns. Where localStorage is unavailable this reads null both times and the
   // guard reduces to the sequence check.
+  // Known limitation: this is a check-then-act, and localStorage offers no
+  // cross-document transaction, so it cannot be made strictly atomic. The window
+  // is however the synchronous block below — check, read, reconcile, write, with
+  // no await or other yield point — so a competing write has to come from a tab
+  // running JS genuinely concurrently in a separate process. Closing that would
+  // mean serialising on Web Locks and making the whole reconcile path async, with
+  // a fallback that would still race on browsers lacking it. Given the backend
+  // stays authoritative and any lost entry reappears on the next sync, the
+  // residual window is not worth that trade.
   function guestbookToken() {
     try { return localStorage.getItem(GB_KEY); } catch (e) { return null; }
   }
