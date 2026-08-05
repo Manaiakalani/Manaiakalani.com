@@ -158,26 +158,26 @@
   // backend is absent or errors, the guestbook silently stays local-only.
   var GB_API = '/api/guestbook';
 
-  // Ordering guard for shared-list syncs. Responses can arrive out of order, and
-  // whichever one is applied last overwrites local storage — so applying a stale
-  // one silently rolls back entries the backend has already accepted.
+  // Ordering guard for shared-list syncs. Responses can arrive out of order and
+  // whichever one is applied last overwrites local storage, so applying a stale
+  // list can silently drop entries the backend has already accepted.
   //
-  // Every sync claims a sequence number when its request is *issued*, and a
-  // response is applied only if no later-issued sync has already been applied.
-  // Sequencing at issue time (rather than at arrival) is what makes this correct
-  // for two concurrent POSTs: if the second signature's response comes back first,
-  // the first one's older list must not be replayed over it.
-  var syncSeq = 0;      // last sequence handed out
-  var appliedSeq = 0;   // highest sequence whose response has been applied
+  // Issue order alone is not enough: the backend may process two concurrent POSTs
+  // in the opposite order, so the later-issued request can be the one carrying the
+  // older list. The two orderings can't be reconciled from the client.
+  //
+  // What makes this tractable is that the two failure directions are not
+  // symmetric. Discarding a response is always safe — the entry it would have
+  // confirmed simply stays marked pending, and reconcileEntries preserves pending
+  // entries — whereas applying a stale response drops already-confirmed entries.
+  // So only the most recently issued sync may apply its response; every superseded
+  // response is dropped, and the next sync reconciles against the real list.
+  var syncSeq = 0;
 
   function nextSyncSeq() { return ++syncSeq; }
 
-  // Returns false when a later sync already won, meaning this response is stale.
-  function claimSync(seq) {
-    if (seq < appliedSeq) return false;
-    appliedSeq = seq;
-    return true;
-  }
+  // True only while no newer sync has been issued since this one started.
+  function isLatestSync(seq) { return seq === syncSeq; }
 
   function readServerList(data) {
     // A positively-unconfigured or errored backend means there is no shared book
@@ -297,7 +297,7 @@
     var seq = nextSyncSeq();
     apiGet().then(function (server) {                      // then reconcile with the shared list
       if (!server) return;
-      if (!claimSync(seq)) return;                         // a later sync already won
+      if (!isLatestSync(seq)) return;                      // a newer sync superseded this one
       // Keep any local-only entry the backend hasn't accepted yet; the shared
       // list stays authoritative for everything it already knows about.
       var merged = reconcileEntries(server, loadGuestbook());
@@ -342,9 +342,9 @@
         return { name: e.name, message: e.message, date: e.date, id: e.id || newEntryId(), pending: true };
       });
       // Merge imported over existing, de-duping identical signatures, cap 100.
-      // Claim the newest sequence so any sync still in flight is discarded rather
-      // than overwriting the freshly imported entries.
-      claimSync(nextSyncSeq());
+      // Bump the sequence so any sync still in flight is superseded and cannot
+      // overwrite the freshly imported entries.
+      nextSyncSeq();
       var merged = mergeEntries(pendingIncoming, loadGuestbook());
       saveGuestbook(merged);
       paintEntries(listEl, countEl, merged);
@@ -425,9 +425,10 @@
       var postSeq = nextSyncSeq();
       apiPost(entry).then(function (res) {
         if (res.ok && res.list) {
-          // A rapid second signature can be confirmed first; its list already
-          // contains this entry, so replaying this older one would drop it.
-          if (!claimSync(postSeq)) return;
+          // A second signature may have been issued while this one was in flight.
+          // Its list supersedes this one regardless of which response arrives
+          // first, so drop this list; this entry is still pending and survives.
+          if (!isLatestSync(postSeq)) return;
           // Merge so any earlier local-only entry survives the shared list replacing
           // local storage (the just-signed entry is already in res.list).
           var merged = reconcileEntries(res.list, loadGuestbook());

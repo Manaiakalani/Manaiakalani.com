@@ -819,6 +819,75 @@ test('geocities: an out-of-order POST response cannot roll back a newer signatur
   expect(saved).toContain('FirstSigner');
 });
 
+// The mirror of the case above: both signatures are in flight at once, but the
+// backend processes the *second-issued* one first. So the first-issued POST comes
+// back with the complete list and arrives first, while the second-issued POST's
+// older single-entry list lands last. Issue order and arrival order disagree, and
+// neither identifies the fresher list — so only the latest-issued sync may apply,
+// and the superseded entry stays pending and is preserved.
+test('geocities: reversed backend processing order cannot drop a signature', async ({ page }) => {
+  await page.addInitScript(() => {
+    try { navigator.serviceWorker.register = () => Promise.reject(new Error('sw blocked in test')); } catch (e) {}
+  });
+
+  let secondPostArrived;
+  const bothInFlight = new Promise(resolve => { secondPostArrived = resolve; });
+  let postCount = 0;
+
+  await page.route('**/api/guestbook', async route => {
+    if (route.request().method() !== 'POST') {
+      return route.fulfill({
+        status: 200, contentType: 'application/json', body: JSON.stringify({ entries: [] })
+      });
+    }
+    const body = JSON.parse(route.request().postData() || '{}');
+    const mine = { name: body.name, message: body.message, date: '2026 Aug 05', id: body.id };
+    postCount += 1;
+
+    if (postCount === 1) {
+      // Issued first, processed second: hold until the other request is also in
+      // flight, then answer with the complete list and land first.
+      await bothInFlight;
+      return route.fulfill({
+        status: 201, contentType: 'application/json',
+        body: JSON.stringify({ entries: [mine, { name: 'Gamma', message: 'issued second', date: '2026 Aug 05', id: 'gamma-id' }] })
+      });
+    }
+
+    // Issued second, processed first: it only ever saw its own row. Delayed so it
+    // lands last, carrying the staler list.
+    secondPostArrived();
+    await new Promise(r => setTimeout(r, 300));
+    return route.fulfill({
+      status: 201, contentType: 'application/json', body: JSON.stringify({ entries: [mine] })
+    });
+  });
+
+  await page.goto('/');
+  await page.locator('.geocities-toggle').click();
+  await page.locator('[data-gc-action="sign-guestbook"]').click();
+  const dlg = page.locator('.gc-guestbook-dialog');
+  await expect(dlg).toBeVisible();
+
+  const sign = async (name, msg) => {
+    await dlg.locator('input[name="name"]').fill(name);
+    await dlg.locator('textarea[name="message"]').fill(msg);
+    await dlg.locator('.gc-gb-sign').click();
+  };
+
+  await sign('Alpha', 'issued first');
+  await sign('Gamma', 'issued second');
+
+  await page.waitForTimeout(900);
+
+  // Neither signature may be lost, whichever response landed last.
+  const saved = await page.evaluate(() => localStorage.getItem('mnk:guestbook'));
+  expect(saved).toContain('Alpha');
+  expect(saved).toContain('Gamma');
+  await expect(dlg.locator('.gc-gb-entry').filter({ hasText: 'Alpha' })).toHaveCount(1);
+  await expect(dlg.locator('.gc-gb-entry').filter({ hasText: 'Gamma' })).toHaveCount(1);
+});
+
 test('geocities: no inline event handlers or javascript: URLs in retro DOM', async ({ page }) => {
   await page.goto('/');
   await page.locator('.geocities-toggle').click();
