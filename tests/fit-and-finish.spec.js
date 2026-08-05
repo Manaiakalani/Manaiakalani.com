@@ -258,9 +258,21 @@ test('thoughts: copy-link button copies the entry URL to the clipboard', async (
   const copyBtn = firstEntry.locator('.copy-link-btn');
   await expect(copyBtn).toBeVisible();
   await copyBtn.click();
+  // `copied` is added only from the writeText() success path, so this on its own
+  // proves the copy happened.
   await expect(copyBtn).toHaveClass(/copied/);
-  const clipText = await page.evaluate(() => navigator.clipboard.readText());
-  expect(clipText).toContain('#' + entryId);
+  // Reading it back needs clipboard-read, which the deployed Permissions-Policy
+  // denies on purpose. Assert the contents wherever the read is allowed, and
+  // tolerate only a policy block so a genuine clipboard regression still fails.
+  const read = await page.evaluate(async () => {
+    try { return { ok: true, text: await navigator.clipboard.readText() }; }
+    catch (e) { return { ok: false, message: String(e && e.message) }; }
+  });
+  if (read.ok) {
+    expect(read.text).toContain('#' + entryId);
+  } else {
+    expect(read.message).toMatch(/permissions policy/i);
+  }
 });
 
 // ── Uses page ──
