@@ -773,6 +773,7 @@ a.building-card:focus-visible {
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--text-primary);
+    margin-top: 0;
     margin-bottom: 0.3rem;
 }
 

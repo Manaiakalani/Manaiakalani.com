@@ -49,7 +49,7 @@
     <!-- Self-hosted Doto: preload the latin subset used above the fold -->
     <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin />
     <!-- External CSS -->
-    <link rel="stylesheet" href="style.css?v=12" />
+    <link rel="stylesheet" href="style.css?v=13" />
 
     <!-- RSS Feed -->
     <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml" />
@@ -58,7 +58,7 @@
     <link rel="manifest" href="/manifest.json" />
 
     <!-- Prevent flash: apply saved theme/geocities before paint -->
-    <script src="boot.js?v=15"></script>
+    <script src="boot.js?v=16"></script>
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -102,7 +102,10 @@
       }
     </script>
 
-    <!-- Analytics -->
+    <!-- Analytics — self-hosted Rybbit. No SRI: the endpoint serves a mutable,
+         auto-updating script and sends no Access-Control-Allow-Origin, so an
+         integrity/crossorigin pair would block it outright. CSP script-src pins
+         the origin instead. -->
     <script
       src="https://analytics.manaiakalani.info/api/script.js"
       data-site-id="c24b6c864956"
@@ -224,7 +227,7 @@
     </footer>
 
     <!-- External JavaScript -->
-    <script defer src="script.js?v=11"></script>
+    <script defer src="script.js?v=12"></script>
 
     <!-- ASCII Cube -->
     <script type="importmap">
@@ -235,7 +238,7 @@
         }
     }
     </script>
-    <script defer src="components.js?v=6"></script>
+    <script defer src="components.js?v=7"></script>
     <script defer src="command-palette.js?v=4"></script>
     <script type="module" src="web-vitals-report.js?v=1"></script>
   </body>

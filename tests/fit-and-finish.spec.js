@@ -619,7 +619,7 @@ test('boot.js references GeoCities assets root-relative', async ({ page }) => {
   expect(res.status()).toBe(200);
   const body = await res.text();
   expect(body).toContain('"/geocities.css?v=6"');
-  expect(body).toContain('"/geocities.js?v=14"');
+  expect(body).toContain('"/geocities.js?v=15"');
 });
 
 // ── Accessibility: aria-busy is cleared once content loads ──
@@ -660,6 +660,320 @@ test('geocities: guestbook opens a real persistent dialog and saves entries (CSP
   // Persists to localStorage under the namespaced key.
   const saved = await page.evaluate(() => localStorage.getItem('mnk:guestbook'));
   expect(saved).toContain('TestVisitor');
+});
+
+// ── Round 9: the shared guestbook reconcile must not lose confirmed entries ──
+// A GET issued before a signature is accepted can resolve *after* the POST has
+// been confirmed. The confirmed entry is no longer marked pending, so replaying
+// that stale (and legitimately empty) shared list would reconcile it straight
+// back out of local storage. A sync generation counter discards the late GET.
+test('geocities: a slow GET cannot roll back a signature the backend already confirmed', async ({ page }) => {
+  await page.addInitScript(() => {
+    try { navigator.serviceWorker.register = () => Promise.reject(new Error('sw blocked in test')); } catch (e) {}
+  });
+
+  let releaseGet;
+  const getHeld = new Promise(resolve => { releaseGet = resolve; });
+
+  await page.route('**/api/guestbook', async route => {
+    if (route.request().method() === 'POST') {
+      // The backend accepted the signature and echoes the authoritative list.
+      const body = JSON.parse(route.request().postData() || '{}');
+      return route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          entries: [{ name: body.name, message: body.message, date: '2026 Aug 05', id: body.id }]
+        })
+      });
+    }
+    // The GET is a configured backend that is still empty, held open until after
+    // the POST has been confirmed.
+    await getHeld;
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ entries: [] })
+    });
+  });
+
+  await page.goto('/');
+  await page.locator('.geocities-toggle').click();
+  await page.locator('[data-gc-action="sign-guestbook"]').click();
+  const dlg = page.locator('.gc-guestbook-dialog');
+  await expect(dlg).toBeVisible();
+
+  await dlg.locator('input[name="name"]').fill('RaceVisitor');
+  await dlg.locator('textarea[name="message"]').fill('confirmed before the slow GET landed');
+  await dlg.locator('.gc-gb-sign').click();
+
+  // Wait for the POST to be applied (the entry is rendered from the server list).
+  await expect(dlg.locator('.gc-gb-entry').first()).toContainText('RaceVisitor');
+
+  // Now let the stale GET resolve; it must be discarded, not replayed.
+  releaseGet();
+  await page.waitForTimeout(500);
+
+  await expect(dlg.locator('.gc-gb-entry').first()).toContainText('RaceVisitor');
+  const saved = await page.evaluate(() => localStorage.getItem('mnk:guestbook'));
+  expect(saved).toContain('RaceVisitor');
+});
+
+// An empty list from a *configured* backend is authoritative — the shared book is
+// genuinely empty, so the 1998 seed entries must clear. An `unconfigured` backend
+// also answers with `entries: []`, and that one must leave local entries alone.
+test('geocities: an empty configured backend clears seed entries, but unconfigured does not', async ({ page }) => {
+  await page.addInitScript(() => {
+    try { navigator.serviceWorker.register = () => Promise.reject(new Error('sw blocked in test')); } catch (e) {}
+  });
+
+  // 1. Configured but empty → authoritative, seeds clear.
+  await page.route('**/api/guestbook', route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ entries: [] }) })
+  );
+  await page.goto('/');
+  await page.locator('.geocities-toggle').click();
+  await page.locator('[data-gc-action="sign-guestbook"]').click();
+  await expect(page.locator('.gc-guestbook-dialog')).toBeVisible();
+  await expect.poll(
+    () => page.locator('.gc-guestbook-dialog .gc-gb-entry').count(),
+    { timeout: 5000 }
+  ).toBe(0);
+
+  // 2. Unconfigured → not authoritative, the local seed entries stay.
+  await page.unroute('**/api/guestbook');
+  await page.route('**/api/guestbook', route =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ entries: [], backend: 'unconfigured' })
+    })
+  );
+  await page.evaluate(() => { try { localStorage.removeItem('mnk:guestbook'); } catch (e) {} });
+  await page.goto('/');
+  await page.locator('[data-gc-action="sign-guestbook"]').click();
+  const dlg2 = page.locator('.gc-guestbook-dialog');
+  await expect(dlg2).toBeVisible();
+  await page.waitForTimeout(500);
+  expect(await dlg2.locator('.gc-gb-entry').count()).toBeGreaterThan(0);
+});
+
+// Two signatures in flight at once: the second POST is confirmed first, then the
+// first POST's older list (which predates the second entry) arrives. Sequencing at
+// request-issue time means that stale list is discarded instead of replayed, so the
+// second signature is not rolled back out of the UI and local storage.
+test('geocities: an out-of-order POST response cannot roll back a newer signature', async ({ page }) => {
+  await page.addInitScript(() => {
+    try { navigator.serviceWorker.register = () => Promise.reject(new Error('sw blocked in test')); } catch (e) {}
+  });
+
+  let releaseFirstPost;
+  const firstPostHeld = new Promise(resolve => { releaseFirstPost = resolve; });
+  let postCount = 0;
+  const accepted = [];
+
+  await page.route('**/api/guestbook', async route => {
+    if (route.request().method() !== 'POST') {
+      return route.fulfill({
+        status: 200, contentType: 'application/json',
+        body: JSON.stringify({ entries: [] })
+      });
+    }
+    const body = JSON.parse(route.request().postData() || '{}');
+    accepted.unshift({ name: body.name, message: body.message, date: '2026 Aug 05', id: body.id });
+    // Snapshot the list as it stood when this POST was accepted.
+    const snapshot = accepted.slice();
+    postCount += 1;
+    if (postCount === 1) await firstPostHeld;   // first response lands last
+    return route.fulfill({
+      status: 201, contentType: 'application/json',
+      body: JSON.stringify({ entries: snapshot })
+    });
+  });
+
+  await page.goto('/');
+  await page.locator('.geocities-toggle').click();
+  await page.locator('[data-gc-action="sign-guestbook"]').click();
+  const dlg = page.locator('.gc-guestbook-dialog');
+  await expect(dlg).toBeVisible();
+
+  const sign = async (name, msg) => {
+    await dlg.locator('input[name="name"]').fill(name);
+    await dlg.locator('textarea[name="message"]').fill(msg);
+    await dlg.locator('.gc-gb-sign').click();
+  };
+
+  await sign('FirstSigner', 'held open');
+  await sign('SecondSigner', 'confirmed first');
+
+  // The second POST resolves immediately and its list contains both entries.
+  await expect(dlg.locator('.gc-gb-entry').first()).toContainText('SecondSigner');
+
+  // Now let the first POST's stale one-entry list arrive. It must be discarded.
+  releaseFirstPost();
+  await page.waitForTimeout(500);
+
+  await expect(dlg.locator('.gc-gb-entry').first()).toContainText('SecondSigner');
+  const saved = await page.evaluate(() => localStorage.getItem('mnk:guestbook'));
+  expect(saved).toContain('SecondSigner');
+  expect(saved).toContain('FirstSigner');
+});
+
+// The mirror of the case above: both signatures are in flight at once, but the
+// backend processes the *second-issued* one first. So the first-issued POST comes
+// back with the complete list and arrives first, while the second-issued POST's
+// older single-entry list lands last. Issue order and arrival order disagree, and
+// neither identifies the fresher list — so only the latest-issued sync may apply,
+// and the superseded entry stays pending and is preserved.
+test('geocities: reversed backend processing order cannot drop a signature', async ({ page }) => {
+  await page.addInitScript(() => {
+    try { navigator.serviceWorker.register = () => Promise.reject(new Error('sw blocked in test')); } catch (e) {}
+  });
+
+  let secondPostArrived;
+  const bothInFlight = new Promise(resolve => { secondPostArrived = resolve; });
+  let postCount = 0;
+
+  await page.route('**/api/guestbook', async route => {
+    if (route.request().method() !== 'POST') {
+      return route.fulfill({
+        status: 200, contentType: 'application/json', body: JSON.stringify({ entries: [] })
+      });
+    }
+    const body = JSON.parse(route.request().postData() || '{}');
+    const mine = { name: body.name, message: body.message, date: '2026 Aug 05', id: body.id };
+    postCount += 1;
+
+    if (postCount === 1) {
+      // Issued first, processed second: hold until the other request is also in
+      // flight, then answer with the complete list and land first.
+      await bothInFlight;
+      return route.fulfill({
+        status: 201, contentType: 'application/json',
+        body: JSON.stringify({ entries: [mine, { name: 'Gamma', message: 'issued second', date: '2026 Aug 05', id: 'gamma-id' }] })
+      });
+    }
+
+    // Issued second, processed first: it only ever saw its own row. Delayed so it
+    // lands last, carrying the staler list.
+    secondPostArrived();
+    await new Promise(r => setTimeout(r, 300));
+    return route.fulfill({
+      status: 201, contentType: 'application/json', body: JSON.stringify({ entries: [mine] })
+    });
+  });
+
+  await page.goto('/');
+  await page.locator('.geocities-toggle').click();
+  await page.locator('[data-gc-action="sign-guestbook"]').click();
+  const dlg = page.locator('.gc-guestbook-dialog');
+  await expect(dlg).toBeVisible();
+
+  const sign = async (name, msg) => {
+    await dlg.locator('input[name="name"]').fill(name);
+    await dlg.locator('textarea[name="message"]').fill(msg);
+    await dlg.locator('.gc-gb-sign').click();
+  };
+
+  await sign('Alpha', 'issued first');
+  await sign('Gamma', 'issued second');
+
+  await page.waitForTimeout(900);
+
+  // Neither signature may be lost, whichever response landed last.
+  const saved = await page.evaluate(() => localStorage.getItem('mnk:guestbook'));
+  expect(saved).toContain('Alpha');
+  expect(saved).toContain('Gamma');
+  await expect(dlg.locator('.gc-gb-entry').filter({ hasText: 'Alpha' })).toHaveCount(1);
+  await expect(dlg.locator('.gc-gb-entry').filter({ hasText: 'Gamma' })).toHaveCount(1);
+});
+
+// localStorage is shared across tabs but the sync sequence is per-document, so a
+// GET held open in one tab can outlive another tab confirming a signature. The
+// storage event supersedes the in-flight sync so the stale empty list is not
+// reconciled over the entry the other tab just confirmed.
+test('geocities: a held GET in one tab cannot wipe an entry another tab confirmed', async ({ context }) => {
+  const block = p => p.addInitScript(() => {
+    try { navigator.serviceWorker.register = () => Promise.reject(new Error('sw blocked in test')); } catch (e) {}
+    // Count settled guestbook fetches so the test can wait on the response
+    // actually being processed rather than on a wall-clock guess — a backgrounded
+    // tab is throttled, which makes a fixed timeout race the wipe it checks for.
+    window.__gbFetches = 0;
+    const originalFetch = window.fetch;
+    window.fetch = function (...args) {
+      const isGuestbook = String(args[0] || '').indexOf('/api/guestbook') !== -1;
+      return originalFetch.apply(this, args).then(r => {
+        if (isGuestbook) window.__gbFetches++;
+        return r;
+      }, e => { if (isGuestbook) window.__gbFetches++; throw e; });
+    };
+  });
+
+  let releaseTabAGet;
+  const tabAGetHeld = new Promise(resolve => { releaseTabAGet = resolve; });
+
+  const tabA = await context.newPage();
+  await block(tabA);
+  await tabA.route('**/api/guestbook', async route => {
+    await tabAGetHeld;                       // an empty snapshot, held open
+    return route.fulfill({
+      status: 200, contentType: 'application/json', body: JSON.stringify({ entries: [] })
+    });
+  });
+
+  // GeoCities mode is itself persisted in the shared localStorage, so the second
+  // tab loads with it already enabled — only toggle when it is actually off.
+  const ensureGeocities = async (p) => {
+    const toggle = p.locator('.geocities-toggle');
+    await expect(toggle).toBeVisible();
+    if ((await toggle.getAttribute('aria-pressed')) !== 'true') await toggle.click();
+    await expect(p.locator('.gc-bottom-links')).toBeVisible();
+  };
+
+  await tabA.goto('/');
+  await ensureGeocities(tabA);
+  await tabA.locator('[data-gc-action="sign-guestbook"]').click();
+  await expect(tabA.locator('.gc-guestbook-dialog')).toBeVisible();
+
+  // Second tab, same origin and therefore the same localStorage, signs and is
+  // confirmed by the backend while tab A's GET is still outstanding.
+  const tabB = await context.newPage();
+  await block(tabB);
+  await tabB.route('**/api/guestbook', route => {
+    if (route.request().method() === 'POST') {
+      const body = JSON.parse(route.request().postData() || '{}');
+      return route.fulfill({
+        status: 201, contentType: 'application/json',
+        body: JSON.stringify({ entries: [{ name: body.name, message: body.message, date: '2026 Aug 05', id: body.id }] })
+      });
+    }
+    return route.fulfill({
+      status: 200, contentType: 'application/json', body: JSON.stringify({ entries: [] })
+    });
+  });
+  await tabB.goto('/');
+  await ensureGeocities(tabB);
+  await tabB.locator('[data-gc-action="sign-guestbook"]').click();
+  const dlgB = tabB.locator('.gc-guestbook-dialog');
+  await expect(dlgB).toBeVisible();
+  await dlgB.locator('input[name="name"]').fill('CrossTabSigner');
+  await dlgB.locator('textarea[name="message"]').fill('confirmed in the other tab');
+  await dlgB.locator('.gc-gb-sign').click();
+  await expect(dlgB.locator('.gc-gb-entry').first()).toContainText('CrossTabSigner');
+
+  // Now let tab A's stale empty list arrive. Focus it first so it is not throttled
+  // as a background tab, then wait for the held fetch to actually settle and its
+  // handlers to run — otherwise the assertion can win a race against the wipe.
+  await tabA.bringToFront();
+  releaseTabAGet();
+  await tabA.waitForFunction(() => window.__gbFetches >= 1, null, { timeout: 10000 });
+  await tabA.waitForTimeout(300);
+
+  const saved = await tabA.evaluate(() => localStorage.getItem('mnk:guestbook'));
+  expect(saved).toContain('CrossTabSigner');
+
+  await tabA.close();
+  await tabB.close();
 });
 
 test('geocities: no inline event handlers or javascript: URLs in retro DOM', async ({ page }) => {

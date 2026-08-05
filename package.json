@@ -4,7 +4,14 @@
   "description": "Personal website for **Maximilian Stein** — Product Manager for **Microsoft Intune** and **Microsoft Security** within Customer Experience Engineering (CxE).",
   "main": "cube.js",
   "scripts": {
-    "test": "npx playwright test"
+    "test": "npx playwright test",
+    "test:api": "npm test --prefix api",
+    "check:csp": "node compute-hashes.js --check",
+    "check:search": "node build-search-index.js --check",
+    "build:search": "node build-search-index.js"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "repository": {
     "type": "git",

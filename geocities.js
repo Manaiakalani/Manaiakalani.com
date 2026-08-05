@@ -15,10 +15,17 @@
 
   // ---- Visitor counter (increment once per page load, not per toggle) ----
   const visitorCount = (function () {
-    let count = parseInt(localStorage.getItem('gc-visitors') || '0', 10);
-    count += 1;
-    localStorage.setItem('gc-visitors', String(count));
-    return count;
+    try {
+      let count = parseInt(localStorage.getItem('gc-visitors') || '0', 10);
+      if (!isFinite(count) || count < 0) count = 0;
+      count += 1;
+      localStorage.setItem('gc-visitors', String(count));
+      return count;
+    } catch (e) {
+      // Storage unavailable (private mode / blocked cookies): the decorative
+      // counter must never stop GeoCities mode from initialising.
+      return 1;
+    }
   })();
 
   // ---- Helper: create element with aria-hidden for decorative content ----
@@ -151,11 +158,69 @@
   // backend is absent or errors, the guestbook silently stays local-only.
   var GB_API = '/api/guestbook';
 
+  // Ordering guard for shared-list syncs. Responses can arrive out of order and
+  // whichever one is applied last overwrites local storage, so applying a stale
+  // list can silently drop entries the backend has already accepted.
+  //
+  // Issue order alone is not enough: the backend may process two concurrent POSTs
+  // in the opposite order, so the later-issued request can be the one carrying the
+  // older list. The two orderings can't be reconciled from the client.
+  //
+  // What makes this tractable is that the two failure directions are not
+  // symmetric. Discarding a response is always safe — the entry it would have
+  // confirmed simply stays marked pending, and reconcileEntries preserves pending
+  // entries — whereas applying a stale response drops already-confirmed entries.
+  // So only the most recently issued sync may apply its response; every superseded
+  // response is dropped, and the next sync reconciles against the real list.
+  var syncSeq = 0;
+
+  function nextSyncSeq() { return ++syncSeq; }
+
+  // The sequence above is per-document, but the guestbook lives in localStorage,
+  // which is shared across tabs — so another tab confirming a signature is just as
+  // invalidating as one of our own syncs. The stored value doubles as a change
+  // token: a sync records it when the request is issued and re-reads it when the
+  // response lands, so any write from any tab in between is detected.
+  //
+  // This has to be read synchronously inside the response callback. A storage
+  // event would not do: events and fetch completions are queued independently, so
+  // the event can be delivered *after* the response callback has already applied a
+  // stale list, which is exactly the wipe being guarded against.
+  //
+  // It cannot starve. The token only changes on a real write, and a sync issued
+  // after the last write records the current value and still matches when it
+  // returns. Where localStorage is unavailable this reads null both times and the
+  // guard reduces to the sequence check.
+  // Known limitation: this is a check-then-act, and localStorage offers no
+  // cross-document transaction, so it cannot be made strictly atomic. The window
+  // is however the synchronous block below — check, read, reconcile, write, with
+  // no await or other yield point — so a competing write has to come from a tab
+  // running JS genuinely concurrently in a separate process. Closing that would
+  // mean serialising on Web Locks and making the whole reconcile path async, with
+  // a fallback that would still race on browsers lacking it. Given the backend
+  // stays authoritative and any lost entry reappears on the next sync, the
+  // residual window is not worth that trade.
+  function guestbookToken() {
+    try { return localStorage.getItem(GB_KEY); } catch (e) { return null; }
+  }
+
+  // True only while no newer sync has been issued and no tab has written since.
+  function isLatestSync(seq, token) {
+    return seq === syncSeq && guestbookToken() === token;
+  }
+
   function readServerList(data) {
+    // A positively-unconfigured or errored backend means there is no shared book
+    // to reconcile against, so the caller must stay on its local copy. This has to
+    // be checked first: an unconfigured GET also answers with `entries: []`, and
+    // treating that as an authoritative empty list would wipe the local entries.
+    if (data && (data.backend === 'unconfigured' || data.backend === 'error')) return null;
     var arr = Array.isArray(data) ? data : (data && Array.isArray(data.entries) ? data.entries : null);
     if (!arr) return null;
-    var clean = sanitizeEntries(arr);
-    return clean.length ? clean : null;
+    // An empty array from a configured backend IS authoritative — the shared book
+    // really is empty. Returning null here would strand every visitor on the local
+    // seed entries until someone happened to sign.
+    return sanitizeEntries(arr);
   }
 
   function apiGet() {
@@ -259,14 +324,16 @@
 
   function renderGuestbookEntries(listEl, countEl) {
     paintEntries(listEl, countEl, loadGuestbook());        // instant local paint
+    var seq = nextSyncSeq();
+    var token = guestbookToken();
     apiGet().then(function (server) {                      // then reconcile with the shared list
-      if (server) {
-        // Keep any local-only entry the backend hasn't accepted yet; the shared
-        // list stays authoritative for everything it already knows about.
-        var merged = reconcileEntries(server, loadGuestbook());
-        saveGuestbook(merged);
-        paintEntries(listEl, countEl, merged);
-      }
+      if (!server) return;
+      if (!isLatestSync(seq, token)) return;               // superseded by a newer sync or another tab
+      // Keep any local-only entry the backend hasn't accepted yet; the shared
+      // list stays authoritative for everything it already knows about.
+      var merged = reconcileEntries(server, loadGuestbook());
+      saveGuestbook(merged);
+      paintEntries(listEl, countEl, merged);
     });
   }
 
@@ -306,6 +373,9 @@
         return { name: e.name, message: e.message, date: e.date, id: e.id || newEntryId(), pending: true };
       });
       // Merge imported over existing, de-duping identical signatures, cap 100.
+      // Bump the sequence so any sync still in flight is superseded and cannot
+      // overwrite the freshly imported entries.
+      nextSyncSeq();
       var merged = mergeEntries(pendingIncoming, loadGuestbook());
       saveGuestbook(merged);
       paintEntries(listEl, countEl, merged);
@@ -383,8 +453,15 @@
       // The entry is already saved and shown locally; keep the cheerful thanks
       // only when it's safely stored (locally when there's no shared backend yet,
       // or shared when the backend accepted). Otherwise say what really happened.
+      var postSeq = nextSyncSeq();
+      var postToken = guestbookToken();
       apiPost(entry).then(function (res) {
         if (res.ok && res.list) {
+          // A second signature may have been issued while this one was in flight,
+          // here or in another tab. Its list supersedes this one regardless of
+          // which response arrives first, so drop this list; this entry is still
+          // pending and survives to be confirmed by the next sync.
+          if (!isLatestSync(postSeq, postToken)) return;
           // Merge so any earlier local-only entry survives the shared list replacing
           // local storage (the just-signed entry is already in res.list).
           var merged = reconcileEntries(res.list, loadGuestbook());
@@ -782,13 +859,15 @@
   toggle.addEventListener('click', function () {
     var isActive = root.getAttribute('data-geocities') === 'true';
     var next = !isActive;
-    localStorage.setItem(GC_KEY, next ? 'true' : 'false');
+    try { localStorage.setItem(GC_KEY, next ? 'true' : 'false'); } catch (e) { /* storage unavailable */ }
     toggle.setAttribute('aria-pressed', String(next));
     applyGeoCities(next);
   });
 
   // ---- Initialize from stored state ----
-  if (localStorage.getItem(GC_KEY) === 'true') {
+  var storedGeo = null;
+  try { storedGeo = localStorage.getItem(GC_KEY); } catch (e) { /* storage unavailable */ }
+  if (storedGeo === 'true') {
     applyGeoCities(true);
   }
 })();
