@@ -176,21 +176,29 @@
 
   function nextSyncSeq() { return ++syncSeq; }
 
-  // True only while no newer sync has been issued since this one started.
-  function isLatestSync(seq) { return seq === syncSeq; }
+  // The sequence above is per-document, but the guestbook lives in localStorage,
+  // which is shared across tabs — so another tab confirming a signature is just as
+  // invalidating as one of our own syncs. The stored value doubles as a change
+  // token: a sync records it when the request is issued and re-reads it when the
+  // response lands, so any write from any tab in between is detected.
+  //
+  // This has to be read synchronously inside the response callback. A storage
+  // event would not do: events and fetch completions are queued independently, so
+  // the event can be delivered *after* the response callback has already applied a
+  // stale list, which is exactly the wipe being guarded against.
+  //
+  // It cannot starve. The token only changes on a real write, and a sync issued
+  // after the last write records the current value and still matches when it
+  // returns. Where localStorage is unavailable this reads null both times and the
+  // guard reduces to the sequence check.
+  function guestbookToken() {
+    try { return localStorage.getItem(GB_KEY); } catch (e) { return null; }
+  }
 
-  // The sequence above is per-document, but localStorage is shared across tabs, so
-  // another tab confirming a signature is just as invalidating as one of our own
-  // syncs: our in-flight response predates its write and would reconcile the
-  // now-confirmed entry straight back out. The storage event fires only in *other*
-  // documents, so treating it as a new sync supersedes whatever we have in flight.
-  // It cannot starve the guestbook — the event only fires on a real cross-tab
-  // write, and the next sync starts from the bumped sequence.
-  try {
-    window.addEventListener('storage', function (e) {
-      if (e && e.key === GB_KEY) nextSyncSeq();
-    });
-  } catch (e) { /* no storage events available; single-tab behaviour is unaffected */ }
+  // True only while no newer sync has been issued and no tab has written since.
+  function isLatestSync(seq, token) {
+    return seq === syncSeq && guestbookToken() === token;
+  }
 
   function readServerList(data) {
     // A positively-unconfigured or errored backend means there is no shared book
@@ -308,9 +316,10 @@
   function renderGuestbookEntries(listEl, countEl) {
     paintEntries(listEl, countEl, loadGuestbook());        // instant local paint
     var seq = nextSyncSeq();
+    var token = guestbookToken();
     apiGet().then(function (server) {                      // then reconcile with the shared list
       if (!server) return;
-      if (!isLatestSync(seq)) return;                      // a newer sync superseded this one
+      if (!isLatestSync(seq, token)) return;               // superseded by a newer sync or another tab
       // Keep any local-only entry the backend hasn't accepted yet; the shared
       // list stays authoritative for everything it already knows about.
       var merged = reconcileEntries(server, loadGuestbook());
@@ -436,12 +445,14 @@
       // only when it's safely stored (locally when there's no shared backend yet,
       // or shared when the backend accepted). Otherwise say what really happened.
       var postSeq = nextSyncSeq();
+      var postToken = guestbookToken();
       apiPost(entry).then(function (res) {
         if (res.ok && res.list) {
-          // A second signature may have been issued while this one was in flight.
-          // Its list supersedes this one regardless of which response arrives
-          // first, so drop this list; this entry is still pending and survives.
-          if (!isLatestSync(postSeq)) return;
+          // A second signature may have been issued while this one was in flight,
+          // here or in another tab. Its list supersedes this one regardless of
+          // which response arrives first, so drop this list; this entry is still
+          // pending and survives to be confirmed by the next sync.
+          if (!isLatestSync(postSeq, postToken)) return;
           // Merge so any earlier local-only entry survives the shared list replacing
           // local storage (the just-signed entry is already in res.list).
           var merged = reconcileEntries(res.list, loadGuestbook());

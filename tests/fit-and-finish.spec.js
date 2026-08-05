@@ -895,6 +895,18 @@ test('geocities: reversed backend processing order cannot drop a signature', asy
 test('geocities: a held GET in one tab cannot wipe an entry another tab confirmed', async ({ context }) => {
   const block = p => p.addInitScript(() => {
     try { navigator.serviceWorker.register = () => Promise.reject(new Error('sw blocked in test')); } catch (e) {}
+    // Count settled guestbook fetches so the test can wait on the response
+    // actually being processed rather than on a wall-clock guess — a backgrounded
+    // tab is throttled, which makes a fixed timeout race the wipe it checks for.
+    window.__gbFetches = 0;
+    const originalFetch = window.fetch;
+    window.fetch = function (...args) {
+      const isGuestbook = String(args[0] || '').indexOf('/api/guestbook') !== -1;
+      return originalFetch.apply(this, args).then(r => {
+        if (isGuestbook) window.__gbFetches++;
+        return r;
+      }, e => { if (isGuestbook) window.__gbFetches++; throw e; });
+    };
   });
 
   let releaseTabAGet;
@@ -949,9 +961,13 @@ test('geocities: a held GET in one tab cannot wipe an entry another tab confirme
   await dlgB.locator('.gc-gb-sign').click();
   await expect(dlgB.locator('.gc-gb-entry').first()).toContainText('CrossTabSigner');
 
-  // Now let tab A's stale empty list arrive.
+  // Now let tab A's stale empty list arrive. Focus it first so it is not throttled
+  // as a background tab, then wait for the held fetch to actually settle and its
+  // handlers to run — otherwise the assertion can win a race against the wipe.
+  await tabA.bringToFront();
   releaseTabAGet();
-  await tabA.waitForTimeout(600);
+  await tabA.waitForFunction(() => window.__gbFetches >= 1, null, { timeout: 10000 });
+  await tabA.waitForTimeout(300);
 
   const saved = await tabA.evaluate(() => localStorage.getItem('mnk:guestbook'));
   expect(saved).toContain('CrossTabSigner');
