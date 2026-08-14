@@ -11,7 +11,7 @@
     "build:search": "node build-search-index.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.19"
   },
   "repository": {
     "type": "git",
@@ -32,6 +32,7 @@
   "overrides": {
     "tmp": "^0.2.7",
     "uuid": "^11.1.1",
-    "js-yaml": "^3.15.1"
+    "js-yaml": "^3.15.1",
+    "lighthouse": "^13.4.1"
   }
 }
