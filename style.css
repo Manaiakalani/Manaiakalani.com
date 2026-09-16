@@ -639,20 +639,8 @@ footer {
     line-height: 1.4;
 }
 
-.building-status {
-    margin: 0.75rem auto 0;
-    font-family: 'Doto', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    color: var(--header-text);
-    opacity: 0.9;
-}
-
-.building-status a {
-    color: inherit;
-    text-decoration: underline;
-    text-underline-offset: 0.15em;
+.header-hook em {
+    font-style: italic;
 }
 
 #typing-effect {
@@ -1135,8 +1123,9 @@ a.building-card:focus-visible {
     header p { font-size: 1.1rem; }
     .social-icons a { font-size: 1.5rem; }
     .theme-toggle,
-    .geocities-toggle,
-    .cmdk-launcher { font-size: 1rem; }
+    .geocities-toggle { font-size: 1rem; }
+    .cmdk-launcher { font-size: 0.78rem; padding: 0 0.55rem 0 0.5rem; }
+    .cmdk-launcher-key { display: none; }
     .cube-wrapper { width: 160px; height: 160px; margin-bottom: 1rem; }
     .site-nav { gap: 0.25rem 0.35rem; }
     .site-nav a { font-size: 0.85rem; padding: 0 0.5rem; }
@@ -1152,6 +1141,8 @@ a.building-card:focus-visible {
     header p { font-size: 0.9rem; }
     .header-subtitle { font-size: 0.8rem; }
     .site-nav a { font-size: 0.78rem; padding: 0 0.4rem; }
+    .cmdk-launcher-label { display: none; }
+    .cmdk-launcher { padding: 0; width: var(--header-control); font-size: 1.05rem; }
     .page-hero h1 { font-size: 1.8rem; }
 }
 
@@ -1524,29 +1515,49 @@ footer {
     position: absolute;
     top: max(var(--header-inset), env(safe-area-inset-top, 0px));
     right: calc(max(var(--header-inset), env(safe-area-inset-right, 0px)) + var(--header-control) + var(--header-control-gap));
-    width: var(--header-control);
     height: var(--header-control);
-    border-radius: 50%;
+    min-width: var(--header-control);
+    width: auto;
+    padding: 0 0.7rem 0 0.65rem;
+    border-radius: 999px;
     background: var(--toggle-bg);
     border: none;
     color: var(--header-text);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.05rem;
+    gap: 0.4rem;
+    font-family: 'Doto', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
     cursor: pointer;
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    transition: background var(--transition-speed) ease, transform var(--transition-speed) ease;
+    transition: background var(--transition-speed) ease;
+}
+
+.cmdk-launcher-label {
+    line-height: 1;
+}
+
+.cmdk-launcher-key {
+    font: inherit;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    opacity: 0.78;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    padding: 0.08rem 0.28rem;
+    line-height: 1.2;
 }
 
 .cmdk-launcher:hover {
     background: var(--toggle-hover);
-    transform: scale(1.1);
 }
 
 .cmdk-launcher:active {
-    transform: scale(0.95);
+    background: var(--toggle-hover);
 }
 
 .cmdk-launcher:focus-visible {
