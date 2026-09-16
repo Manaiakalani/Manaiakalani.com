@@ -241,11 +241,14 @@ header p {
     outline-offset: 4px;
 }
 
-.theme-toggle .fa-sun { display: none; }
-.theme-toggle .fa-moon { display: inline; }
-
-[data-theme="dark"] .theme-toggle .fa-sun { display: inline; }
-[data-theme="dark"] .theme-toggle .fa-moon { display: none; }
+.theme-toggle .theme-icon {
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+.theme-toggle .theme-icon--moon { display: flex; }
+[data-theme="dark"] .theme-toggle .theme-icon--sun { display: flex; }
+[data-theme="dark"] .theme-toggle .theme-icon--moon { display: none; }
 
 /* About Section */
 #about {
@@ -424,7 +427,8 @@ footer {
 .gc-icon .icon,
 .cmdk-launcher .icon,
 .cmdk__icon .icon,
-.cmdk__search-icon .icon {
+.cmdk__search-icon .icon,
+.theme-toggle .icon {
     width: 1.15em;
     height: 1.15em;
 }
@@ -1049,6 +1053,41 @@ a.building-card:focus-visible {
 .select-wrapper {
     flex: 1 1 240px;
     max-width: 320px;
+}
+
+.page-toolbar--stack {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.page-toolbar--stack .search-wrapper {
+    flex: none;
+    width: min(100%, 22rem);
+    max-width: none;
+}
+
+.page-toolbar--stack .select-wrapper {
+    flex: none;
+    width: min(100%, 16rem);
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.toolbar-label {
+    font-family: 'Doto', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.page-toolbar--stack .select-input {
+    text-align: center;
+    text-align-last: center;
 }
 
 .search-input,

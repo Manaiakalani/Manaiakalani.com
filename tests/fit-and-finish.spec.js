@@ -90,6 +90,14 @@ test('chrome: geocities toggle uses a cone icon instead of an emoji', async ({ p
   await expect(page.locator('.geocities-toggle [data-icon="cone"] svg')).toBeVisible();
 });
 
+test('chrome: header icons are the site glyph set', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.geocities-toggle [data-icon="cone"] svg')).toBeVisible();
+  await expect(page.locator('.cmdk-launcher svg.icon')).toBeVisible();
+  await expect(page.locator('.theme-toggle [data-icon="moon"] svg')).toBeVisible();
+  await expect(page.locator('.fa-moon, .fa-sun')).toHaveCount(0);
+});
+
 test('index: featured projects teaser exists', async ({ page }) => {
   await page.goto('/');
   await page.waitForSelector('.featured-teaser .project-card', { timeout: 10000 });
