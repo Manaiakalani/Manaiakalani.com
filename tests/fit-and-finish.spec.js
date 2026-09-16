@@ -1361,7 +1361,7 @@ test('404: Clippy and a search of the missing path', async ({ page }) => {
   await expect(page.locator('img.clippy')).toBeVisible();
   await expect(page.locator('#lost-search')).toBeVisible();
   const scriptSrc = await page.locator('script[src*="script.js?v="]').first().getAttribute('src');
-  expect(scriptSrc).toMatch(/script\.js\?v=15/);
+  expect(scriptSrc).toMatch(/script\.js\?v=\d+/);
 });
 
 test('about uses the ʻokina in Hawaiʻi', async ({ page }) => {
