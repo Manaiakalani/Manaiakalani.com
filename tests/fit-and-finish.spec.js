@@ -161,6 +161,27 @@ test('projects: GitHub link is visible', async ({ page }) => {
   await expect(ghLink).toBeVisible();
 });
 
+test('projects: GitHub link is fully visible and sits above the footer', async ({ page }) => {
+  await page.goto('/projects.html');
+  const ghLink = page.locator('a.github-link');
+  await expect(ghLink).toBeVisible();
+  await expect(ghLink).toContainText('View all repositories on GitHub');
+  await ghLink.scrollIntoViewIfNeeded();
+  const gap = await page.evaluate(() => {
+    const a = document.querySelector('a.github-link').getBoundingClientRect();
+    const footer = document.querySelector('footer').getBoundingClientRect();
+    const vw = window.innerWidth;
+    return {
+      footerGap: footer.y - a.bottom,
+      overflowRight: a.right - vw,
+      overflowLeft: -a.x,
+    };
+  });
+  expect(gap.footerGap, `footer gap ${gap.footerGap}`).toBeGreaterThanOrEqual(16);
+  expect(gap.overflowRight, `clips viewport right by ${gap.overflowRight}`).toBeLessThanOrEqual(1);
+  expect(gap.overflowLeft, `clips viewport left by ${gap.overflowLeft}`).toBeLessThanOrEqual(1);
+});
+
 // ── Projects: search/filter ──
 test('projects: search filters visible cards', async ({ page }) => {
   await page.goto('/projects.html');
