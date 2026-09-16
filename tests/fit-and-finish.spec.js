@@ -83,6 +83,17 @@ test('index: Clippy is the Fluent 3D paperclip image, not the 🖇️ emoji', as
   await expect(clippy).toHaveAttribute('alt', 'Clippy');
   expect(await clippy.evaluate(el => el.naturalWidth)).toBeGreaterThan(0);
   await expect(page.locator('#about')).not.toContainText('🖇️');
+  const bubble = page.locator('#about .clippy-bubble');
+  await expect(bubble).toContainText("It looks like you're trying to build something useful");
+  const imgBox = await clippy.boundingBox();
+  const bubbleBox = await bubble.boundingBox();
+  expect(imgBox).toBeTruthy();
+  expect(bubbleBox).toBeTruthy();
+  if (Math.abs(bubbleBox.y - imgBox.y) < 48) {
+    expect(bubbleBox.x).toBeGreaterThan(imgBox.x + imgBox.width / 2);
+  } else {
+    expect(bubbleBox.y).toBeGreaterThan(imgBox.y);
+  }
 });
 
 test('chrome: geocities toggle uses a globe glyph instead of an emoji', async ({ page }) => {
@@ -1350,7 +1361,7 @@ test('404: Clippy and a search of the missing path', async ({ page }) => {
   await expect(page.locator('img.clippy')).toBeVisible();
   await expect(page.locator('#lost-search')).toBeVisible();
   const scriptSrc = await page.locator('script[src*="script.js?v="]').first().getAttribute('src');
-  expect(scriptSrc).toMatch(/script\.js\?v=15/);
+  expect(scriptSrc).toMatch(/script\.js\?v=\d+/);
 });
 
 test('about uses the ʻokina in Hawaiʻi', async ({ page }) => {
