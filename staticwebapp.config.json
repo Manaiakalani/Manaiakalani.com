@@ -18,6 +18,7 @@
     { "route": "/lighthouserc.json", "rewrite": "/404.html" },
     { "route": "/compute-hashes.js", "rewrite": "/404.html" },
     { "route": "/build-search-index.js", "rewrite": "/404.html" },
+    { "route": "/scripts/*", "rewrite": "/404.html" },
     { "route": "/node_modules/*", "rewrite": "/404.html" },
     { "route": "/.github/*", "rewrite": "/404.html" },
     { "route": "/README.md", "rewrite": "/404.html" },

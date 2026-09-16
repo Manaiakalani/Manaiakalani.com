@@ -49,7 +49,7 @@
     <!-- Self-hosted Doto: preload the latin subset used above the fold -->
     <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin />
     <!-- External CSS -->
-    <link rel="stylesheet" href="style.css?v=14" />
+    <link rel="stylesheet" href="style.css?v=15" />
 
     <!-- RSS Feed -->
     <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml" />
@@ -141,7 +141,7 @@
         aria-label="Toggle GeoCities mode"
         title="Welcome to 1997!"
       >
-        <span class="gc-icon">🚧</span>
+        <span class="gc-icon" data-icon="cone"></span>
       </button>
     </header>
 
@@ -186,7 +186,7 @@
               >It looks like you're trying to build something useful. Need help
               with that?</em
             >
-            🖇️
+            <span class="clippy" data-icon="clippy" role="img" aria-label="Clippy"></span>
           </p>
         </div>
       </div>
@@ -229,7 +229,8 @@
     </footer>
 
     <!-- External JavaScript -->
-    <script defer src="script.js?v=12"></script>
+    <script defer src="icons.js?v=1"></script>
+    <script defer src="script.js?v=13"></script>
 
     <!-- ASCII Cube -->
     <script type="importmap">
@@ -240,8 +241,8 @@
         }
     }
     </script>
-    <script defer src="components.js?v=7"></script>
-    <script defer src="command-palette.js?v=4"></script>
+    <script defer src="components.js?v=8"></script>
+    <script defer src="command-palette.js?v=5"></script>
     <script type="module" src="web-vitals-report.js?v=1"></script>
   </body>
 </html>

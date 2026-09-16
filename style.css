@@ -398,6 +398,59 @@ footer {
     }
 }
 
+.icon {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    display: block;
+    flex-shrink: 0;
+}
+
+.clippy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75em;
+    height: 1.75em;
+    vertical-align: -0.4em;
+    margin-left: 0.15em;
+}
+
+.clippy .icon-clippy {
+    width: 1.75em;
+    height: 1.75em;
+}
+
+.gc-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gc-icon .icon,
+.cmdk-launcher .icon,
+.cmdk__icon .icon,
+.cmdk__search-icon .icon {
+    width: 1.15em;
+    height: 1.15em;
+}
+
+.random-thought-btn .icon,
+.random-project-btn .icon,
+.copy-link-btn .icon,
+.heart-beat .icon,
+.building-label .icon {
+    width: 1em;
+    height: 1em;
+}
+
+.cmdk__icon,
+.cmdk__search-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Heartbeat Animation */
 @keyframes heartbeat {
     0%, 100% { transform: scale(1); }

@@ -18,6 +18,7 @@ const MOCK_REPOS = [
   { name: 'project-alpha', description: 'A test project', language: 'TypeScript', html_url: 'https://github.com/test/alpha', fork: false, stargazers_count: 10, forks_count: 2, pushed_at: daysAgo(5) },
   { name: 'project-beta', description: 'Another project', language: 'Python', html_url: 'https://github.com/test/beta', fork: false, stargazers_count: 3, forks_count: 1, pushed_at: daysAgo(10) },
   { name: 'project-gamma', description: 'Third project', language: 'JavaScript', html_url: 'https://github.com/test/gamma', fork: false, stargazers_count: 1, forks_count: 0, pushed_at: daysAgo(1) },
+  { name: 'Manaiakalani.com', description: 'This site', language: 'HTML', html_url: 'https://github.com/Manaiakalani/Manaiakalani.com', fork: false, stargazers_count: 2, forks_count: 0, pushed_at: daysAgo(0) },
   { name: 'project-delta', description: 'Fourth project', language: 'Go', html_url: 'https://github.com/test/delta', fork: false, stargazers_count: 50, forks_count: 5, pushed_at: daysAgo(20) },
   { name: 'project-epsilon', description: 'Fifth project', language: 'Rust', html_url: 'https://github.com/test/epsilon', fork: false, stargazers_count: 0, forks_count: 0, pushed_at: daysAgo(15) },
   { name: 'project-zeta', description: 'Sixth project', language: 'HTML', html_url: 'https://github.com/test/zeta', fork: false, stargazers_count: 0, forks_count: 0, pushed_at: daysAgo(30) },
@@ -71,6 +72,17 @@ test('index: about section exists', async ({ page }) => {
   await expect(page.locator('#about')).toBeVisible();
 });
 
+test('index: Clippy is a fluent paperclip SVG, not the 🖇️ emoji', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.clippy svg.icon-clippy')).toBeVisible();
+  await expect(page.locator('#about')).not.toContainText('🖇️');
+});
+
+test('chrome: geocities toggle uses a cone icon instead of an emoji', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.geocities-toggle [data-icon="cone"] svg')).toBeVisible();
+});
+
 test('index: featured projects teaser exists', async ({ page }) => {
   await page.goto('/');
   await page.waitForSelector('.featured-teaser .project-card', { timeout: 10000 });
@@ -90,9 +102,12 @@ test('index: currently building widget shows most recently active project', asyn
   await page.goto('/');
   await page.waitForSelector('#currently-building .building-card', { timeout: 10000 });
   await expect(page.locator('.currently-building-teaser')).toBeVisible();
-  // project-gamma has the most recent pushed_at in the mock data
-  await expect(page.locator('#currently-building .building-card h3')).toHaveText('project-gamma');
+  // The portfolio repo is the most recently pushed — currently-building must
+  // include it even though the Projects grid still excludes it.
+  await expect(page.locator('#currently-building .building-card h3')).toHaveText('Manaiakalani.com');
+  await expect(page.locator('#currently-building time.building-updated')).toHaveAttribute('datetime', /20/);
   await expect(page.locator('#currently-building .skeleton-card')).toHaveCount(0);
+  await expect(page.locator('.featured-teaser .project-card h2', { hasText: 'Manaiakalani.com' })).toHaveCount(0);
 });
 
 test('index: currently building widget hides when GitHub API fails', async ({ page }) => {
