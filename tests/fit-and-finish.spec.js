@@ -224,7 +224,8 @@ test('thoughts: search filters entries and shows no-results message', async ({ p
   await search.fill('');
   await page.waitForTimeout(300);
   const restored = await page.locator('.thought-entry:visible').count();
-  expect(restored).toBeGreaterThanOrEqual(10);
+  const all = await page.locator('.thought-entry').count();
+  expect(restored).toBe(all);
 });
 
 test('thoughts: jump-to-entry nav lists all entries and navigates', async ({ page }) => {
@@ -232,7 +233,8 @@ test('thoughts: jump-to-entry nav lists all entries and navigates', async ({ pag
   const jumpNav = page.locator('#thoughts-jump-nav');
   await expect(jumpNav).toBeVisible();
   const optionCount = await jumpNav.locator('option').count();
-  expect(optionCount).toBe(11); // 10 entries + the "Jump to an entry…" placeholder
+  const entryCount = await page.locator('.thought-entry').count();
+  expect(optionCount).toBe(entryCount + 1); // entries + the "Jump to an entry…" placeholder
 
   await jumpNav.selectOption('the-clippy-philosophy');
   await expect(page).toHaveURL(/#the-clippy-philosophy$/);

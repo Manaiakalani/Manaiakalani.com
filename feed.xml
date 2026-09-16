@@ -5,10 +5,31 @@
   <link href="https://manaiakalani.com/feed.xml" rel="self" />
   <link href="https://manaiakalani.com/thoughts.html" />
   <id>https://manaiakalani.com/feed.xml</id>
-  <updated>2026-06-04T02:02:00Z</updated>
+  <updated>2026-09-15T20:00:00Z</updated>
   <author>
     <name>Maximilian Stein</name>
   </author>
+  <entry>
+    <title>Fit and Finish Is Respect</title>
+    <link href="https://manaiakalani.com/thoughts.html#fit-and-finish-is-respect" />
+    <id>https://manaiakalani.com/thoughts.html#fit-and-finish-is-respect</id>
+    <updated>2026-09-15T20:00:00Z</updated>
+    <summary>I spent a night measuring this site the way a visitor actually uses it: thumb on a 320px phone, six viewports, nav links that looked fine and were 27 pixels tall. Thought titles had inherited a centered heading style so the list read like a poster instead of writing. The command palette sat 6px from the theme toggle. Nobody files a ticket for that. They just bounce. Fit and finish is not polish for its own sake. It is the difference between "I built this" and "I meant for you to use this."</summary>
+  </entry>
+  <entry>
+    <title>Your Personal Site Has a Supply Chain</title>
+    <link href="https://manaiakalani.com/thoughts.html#your-personal-site-has-a-supply-chain" />
+    <id>https://manaiakalani.com/thoughts.html#your-personal-site-has-a-supply-chain</id>
+    <updated>2026-08-14T00:00:00Z</updated>
+    <summary>This site is static HTML. I still ended up with a high-severity parser in a Lighthouse tool I never imported on purpose, a lockfile that could not clean-install, and a week of Dependabot PRs that could not merge because of it. A homepage is a product. It has a lockfile, a content-security policy, and a queue of unglamorous patches. If you only ship the fun pages, the boring ones are what eventually take the site down. Keep the supply chain as honest as the About page.</summary>
+  </entry>
+  <entry>
+    <title>A Homepage Can Still Be a Place</title>
+    <link href="https://manaiakalani.com/thoughts.html#a-homepage-can-still-be-a-place" />
+    <id>https://manaiakalani.com/thoughts.html#a-homepage-can-still-be-a-place</id>
+    <updated>2026-07-22T00:00:00Z</updated>
+    <summary>I wired a shared sign-in book and a visitor counter onto this site this summer. If the backend is not there, they vanish. No fake numbers, no spinner that never ends. That is the point. Community strategy at work is sitting between engineers and the people who use what they ship. The same instinct belongs on a personal homepage: leave a place someone can actually sign, count the visits only when the count is real, and let the rest of the page keep working when the lights in the back are off.</summary>
+  </entry>
   <entry>
     <title>Ship It Where Someone Can Use It</title>
     <link href="https://manaiakalani.com/thoughts.html#ship-it-where-someone-can-use-it" />
