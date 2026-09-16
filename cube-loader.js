@@ -9,9 +9,9 @@ if (canvas) {
   let cubePromise = null;
   const loadCube = () => {
     if (!cubePromise) {
-      cubePromise = import("./cube.js?v=2")
+      cubePromise = import("/cube.js?v=2")
         .then(({ initCube }) => {
-          initCube(canvas, "./cube-texture.webp");
+          initCube(canvas, "/cube-texture.webp");
           return true;
         })
         .catch(() => {

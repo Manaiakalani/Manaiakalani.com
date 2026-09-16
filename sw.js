@@ -15,7 +15,7 @@
  *     network — the worker never intercepts them.
  * Bump CACHE on every deploy so the activate step purges the previous cache.
  */
-var CACHE = 'mnk-cache-v7';
+var CACHE = 'mnk-cache-v8';
 // The offline shell (home + 404) MUST land before activate purges the old cache;
 // the rest are best-effort niceties.
 var CORE_ESSENTIAL = ['/', '/404.html'];
@@ -23,7 +23,10 @@ var CORE_EXTRA = [
     '/projects.html',
     '/thoughts.html',
     '/uses.html',
+    '/colophon.html',
     '/manifest.json',
+    '/icon-192.png',
+    '/icon-512.png',
     '/favicon.png',
     '/favicon-32.png',
     '/og-image.png'

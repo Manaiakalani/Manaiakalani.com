@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!--
+  Aloha, view-source friend.
+  This page is a product: vanilla HTML, a CSP, a guestbook, and a cone that goes to 1997.
+  manaiakalani.com
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -29,8 +34,8 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/style.css?v=21">
-    <script src="/boot.js?v=18"></script>
+    <link rel="stylesheet" href="/style.css?v=22">
+    <script src="/boot.js?v=19"></script>
     <style>
         .four-oh-four {
             --gradient: linear-gradient(-45deg, #0f4c81, #c84534, #6a4c93, #8a6f00, #5a7b3b);
@@ -116,6 +121,8 @@
             border-radius: 6px;
             text-decoration: none;
             cursor: pointer;
+            appearance: none;
+            margin: 0.35rem;
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .home-btn:hover {
@@ -194,24 +201,7 @@
 </head>
 <body>
     <a href="#main" class="skip-link">Skip to main content</a>
-    <header>
-        <div class="container">
-            <span class="brand-text">MANAIAKALANI</span>
-            <nav class="site-nav" aria-label="Main">
-                <a href="/">About</a>
-                <a href="/thoughts.html">Thoughts</a>
-                <a href="/projects.html">Projects</a>
-                <a href="/uses.html">Uses</a>
-            </nav>
-        </div>
-        <button class="theme-toggle" aria-label="Toggle dark mode">
-            <span class="theme-icon theme-icon--moon" data-icon="moon"></span>
-            <span class="theme-icon theme-icon--sun" data-icon="sun"></span>
-        </button>
-        <button class="geocities-toggle" aria-label="Toggle GeoCities mode" title="Welcome to 1997!">
-            <span class="gc-icon" data-icon="cone" aria-hidden="true"></span>
-        </button>
-    </header>
+    <header id="site-header" data-variant="lost"></header>
 
     <main id="main" tabindex="-1">
         <section class="four-oh-four">
@@ -225,10 +215,12 @@
     │  File not found.        │
     └─────────────────────────┘</div>
             <p class="lost-message">
-                This page got lost somewhere between <strong>localhost</strong> and <strong>production</strong>. 
+                This page got lost somewhere between <strong>localhost</strong> and <strong>production</strong>.
                 It happens to the best of us.
             </p>
+            <img class="clippy" src="/clippy.webp?v=1" width="64" height="64" alt="Clippy" />
             <p class="path-echo"><code id="path-display"></code></p>
+            <button type="button" class="home-btn" id="lost-search">Ask Clippy to look around</button>
             <a href="/" class="home-btn">← Take me home</a>
             <button type="button" class="easter-egg" id="egg" title="Click me" aria-label="Table flip easter egg">( ╯°□°)╯︵ ┻━┻</button>
         </section>
@@ -238,7 +230,6 @@
         <div class="container" id="footer-content"></div>
     </footer>
 
-    <script src="/script.js?v=12" defer></script>
     <script type="importmap">
     {
         "imports": {
@@ -247,9 +238,10 @@
         }
     }
     </script>
-    <script defer src="/icons.js?v=5"></script>
-    <script defer src="/components.js?v=8"></script>
-    <script defer src="/command-palette.js?v=6"></script>
+    <script defer src="/icons.js?v=6"></script>
+    <script defer src="/components.js?v=9"></script>
+    <script defer src="/script.js?v=14"></script>
+    <script defer src="/command-palette.js?v=7"></script>
     <script type="module" src="/web-vitals-report.js?v=1"></script>
 </body>
 </html>

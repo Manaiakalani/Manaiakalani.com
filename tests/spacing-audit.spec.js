@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-const PAGES = ['/', '/projects.html', '/thoughts.html', '/uses.html', '/404.html'];
+const PAGES = ['/', '/projects.html', '/thoughts.html', '/uses.html', '/404.html', '/colophon.html'];
 const TOUCH = 44;
 
 test.beforeEach(async ({ page }) => {

@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!--
+  Aloha, view-source friend.
+  This page is a product: vanilla HTML, a CSP, a guestbook, and a cone that goes to 1997.
+  manaiakalani.com
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -39,7 +44,7 @@
     <!-- Self-hosted Doto: preload the latin subset used above the fold -->
     <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin>
     <!-- External CSS -->
-    <link rel="stylesheet" href="style.css?v=21">
+    <link rel="stylesheet" href="style.css?v=22">
 
     <!-- RSS Feed -->
     <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml">
@@ -48,7 +53,7 @@
     <link rel="manifest" href="/manifest.json">
 
     <!-- Prevent flash: apply saved theme/geocities before paint -->
-    <script src="boot.js?v=18"></script>
+    <script src="boot.js?v=19"></script>
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -82,31 +87,17 @@
 <body>
     <a href="#main" class="skip-link">Skip to main content</a>
     <!-- Header Section -->
-    <header>
-        <div class="container">
-            <span class="brand-text">MANAIAKALANI</span>
-            <p class="header-subtitle">Aloha, I'm Maximilian (Manaiakalani) Stein</p>
-            <nav class="site-nav" aria-label="Main">
-                <a href="/">About</a>
-                <a href="thoughts.html">Thoughts</a>
-                <a href="projects.html">Projects</a>
-                <a href="uses.html">Uses</a>
-            </nav>
-        </div>
-        <button class="theme-toggle" aria-label="Toggle dark mode">
-            <span class="theme-icon theme-icon--moon" data-icon="moon"></span>
-            <span class="theme-icon theme-icon--sun" data-icon="sun"></span>
-        </button>
-        <button class="geocities-toggle" aria-label="Toggle GeoCities mode" title="Welcome to 1997!">
-            <span class="gc-icon" data-icon="cone"></span>
-        </button>
-    </header>
+    <header id="site-header" data-variant="page"></header>
 
     <main class="container" id="main" tabindex="-1">
         <!-- Page Hero -->
         <section class="page-hero">
             <h1>Uses</h1>
             <p>The tools, hardware, and software I reach for every day — for work, side projects, and everything in between.</p>
+            <div class="page-hero-actions">
+                <button type="button" id="random-use-btn">Random tool</button>
+            </div>
+            <p id="uses-status" class="visually-hidden" role="status" aria-live="polite"></p>
         </section>
 
         <section class="uses-section" id="editor-terminal">
@@ -263,8 +254,9 @@
     </footer>
 
     <!-- External JavaScript -->
-    <script defer src="icons.js?v=5"></script>
-    <script defer src="script.js?v=13"></script>
+    <script defer src="icons.js?v=6"></script>
+    <script defer src="components.js?v=9"></script>
+    <script defer src="script.js?v=14"></script>
 
     <!-- ASCII Cube -->
     <script type="importmap">
@@ -275,8 +267,7 @@
         }
     }
     </script>
-    <script defer src="components.js?v=8"></script>
-    <script defer src="command-palette.js?v=6"></script>
+    <script defer src="command-palette.js?v=7"></script>
     <script type="module" src="web-vitals-report.js?v=1"></script>
 </body>
 </html>

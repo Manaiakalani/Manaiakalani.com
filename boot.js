@@ -1,7 +1,7 @@
 (function () {
   // One-time localStorage migration: unnamespaced → mnk: prefix
   try {
-    var migrations = [['theme','mnk:theme'],['geocities','mnk:geocities'],['gh_repos_cache','mnk:gh_repos_cache']];
+    var migrations = [['theme','mnk:theme'],['geocities','mnk:geocities'],['gh_repos_cache','mnk:gh_repos_cache'],['gc-visitors','mnk:gc-visitors']];
     for (var i = 0; i < migrations.length; i++) {
       var oldK = migrations[i][0], newK = migrations[i][1];
       if (localStorage.getItem(newK) === null && localStorage.getItem(oldK) !== null) {
@@ -11,8 +11,8 @@
     }
   } catch (e) { /* localStorage unavailable */ }
 
-  var GEO_CSS_HREF = "/geocities.css?v=7";
-  var GEO_JS_HREF = "/geocities.js?v=16";
+  var GEO_CSS_HREF = "/geocities.css?v=8";
+  var GEO_JS_HREF = "/geocities.js?v=17";
   var GEO_KEY = "mnk:geocities";
   var geoCssPromise;
   var geoJsPromise;
@@ -47,7 +47,7 @@
       link.addEventListener("load", resolve, { once: true });
       link.addEventListener("error", resolve, { once: true });
 
-      var anchor = document.querySelector('link[href^="style.css"]');
+      var anchor = document.querySelector('link[href*="style.css"]');
       if (anchor) {
         anchor.insertAdjacentElement("afterend", link);
       } else {

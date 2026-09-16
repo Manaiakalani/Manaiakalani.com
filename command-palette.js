@@ -27,7 +27,8 @@
     add({ icon: ic('home'), title: 'About', hint: 'Page', keys: 'home index start bio intro', run: function () { go('/'); } });
     add({ icon: ic('grid'), title: 'Projects', hint: 'Page', keys: 'work repos code github', run: function () { go('/projects.html'); } });
     add({ icon: ic('thought'), title: 'Thoughts', hint: 'Page', keys: 'blog posts writing notes', run: function () { go('/thoughts.html'); } });
-    add({ icon: ic('gear'), title: 'Uses', hint: 'Page', keys: 'gear setup tools stack hardware', run: function () { go('/uses.html'); } });
+    add({ icon: ic('gear'), title: 'Uses', hint: 'Page', keys: 'gear setup tools stack hardware studio jupyter notes macbook koss microphone scarlett rokit', run: function () { go('/uses.html'); } });
+    add({ icon: ic('page'), title: 'Colophon', hint: 'Page', keys: 'colophon supply chain csp swa rybbit guestbook how its made', run: function () { go('/colophon.html'); } });
 
     var themeBtn = doc.querySelector('.theme-toggle');
     if (themeBtn) add({ icon: ic('moon'), title: 'Toggle light / dark theme', hint: 'Action', keys: 'dark light mode colour appearance', run: function () { themeBtn.click(); } });
@@ -36,6 +37,14 @@
     if (retroBtn) add({ icon: ic('cone'), title: 'Toggle retro mode', hint: 'Action', keys: 'geocities 90s nostalgia web1 old', run: function () { retroBtn.click(); } });
 
     add({ icon: ic('link'), title: 'Copy link to this page', hint: 'Action', keys: 'url share clipboard permalink', run: copyPageLink });
+    add({ icon: ic('book'), title: 'Sign the guestbook', hint: 'Action', keys: 'guestbook sign book visitors place', run: function () {
+        if (typeof window.openGuestbookFromChrome === 'function') window.openGuestbookFromChrome(true);
+        else if (typeof window.openGuestbook === 'function') window.openGuestbook(true);
+    } });
+    add({ icon: ic('page'), title: 'Ask Clippy', hint: 'Action', keys: 'clippy balloon help office assistant', run: function () {
+        if (typeof window.askClippy === 'function') window.askClippy();
+        else go('/#about');
+    } });
 
     // Native share sheet — only offered where the browser supports it; elsewhere
     // the copy-link command above covers the same need.
@@ -48,6 +57,15 @@
 
     var randProject = doc.getElementById('random-project-btn');
     add({ icon: ic('dice'), title: 'Random project', hint: randProject ? 'Action' : 'Projects', keys: 'shuffle surprise lucky repo', run: function () { randProject ? randProject.click() : go('/projects.html'); } });
+    add({ icon: ic('dice'), title: 'Random use', hint: 'Uses', keys: 'shuffle surprise lucky stack studio', run: function () {
+        if (document.getElementById('random-use-btn')) document.getElementById('random-use-btn').click();
+        else go('/uses.html');
+    } });
+    add({ icon: ic('hammer'), title: 'Currently building', hint: 'Status', keys: 'building github pushing now', run: function () {
+        var el = document.getElementById('building-status') || document.getElementById('currently-building');
+        if (el) el.scrollIntoView({ block: 'center' });
+        else go('/');
+    } });
 
     add({ icon: ic('rss'), title: 'Subscribe via RSS', hint: 'Feed', keys: 'feed rss atom follow updates', run: function () { go('/feed.xml'); } });
 
@@ -57,17 +75,19 @@
 
     function copyPageLink() {
         var url = window.location.href;
+        function copied() {
+            empty.textContent = 'Copied.';
+            setTimeout(function () { if (empty.textContent === 'Copied.') empty.textContent = ''; }, 1500);
+        }
         function fallback() {
             var ta = doc.createElement('textarea');
             ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
             doc.body.appendChild(ta); ta.select();
-            try { doc.execCommand('copy'); } catch (e) { /* ignore */ }
+            try { doc.execCommand('copy'); copied(); } catch (e) { /* ignore */ }
             doc.body.removeChild(ta);
         }
-        // Try the async Clipboard API, but fall back to execCommand when it is
-        // unavailable or rejected (e.g. a restrictive Permissions-Policy).
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(url).catch(fallback);
+            navigator.clipboard.writeText(url).then(copied).catch(fallback);
         } else {
             fallback();
         }
@@ -92,7 +112,7 @@
     var contentLoading = false;
 
     function iconFor(kind) {
-        return { Thought: ic('thought'), Uses: ic('wrench'), About: ic('person') }[kind] || ic('page');
+        return { Thought: ic('thought'), Uses: ic('gear'), About: ic('person') }[kind] || ic('page');
     }
 
     function loadContent() {
@@ -331,6 +351,7 @@
     launcher.title = 'Command menu (' + modLabel + 'K)';
     launcher.innerHTML = ic('search');
     launcher.addEventListener('click', function () { open(); });
+    window.openCommandPalette = open;
     var header = doc.querySelector('header') || doc.body;
     header.appendChild(launcher);
 })();

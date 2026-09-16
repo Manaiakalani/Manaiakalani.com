@@ -13,20 +13,33 @@
   let lastTrailTime = 0;
   const TRAIL_THROTTLE_MS = 50;
 
-  // ---- Visitor counter (increment once per page load, not per toggle) ----
-  const visitorCount = (function () {
-    try {
-      let count = parseInt(localStorage.getItem('gc-visitors') || '0', 10);
-      if (!isFinite(count) || count < 0) count = 0;
-      count += 1;
-      localStorage.setItem('gc-visitors', String(count));
-      return count;
-    } catch (e) {
-      // Storage unavailable (private mode / blocked cookies): the decorative
-      // counter must never stop GeoCities mode from initialising.
-      return 1;
+  // Prefer the live /api/counter odometer so the 1997 display matches the footer.
+  function sharedVisitorDigits() {
+    if (typeof window.mnkVisitorCount === 'number' && isFinite(window.mnkVisitorCount)) {
+      return String(Math.max(0, Math.floor(window.mnkVisitorCount))).padStart(7, '0');
     }
-  })();
+    var odo = document.querySelector('.visits-odometer');
+    if (odo) {
+      var painted = Array.prototype.map.call(odo.querySelectorAll('.visits-digit'), function (el) {
+        return el.textContent;
+      }).join('');
+      if (painted) return painted.padStart(7, '0');
+    }
+    return '0000001';
+  }
+
+  function paintGcCounter(count) {
+    var display = document.querySelector('.gc-digit-display');
+    if (!display) return;
+    var digits = String(count).padStart(7, '0').split('');
+    display.innerHTML = digits.map(function (d) {
+      return '<span class="gc-digit">' + d + '</span>';
+    }).join('');
+  }
+
+  window.mnkSyncGcCounter = function (count) {
+    paintGcCounter(count);
+  };
 
   // ---- Helper: create element with aria-hidden for decorative content ----
   function decorative(el) {
@@ -64,11 +77,15 @@
     container.innerHTML =
       '<span class="gc-marquee-text">' +
       '★ Welcome to my AWESOME homepage!! ★ You are visitor #' +
-      String(visitorCount).padStart(6, '0') +
+      sharedVisitorDigits() +
       '! ★ This site is best viewed in Netscape Navigator 4.0 at 800x600 ★ ' +
-      'Sign my guestbook!! ★ Last updated: ' +
-      new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) +
-      ' ★ Ask Jeeves if you need help finding anything! ★ ' +
+      'Sign my guestbook!! ★ ' +
+      (window.mnkBuilding && window.mnkBuilding.name
+        ? ('Currently pushing ' + window.mnkBuilding.name +
+          (window.mnkBuilding.rel ? ' · ' + window.mnkBuilding.rel : '') + ' ★ ')
+        : ('Last updated: ' +
+          new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) + ' ★ ')) +
+      'Ask Jeeves if you need help finding anything! ★ ' +
       'FREE MIDI FILES ★ Cool Links ★ Powered by GeoCities ★' +
       '</span>';
     return decorative(container);
@@ -520,7 +537,6 @@
     dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
 
     document.body.appendChild(dlg);
-    gcElements.push(dlg);
     guestbookDialog = dlg;
     return dlg;
   }
@@ -566,23 +582,30 @@
   }
 
   function createWebring() {
-    const sites = [
-      'https://www.spacejam.com/1996/',
-      'https://www.cameronsworld.net/',
-      'https://therestartpage.com/',
-      'https://zombo.com/',
-      'https://www.hamsterdance.org/hamsterdance/',
-      'https://www.arngren.net/',
-      'https://www.lingscars.com/',
+    var sites = [
+      { name: 'This homepage', href: 'https://manaiakalani.com/' },
+      { name: 'Space Jam 1996', href: 'https://www.spacejam.com/1996/' },
+      { name: "Cameron's World", href: 'https://www.cameronsworld.net/' },
+      { name: 'The Restart Page', href: 'https://therestartpage.com/' },
+      { name: 'Zombo.com', href: 'https://zombo.com/' },
+      { name: 'Hamster Dance', href: 'https://www.hamsterdance.org/hamsterdance/' },
+      { name: 'Arngren', href: 'https://www.arngren.net/' },
+      { name: "Ling's Cars", href: 'https://www.lingscars.com/' }
     ];
+    var here = window.location.hostname.replace(/^www\./, '');
+    var idx = 0;
+    for (var i = 0; i < sites.length; i++) {
+      if (sites[i].href.indexOf(here) !== -1) { idx = i; break; }
+    }
+    function at(n) { return sites[(n + sites.length) % sites.length]; }
     var rand = sites[Math.floor(Math.random() * sites.length)];
-    const div = document.createElement('div');
+    var div = document.createElement('div');
     div.className = 'gc-webring';
     div.innerHTML =
       '<span class="gc-webring-title">🌐 The Cool Homepages Webring 🌐</span>' +
-      '<a href="' + sites[0] + '" target="_blank" rel="noopener noreferrer" title="Previous site">&lt;&lt; Prev</a>' +
-      ' | <a href="' + rand + '" target="_blank" rel="noopener noreferrer" title="Random site">Random</a> | ' +
-      '<a href="' + sites[sites.length - 1] + '" target="_blank" rel="noopener noreferrer" title="Next site">Next &gt;&gt;</a>';
+      '<a href="' + at(idx - 1).href + '" target="_blank" rel="noopener noreferrer" title="' + at(idx - 1).name + '">&lt;&lt; Prev</a>' +
+      ' | <a href="' + rand.href + '" target="_blank" rel="noopener noreferrer" title="Random site">Random</a> | ' +
+      '<a href="' + at(idx + 1).href + '" target="_blank" rel="noopener noreferrer" title="' + at(idx + 1).name + '">Next &gt;&gt;</a>';
     return div;
   }
 
@@ -619,36 +642,105 @@
   }
 
   function createMidiPlayer() {
+    var tracks = [
+      { name: 'canyon.mid', seed: 0 },
+      { name: 'cloud-city.mid', seed: 1 },
+      { name: 'under-construction.mid', seed: 2 }
+    ];
+    var idx = 0;
+    var ctx = null;
+    var playing = false;
+    var nodes = [];
     var div = document.createElement('div');
     div.className = 'gc-midi-player';
     div.innerHTML =
       '<div class="gc-midi-header">' +
         '<span>🎵 MIDI Jukebox</span>' +
-        '<span title="Close">✕</span>' +
+        '<button type="button" class="gc-midi-close" title="Close" aria-label="Close MIDI player">✕</button>' +
       '</div>' +
       '<div class="gc-midi-body">' +
         '<div class="gc-midi-controls">' +
-          '<button class="gc-midi-btn" title="Previous" aria-label="Previous track">⏮</button>' +
-          '<button class="gc-midi-btn" title="Play" aria-label="Play" data-gc-action="play-midi">▶</button>' +
-          '<button class="gc-midi-btn" title="Stop" aria-label="Stop">⏹</button>' +
-          '<button class="gc-midi-btn" title="Next" aria-label="Next track">⏭</button>' +
+          '<button type="button" class="gc-midi-btn" data-gc-midi="prev" title="Previous" aria-label="Previous track">⏮</button>' +
+          '<button type="button" class="gc-midi-btn" data-gc-midi="play" title="Play" aria-label="Play">▶</button>' +
+          '<button type="button" class="gc-midi-btn" data-gc-midi="stop" title="Stop" aria-label="Stop">⏹</button>' +
+          '<button type="button" class="gc-midi-btn" data-gc-midi="next" title="Next" aria-label="Next track">⏭</button>' +
         '</div>' +
-        '<div class="gc-midi-track">♫ canyon.mid</div>' +
-        '<div class="gc-midi-eq">' +
-          '<div class="gc-midi-eq-bar" style="height:8px"></div>' +
-          '<div class="gc-midi-eq-bar" style="height:12px"></div>' +
-          '<div class="gc-midi-eq-bar" style="height:6px"></div>' +
-          '<div class="gc-midi-eq-bar" style="height:14px"></div>' +
-          '<div class="gc-midi-eq-bar" style="height:10px"></div>' +
+        '<div class="gc-midi-track">♫ ' + tracks[0].name + '</div>' +
+        '<div class="gc-midi-eq" aria-hidden="true">' +
+          '<div class="gc-midi-eq-bar"></div><div class="gc-midi-eq-bar"></div>' +
+          '<div class="gc-midi-eq-bar"></div><div class="gc-midi-eq-bar"></div>' +
+          '<div class="gc-midi-eq-bar"></div>' +
         '</div>' +
       '</div>';
-    // CSP-safe play handler (no inline onclick)
-    var play = div.querySelector('[data-gc-action="play-midi"]');
-    if (play) {
-      play.addEventListener('click', function () {
-        alert('🎵 Now playing: canyon.mid\n\nJust kidding — your 28.8k modem can\u0027t handle audio AND graphics!');
-      });
+
+    var trackEl = div.querySelector('.gc-midi-track');
+    var playBtn = div.querySelector('[data-gc-midi="play"]');
+    function setTrackLabel() {
+      trackEl.textContent = '♫ ' + tracks[idx].name;
     }
+    function stopMidi() {
+      playing = false;
+      div.classList.remove('is-playing');
+      playBtn.textContent = '▶';
+      playBtn.setAttribute('aria-label', 'Play');
+      nodes.forEach(function (n) {
+        try { n.stop(); } catch (e) {}
+      });
+      nodes = [];
+    }
+    function playMidi() {
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!ctx) ctx = new AudioCtx();
+      if (ctx.state === 'suspended' && ctx.resume) ctx.resume();
+      stopMidi();
+      playing = true;
+      div.classList.add('is-playing');
+      playBtn.textContent = '⏸';
+      playBtn.setAttribute('aria-label', 'Pause');
+      // Four-bar square-wave sting. Names are 1997; the oscillator is 2026.
+      var scale = [261.63, 329.63, 392.0, 523.25, 392.0, 329.63, 293.66, 261.63];
+      var shift = [0, 2, 4][tracks[idx].seed] || 0;
+      var t0 = ctx.currentTime + 0.05;
+      var beat = 0.22;
+      for (var n = 0; n < 16; n++) {
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.value = scale[(n + shift) % scale.length] * (n % 8 === 7 ? 0.5 : 1);
+        gain.gain.setValueAtTime(0.0001, t0 + n * beat);
+        gain.gain.exponentialRampToValueAtTime(0.05, t0 + n * beat + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + n * beat + beat * 0.9);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t0 + n * beat);
+        osc.stop(t0 + n * beat + beat);
+        nodes.push(osc);
+      }
+      var last = nodes[nodes.length - 1];
+      if (last) last.onended = function () {
+        if (playing) stopMidi();
+      };
+    }
+    div.querySelector('[data-gc-midi="play"]').addEventListener('click', function () {
+      if (playing) stopMidi();
+      else playMidi();
+    });
+    div.querySelector('[data-gc-midi="stop"]').addEventListener('click', stopMidi);
+    div.querySelector('[data-gc-midi="prev"]').addEventListener('click', function () {
+      idx = (idx + tracks.length - 1) % tracks.length;
+      setTrackLabel();
+      if (playing) playMidi();
+    });
+    div.querySelector('[data-gc-midi="next"]').addEventListener('click', function () {
+      idx = (idx + 1) % tracks.length;
+      setTrackLabel();
+      if (playing) playMidi();
+    });
+    div.querySelector('.gc-midi-close').addEventListener('click', function () {
+      stopMidi();
+      div.hidden = true;
+    });
     return div;
   }
 
@@ -671,8 +763,8 @@
 
   // ---- Blinking NEW! badges on project cards ----
   function injectNewBadges() {
+    document.querySelectorAll('.gc-new-badge').forEach(function (el) { el.remove(); });
     var cards = document.querySelectorAll('.project-card');
-    // Tag the first 3 cards as "NEW!"
     for (var i = 0; i < Math.min(3, cards.length); i++) {
       var badge = document.createElement('span');
       badge.className = 'gc-new-badge';
@@ -719,11 +811,11 @@
   function createGraphicalCounter() {
     var div = document.createElement('div');
     div.className = 'gc-graphical-counter';
-    var digits = String(visitorCount).padStart(7, '0').split('');
+    var digits = sharedVisitorDigits().split('');
     div.innerHTML =
       '<span class="gc-counter-label">~ You are visitor number ~</span>' +
       '<div class="gc-digit-display">' +
-      digits.map(function(d) {
+      digits.map(function (d) {
         return '<span class="gc-digit">' + d + '</span>';
       }).join('') +
       '</div>';
@@ -825,8 +917,14 @@
       });
     }
 
-    // Blinking NEW! badges on project cards
     injectNewBadges();
+    ['featured-projects', 'all-projects'].forEach(function (id) {
+      var grid = document.getElementById(id);
+      if (!grid || typeof MutationObserver !== 'function') return;
+      var obs = new MutationObserver(function () { injectNewBadges(); });
+      obs.observe(grid, { childList: true });
+      gcElements.push({ parentNode: { removeChild: function () { obs.disconnect(); } } });
+    });
 
     // Construction cones on sub-page titles
     var cones = createConstructionCones();
@@ -863,7 +961,7 @@
       if (el.parentNode) el.parentNode.removeChild(el);
     });
     gcElements.length = 0;
-    guestbookDialog = null; // detached with gcElements; rebuild on next enable
+    // Guestbook dialog is independent of retro chrome so footer/⌘K can keep it.
 
     // Clean up any leftover cursor trails
     document.querySelectorAll('.gc-cursor-trail').forEach(function (el) { el.remove(); });
@@ -895,4 +993,10 @@
   if (storedGeo === 'true') {
     applyGeoCities(true);
   }
+
+  window.openGuestbook = openGuestbook;
+  window.enableGeoCities = function () {
+    if (root.getAttribute('data-geocities') === 'true') return;
+    toggle.click();
+  };
 })();
