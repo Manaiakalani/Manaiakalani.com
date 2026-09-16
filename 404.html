@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>404 — Maximilian Stein</title>
     <meta name="description" content="The page you requested could not be found on Maximilian Stein's website.">
     <!-- Open Graph -->
@@ -29,7 +29,7 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/style.css?v=13">
+    <link rel="stylesheet" href="/style.css?v=14">
     <script src="/boot.js?v=17"></script>
     <style>
         .four-oh-four {
@@ -54,11 +54,14 @@
             margin-bottom: 0.5rem;
             animation: glitch-shake 3s infinite;
             position: relative;
+            display: inline-block;
+            max-width: 100%;
+            overflow: hidden;
         }
         .glitch-code::after {
             content: '404';
             position: absolute;
-            left: 2px;
+            left: 0;
             top: 2px;
             background: var(--gradient);
             -webkit-background-clip: text;
@@ -102,6 +105,10 @@
             font-family: 'Doto', monospace;
             font-size: 1rem;
             font-weight: 700;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 0.75rem 2rem;
             background: var(--gradient);
             color: #fff;
@@ -119,6 +126,11 @@
             margin-top: 3rem;
             font-family: 'Doto', monospace;
             font-size: 0.85rem;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 0.75rem;
             color: var(--text-secondary);
             opacity: 0.6;
             cursor: pointer;
