@@ -771,6 +771,10 @@ html[data-geocities="true"] .site-nav a {
   text-shadow: 1px 1px 0 #000;
 }
 
+html[data-geocities="true"] .site-nav a::before {
+  content: none;
+}
+
 html[data-geocities="true"] .site-nav a:hover {
   color: var(--gc-accent);
   background: rgba(255, 255, 0, 0.2);

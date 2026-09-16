@@ -660,7 +660,7 @@ test('boot.js references GeoCities assets root-relative', async ({ page }) => {
   const res = await page.request.get(src);
   expect(res.status()).toBe(200);
   const body = await res.text();
-  expect(body).toContain('"/geocities.css?v=6"');
+  expect(body).toContain('"/geocities.css?v=7"');
   expect(body).toContain('"/geocities.js?v=16"');
 });
 

@@ -481,34 +481,56 @@ footer {
     font-size: 1rem;
     font-weight: 700;
     letter-spacing: 0.05em;
+    line-height: 1;
     text-transform: uppercase;
+    box-sizing: border-box;
     min-height: var(--touch);
-    padding: 0.5rem 0.7rem;
+    padding: 0 0.7rem;
     border-radius: 4px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: color var(--transition-speed) ease, background var(--transition-speed) ease;
+    position: relative;
+    isolation: isolate;
+    background: transparent;
+    transition: color var(--transition-speed) ease;
 }
 
-.site-nav a:hover {
-    color: #ffffff;
+/* Grey hug the label; min-height is the 44px hit target, not the fill. */
+.site-nav a::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-inline: 0;
+    top: 50%;
+    height: 1.75em;
+    transform: translateY(-50%);
+    border-radius: 4px;
+    background: transparent;
+    transition: background var(--transition-speed) ease;
+    pointer-events: none;
+}
+
+.site-nav a:hover::before {
     background: rgba(255, 255, 255, 0.15);
 }
 
-.site-nav a.active {
-    color: #ffffff;
+.site-nav a.active::before {
     background: rgba(255, 255, 255, 0.2);
 }
 
 .site-nav a:focus-visible {
     color: #ffffff;
     text-decoration: none;
-    background: rgba(255, 255, 255, 0.22);
+    background: transparent;
     border-radius: 4px;
 }
 
-[data-theme="dark"] .site-nav a:focus-visible {
+.site-nav a:focus-visible::before {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+[data-theme="dark"] .site-nav a:focus-visible::before {
     background: rgba(255, 255, 255, 0.26);
 }
 
@@ -985,7 +1007,7 @@ a.building-card:focus-visible {
     .cmdk-launcher { font-size: 1rem; }
     .cube-wrapper { width: 160px; height: 160px; margin-bottom: 1rem; }
     .site-nav { gap: 0.25rem 0.35rem; }
-    .site-nav a { font-size: 0.85rem; padding: 0.5rem 0.5rem; }
+    .site-nav a { font-size: 0.85rem; padding: 0 0.5rem; }
     .header-subtitle { font-size: 0.95rem; }
     .featured-grid { grid-template-columns: 1fr; }
     .projects-grid { grid-template-columns: 1fr; }
@@ -997,7 +1019,7 @@ a.building-card:focus-visible {
     .brand-text { font-size: 1.7rem; }
     header p { font-size: 0.9rem; }
     .header-subtitle { font-size: 0.8rem; }
-    .site-nav a { font-size: 0.78rem; padding: 0.5rem 0.4rem; }
+    .site-nav a { font-size: 0.78rem; padding: 0 0.4rem; }
     .page-hero h1 { font-size: 1.8rem; }
 }
 
