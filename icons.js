@@ -95,6 +95,117 @@
         page:
             '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
             '<path fill="currentColor" d="M6 2h8l6 6v14H6V2zm8 1.8V9h5.2z"/>' +
+            '</svg>',
+
+        editor:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" fill-rule="evenodd" d="M3 3.5A1.5 1.5 0 0 1 4.5 2h15A1.5 1.5 0 0 1 21 3.5v17a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 20.5v-17ZM5 7h14v12.5H5V7Zm1.2-3h2.3v1.4H6.2V4Z"/>' +
+            '<path fill="currentColor" d="M7 10h10v1.5H7zm0 3h7v1.5H7zm0 3h8.5V17.5H7z"/>' +
+            '</svg>',
+
+        terminal:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" fill-rule="evenodd" d="M3 4.5A1.5 1.5 0 0 1 4.5 3h15A1.5 1.5 0 0 1 21 4.5v15a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19.5v-15ZM7.2 8.2 11 12l-3.8 3.8-1.5-1.5L8 12 5.7 9.7l1.5-1.5ZM12 14.4h6.2V16H12z"/>' +
+            '</svg>',
+
+        spark:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M12 1.4 13.7 9 21.6 12 13.7 15 12 22.6 10.3 15 2.4 12 10.3 9 12 1.4z"/>' +
+            '</svg>',
+
+        laptop:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M4 5.2A1.2 1.2 0 0 1 5.2 4h13.6A1.2 1.2 0 0 1 20 5.2V15H4V5.2ZM2.4 16.4h19.2V19a1 1 0 0 1-1 1H3.4a1 1 0 0 1-1-1v-2.6Z"/>' +
+            '</svg>',
+
+        tower:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" fill-rule="evenodd" d="M7.2 2h9.6v20H7.2V2Zm2.3 2.2h5v1.7h-5V4.2Zm0 3.2h5v1.2h-5V7.4Zm0 2.2h5v1.2h-5V9.6ZM12 18.4a1.3 1.3 0 1 1 0 2.6 1.3 1.3 0 0 1 0-2.6Z"/>' +
+            '</svg>',
+
+        screens:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M1.8 4.2h9.2v8.2H1.8zm11.2 0h9.2v8.2h-9.2zM5.6 13.2h1.4V15H3.8v1.5h6.2V15H7.6v-1.8zm11.2 0h1.4V15h-3.2v1.5h6.2V15h-1.8v-1.8z"/>' +
+            '</svg>',
+
+        chat:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M3.2 3.4h17.6v12.2H9.1L3.2 21V3.4z"/>' +
+            '</svg>',
+
+        notebook:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" fill-rule="evenodd" d="M5 2h14v20H5V2Zm2.2 0H8.6v20H7.2V2ZM10 6.2h7v1.7h-7V6.2Zm0 3.3h7v1.7h-7V9.5Z"/>' +
+            '</svg>',
+
+        check:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" fill-rule="evenodd" d="M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm12.2 6.1-1.5-1.4-5.1 5.4-2.3-2.3-1.5 1.5 3.8 3.8 6.6-7z"/>' +
+            '</svg>',
+
+        branch:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M7.2 3.2a2.8 2.8 0 0 1 1.3 5.3v2.3c1.7.4 3.2 1.3 4.4 2.5a6.8 6.8 0 0 1 2.3-1.5V9.6a2.8 2.8 0 1 1 2.2 0v2.6A8.8 8.8 0 0 0 12.8 16a6.6 6.6 0 0 1-4.3 3.2 2.8 2.8 0 1 1-2.2-.1 4.4 4.4 0 0 0 3.2-2.3c.4-.7.6-1.4.7-2.2H8.5A2.8 2.8 0 0 1 7.2 3.2Z"/>' +
+            '</svg>',
+
+        crate:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M12 2.2 21.5 7v10L12 21.8 2.5 17V7L12 2.2Zm0 2.4L5.2 8 12 11.4 18.8 8 12 4.6ZM4.7 9.7v6.2L11 19.3v-6.2L4.7 9.7Zm14.6 0L13 13.1v6.2l6.3-3.4V9.7Z"/>' +
+            '</svg>',
+
+        cloud:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M8.4 6.2a5.4 5.4 0 0 1 5.1 3.6h.4a4.8 4.8 0 0 1 .3 9.6H7.6A5.1 5.1 0 0 1 7.4 9.3a5.4 5.4 0 0 1 1-3.1Z"/>' +
+            '</svg>',
+
+        camera:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" fill-rule="evenodd" d="M8.2 4.2 9.6 2.6h4.8l1.4 1.6H20a1.2 1.2 0 0 1 1.2 1.2v13a1.2 1.2 0 0 1-1.2 1.2H4a1.2 1.2 0 0 1-1.2-1.2v-13A1.2 1.2 0 0 1 4 4.2h4.2ZM12 8.4a4.4 4.4 0 1 0 0 8.8 4.4 4.4 0 0 0 0-8.8Zm0 2.2a2.2 2.2 0 1 1 0 4.4 2.2 2.2 0 0 1 0-4.4Z"/>' +
+            '</svg>',
+
+        palette:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" fill-rule="evenodd" d="M12 2.2A9.8 9.8 0 0 1 20.6 16c-.6 1.6-2.4 2-3.8 1.2-1-.6-1.5-1.7-1.4-2.8v-.4c0-1.2.9-2.2 2.1-2.3h.7A3.3 3.3 0 0 0 18.4 5.6 7.6 7.6 0 1 0 12 19.6h.6v2.2H12A9.8 9.8 0 0 1 12 2.2ZM8.2 7.4a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8Zm4.4.4a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8ZM7.2 12.2a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8Z"/>' +
+            '</svg>',
+
+        wave:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M4 9.5h2.2v9H4zm3.5-4h2.2v13H7.5zm3.5 2.4h2.2v10.6H11zm3.5-5.2h2.2v15.8H14.5zM18 8h2.2v10.5H18z"/>' +
+            '</svg>',
+
+        server:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M3.4 3h17.2v5.2H3.4zm0 6.4h17.2v5.2H3.4zm0 6.4h17.2V21H3.4zM6 5.1h2.2v1.2H6zm0 6.4h2.2v1.2H6zm0 6.4h2.2v1.2H6z"/>' +
+            '</svg>',
+
+        chart:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M4.2 12.2h3.4V20H4.2zm6.1-6h3.4V20h-3.4zm6.1 3.3h3.4V20h-3.4zM3 20.8h18v1.6H3z"/>' +
+            '</svg>',
+
+        funnel:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M3.2 3.4h17.6l-5.8 7.4v5.3L12.2 21l-3.2-4.9v-5.3L3.2 3.4z"/>' +
+            '</svg>',
+
+        mic:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M9.1 2.2h5.8A3.2 3.2 0 0 1 18.1 5.4v6.4a6.1 6.1 0 0 1-12.2 0V5.4A3.2 3.2 0 0 1 9.1 2.2ZM6.2 11.4H4.4a7.6 7.6 0 0 0 6.7 7.3V21H8.2v1.8h7.6V21h-2.9v-2.3a7.6 7.6 0 0 0 6.7-7.3h-1.8a5.8 5.8 0 0 1-11.6 0Z"/>' +
+            '</svg>',
+
+        arm:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M3.4 18.2h7.4v2.4H3.4zm3 0V11.6L14.2 5l1.6 1.7-6.4 5.5.8 1.7 7.3-3.3 1.3 1.8-8.4 3.8c-1.4.6-2.4 1.8-2.8 3.2H6.4ZM18.4 4.4a2.1 2.1 0 1 1 0 4.2 2.1 2.1 0 0 1 0-4.2Z"/>' +
+            '</svg>',
+
+        interface:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" fill-rule="evenodd" d="M2.4 6.4h19.2v11.2H2.4V6.4ZM7.2 9.2a2.4 2.4 0 1 0 0 4.8 2.4 2.4 0 0 0 0-4.8Zm7.6 0a2.4 2.4 0 1 0 0 4.8 2.4 2.4 0 0 0 0-4.8ZM6.2 16.2h2v1.2h-2zm3.4 0h2v1.2h-2z"/>' +
+            '</svg>',
+
+        speaker:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" fill-rule="evenodd" d="M5.2 3.2h13.6v17.6H5.2V3.2ZM12 8.1a4.6 4.6 0 1 0 .1 9.2 4.6 4.6 0 0 0-.1-9.2Zm0 2.2a2.4 2.4 0 1 1 0 4.8 2.4 2.4 0 0 1 0-4.8ZM9.2 5h5.6v1.4H9.2V5Z"/>' +
             '</svg>'
     };
 

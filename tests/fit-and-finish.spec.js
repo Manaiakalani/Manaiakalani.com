@@ -155,6 +155,23 @@ test('projects: cards have title and description', async ({ page }) => {
   await expect(firstCard.locator('p')).toBeVisible();
 });
 
+test('uses: studio chain and item glyphs are present', async ({ page }) => {
+  await page.goto('/uses.html');
+  const studio = page.locator('#studio');
+  await expect(studio).toBeVisible();
+  await expect(studio).toContainText('Audio-Technica AT2020');
+  await expect(studio).toContainText('RODE PSA1+');
+  await expect(studio).toContainText('Scarlett 2i2');
+  await expect(studio).toContainText('KRK ROKIT 5 G4');
+  const icons = page.locator('.uses-icon svg.icon');
+  expect(await icons.count()).toBeGreaterThanOrEqual(18);
+  expect(await page.locator('#studio [data-icon="mic"] svg').evaluate(el => el.ownerSVGElement ? 1 : el.tagName)).toBeTruthy();
+  await expect(page.locator('#studio [data-icon="mic"] svg')).toBeVisible();
+  await expect(page.locator('#studio [data-icon="arm"] svg')).toBeVisible();
+  await expect(page.locator('#studio [data-icon="interface"] svg')).toBeVisible();
+  await expect(page.locator('#studio [data-icon="speaker"] svg')).toBeVisible();
+});
+
 test('projects: GitHub link is visible', async ({ page }) => {
   await page.goto('/projects.html');
   const ghLink = page.locator('a.github-link');

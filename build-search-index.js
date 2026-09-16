@@ -44,7 +44,7 @@ read('thoughts.html').split('<div class="thought-entry"').slice(1).forEach(funct
 });
 
 // ---- Uses: one entry per .uses-section, linked to its anchor ----
-read('uses.html').split('<section class="uses-section"').slice(1).forEach(function (chunk) {
+read('uses.html').split('<section class="uses-section').slice(1).forEach(function (chunk) {
   const id = (chunk.match(/\bid="([^"]+)"/) || [])[1] || '';
   const h2 = clean((chunk.match(/<h2>([\s\S]*?)<\/h2>/) || [])[1] || '');
   const list = (chunk.match(/<ul class="uses-list">([\s\S]*?)<\/ul>/) || [])[1] || '';
