@@ -1,6 +1,6 @@
 # Manaiakalani.com
 
-Personal website for **Maximilian Stein** — Community Strategy Lead for **Microsoft Intune** and **Microsoft Security** within Customer Experience Engineering (CxE).
+Personal website for **Maximilian Stein** — Product Manager for **Microsoft Intune** and **Microsoft Security** within Customer Experience Engineering (CxE).
 
 🌐 **Live:** [manaiakalani.com](https://manaiakalani.com)
 

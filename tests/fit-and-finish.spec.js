@@ -70,6 +70,8 @@ test('index: hero section with Aloha greeting', async ({ page }) => {
 test('index: about section exists', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#about')).toBeVisible();
+  await expect(page.locator('#about')).toContainText('Product Manager');
+  await expect(page.locator('#about')).toContainText('Social+');
 });
 
 test('index: Clippy is the Fluent 3D paperclip image, not the 🖇️ emoji', async ({ page }) => {
@@ -1267,7 +1269,7 @@ test('counter: increments once per session (POST first visit, GET thereafter)', 
 
 // ── Round 6: richer per-page social cards ──
 const OG_CARDS = [
-  { path: '/', img: 'og-home.png', alt: 'Maximilian Stein — Community Strategy Lead' },
+  { path: '/', img: 'og-home.png', alt: 'Maximilian Stein — Product Manager' },
   { path: '/thoughts.html', img: 'og-thoughts.png', alt: 'Maximilian Stein — Thoughts' },
   { path: '/uses.html', img: 'og-uses.png', alt: 'Maximilian Stein — Uses' },
   { path: '/projects.html', img: 'og-projects.png', alt: 'Maximilian Stein — Projects' },
