@@ -686,36 +686,40 @@ if (typingEl) {
     var i = 0;
 
     function ensureBalloon(anchor) {
-        var pop = document.querySelector('.clippy-pop');
-        if (pop) return pop;
-        pop = document.createElement('div');
-        pop.className = 'clippy-pop';
-        pop.hidden = true;
-        pop.setAttribute('role', 'dialog');
-        pop.setAttribute('aria-label', 'Clippy');
-        pop.innerHTML =
-            '<p class="clippy-pop-line"></p>' +
-            '<div class="clippy-pop-actions">' +
+        var bubble = document.querySelector('.clippy-bubble');
+        if (!bubble) {
+            var row = anchor.closest('.clippy-row');
+            bubble = document.createElement('div');
+            bubble.className = 'clippy-bubble';
+            bubble.innerHTML = '<p class="clippy-bubble-line"></p>';
+            if (row) row.appendChild(bubble);
+            else anchor.parentNode.appendChild(bubble);
+        }
+        if (!bubble.querySelector('.clippy-pop-actions')) {
+            var actions = document.createElement('div');
+            actions.className = 'clippy-pop-actions';
+            actions.hidden = true;
+            actions.innerHTML =
                 '<button type="button" data-clippy="retro">Toggle 1997</button>' +
                 '<button type="button" data-clippy="thought">Random thought</button>' +
-                '<button type="button" data-clippy="search">Search</button>' +
-            '</div>';
-        (anchor.closest('.about-text, .four-oh-four, main') || anchor.parentNode || document.body).appendChild(pop);
-        pop.addEventListener('click', function (e) {
-            var btn = e.target.closest('[data-clippy]');
-            if (!btn) return;
-            var act = btn.getAttribute('data-clippy');
-            if (act === 'retro') {
-                var cone = document.querySelector('.geocities-toggle');
-                if (cone) cone.click();
-            } else if (act === 'thought') {
-                window.location.href = '/thoughts.html#random';
-            } else if (act === 'search') {
-                if (typeof window.openCommandPalette === 'function') window.openCommandPalette();
-            }
-            pop.hidden = true;
-        });
-        return pop;
+                '<button type="button" data-clippy="search">Search</button>';
+            bubble.appendChild(actions);
+            actions.addEventListener('click', function (e) {
+                var btn = e.target.closest('[data-clippy]');
+                if (!btn) return;
+                var act = btn.getAttribute('data-clippy');
+                if (act === 'retro') {
+                    var cone = document.querySelector('.geocities-toggle');
+                    if (cone) cone.click();
+                } else if (act === 'thought') {
+                    window.location.href = '/thoughts.html#random';
+                } else if (act === 'search') {
+                    if (typeof window.openCommandPalette === 'function') window.openCommandPalette();
+                }
+                actions.hidden = true;
+            });
+        }
+        return bubble;
     }
 
     function askClippy() {
@@ -724,16 +728,19 @@ if (typingEl) {
             window.location.href = '/#about';
             return;
         }
-        var pop = ensureBalloon(clippy);
-        var line = pop.querySelector('.clippy-pop-line');
+        var bubble = ensureBalloon(clippy);
+        var line = bubble.querySelector('.clippy-bubble-line');
+        var actions = bubble.querySelector('.clippy-pop-actions');
         if (line) {
             line.textContent = lines[i % lines.length];
             i += 1;
         }
-        pop.hidden = !pop.hidden;
-        if (!pop.hidden) {
-            var first = pop.querySelector('button');
-            if (first) first.focus();
+        if (actions) {
+            actions.hidden = !actions.hidden;
+            if (!actions.hidden) {
+                var first = actions.querySelector('button');
+                if (first) first.focus();
+            }
         }
     }
 

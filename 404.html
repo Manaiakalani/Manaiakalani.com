@@ -34,7 +34,7 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/style.css?v=23">
+    <link rel="stylesheet" href="/style.css?v=24">
     <script src="/boot.js?v=19"></script>
     <style>
         .four-oh-four {
@@ -218,7 +218,12 @@
                 This page got lost somewhere between <strong>localhost</strong> and <strong>production</strong>.
                 It happens to the best of us.
             </p>
-            <img class="clippy" src="/clippy.webp?v=1" width="64" height="64" alt="Clippy" />
+            <div class="clippy-row clippy-row--lost">
+                <img class="clippy" src="/clippy.webp?v=1" width="64" height="64" alt="Clippy" />
+                <div class="clippy-bubble">
+                    <p class="clippy-bubble-line">Looks like that page got lost. Want me to look around?</p>
+                </div>
+            </div>
             <p class="path-echo"><code id="path-display"></code></p>
             <button type="button" class="home-btn" id="lost-search">Ask Clippy to look around</button>
             <a href="/" class="home-btn">← Take me home</a>
@@ -240,7 +245,7 @@
     </script>
     <script defer src="/icons.js?v=7"></script>
     <script defer src="/components.js?v=10"></script>
-    <script defer src="/script.js?v=15"></script>
+    <script defer src="/script.js?v=16"></script>
     <script defer src="/command-palette.js?v=8"></script>
     <script type="module" src="/web-vitals-report.js?v=1"></script>
 </body>
