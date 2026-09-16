@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<!--
+  Aloha, view-source friend.
+  This page is a product: vanilla HTML, a CSP, a guestbook, and a cone that goes to 1997.
+  manaiakalani.com
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Colophon — Maximilian Stein</title>
+    <meta name="description" content="How manaiakalani.com is made: Azure Static Web Apps, a CSP, a guestbook, Rybbit, and a cone that goes to 1997.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Maximilian Stein">
+    <meta property="og:url" content="https://manaiakalani.com/colophon.html">
+    <meta property="og:title" content="Colophon — Maximilian Stein">
+    <meta property="og:description" content="How this homepage is made.">
+    <meta property="og:image" content="https://manaiakalani.com/og-home.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Maximilian Stein — Product Manager">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Colophon — Maximilian Stein">
+    <meta property="twitter:description" content="How this homepage is made.">
+    <meta property="twitter:image" content="https://manaiakalani.com/og-home.png">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#c84534">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121218">
+    <meta name="author" content="Maximilian Stein">
+    <link rel="canonical" href="https://manaiakalani.com/colophon.html">
+    <link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="style.css?v=22">
+    <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml">
+    <link rel="manifest" href="/manifest.json">
+    <script src="boot.js?v=19"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Colophon — Maximilian Stein",
+        "url": "https://manaiakalani.com/colophon.html",
+        "author": { "@type": "Person", "name": "Maximilian Stein", "url": "https://manaiakalani.com" }
+      }
+    </script>
+    <script src="https://analytics.manaiakalani.info/api/script.js" data-site-id="c24b6c864956" defer></script>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <header id="site-header" data-variant="page"></header>
+    <main class="container" id="main" tabindex="-1">
+        <section class="page-hero">
+            <h1>Colophon</h1>
+            <p>This page is the product. A homepage still has a lockfile, a content-security policy, and a guestbook that disappears if the lights in the back are off.</p>
+        </section>
+        <section class="uses-section" id="stack">
+            <h2>How it's made</h2>
+            <ul class="uses-list">
+                <li data-motion="pop">
+                    <span class="uses-icon" data-icon="cloud" aria-hidden="true"></span>
+                    <span class="uses-copy"><strong>Azure Static Web Apps</strong><span class="uses-note">Static HTML on the edge. GitHub Actions deploys <code>main</code>.</span></span>
+                </li>
+                <li data-motion="spin">
+                    <span class="uses-icon" data-icon="funnel" aria-hidden="true"></span>
+                    <span class="uses-copy"><strong>Content-Security-Policy</strong><span class="uses-note">No inline handlers. Hashes for the few inline scripts. jsDelivr only for Three.js and Web Vitals.</span></span>
+                </li>
+                <li data-motion="bob">
+                    <span class="uses-icon" data-icon="book" aria-hidden="true"></span>
+                    <span class="uses-copy"><strong>Guestbook + hit counter</strong><span class="uses-note">Azure Functions + Table Storage. If the backend is missing, they vanish. No fake numbers.</span></span>
+                </li>
+                <li data-motion="pulse">
+                    <span class="uses-icon" data-icon="chart" aria-hidden="true"></span>
+                    <span class="uses-copy"><strong>Rybbit Analytics</strong><span class="uses-note">Self-hosted. Web Vitals reported as custom events.</span></span>
+                </li>
+                <li data-motion="tilt">
+                    <span class="uses-icon" data-icon="laptop" aria-hidden="true"></span>
+                    <span class="uses-copy"><strong>Doto + original glyphs</strong><span class="uses-note">Self-hosted type. Icons are currentColor SVGs in <code>icons.js</code>, not an icon font.</span></span>
+                </li>
+                <li data-motion="swing">
+                    <span class="uses-icon" data-icon="cone" aria-hidden="true"></span>
+                    <span class="uses-copy"><strong>GeoCities mode</strong><span class="uses-note">The cone, Konami, or typing <code>clippy</code>. MIDI is a square-wave sting, not an alert().</span></span>
+                </li>
+                <li data-motion="pop">
+                    <span class="uses-icon" data-icon="check" aria-hidden="true"></span>
+                    <span class="uses-copy"><strong>Playwright + Lighthouse CI</strong><span class="uses-note">Six viewports, guestbook races, CSP hash check, search index freshness.</span></span>
+                </li>
+                <li data-motion="bob">
+                    <span class="uses-icon" data-icon="github" aria-hidden="true"></span>
+                    <span class="uses-copy"><strong>GitHub as CMS</strong><span class="uses-note">Projects and “currently building” come from the public API. Thoughts are HTML on purpose.</span></span>
+                </li>
+            </ul>
+        </section>
+    </main>
+    <footer>
+        <div class="container" id="footer-content"></div>
+    </footer>
+    <script defer src="icons.js?v=6"></script>
+    <script defer src="components.js?v=9"></script>
+    <script defer src="script.js?v=14"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script defer src="command-palette.js?v=7"></script>
+    <script type="module" src="web-vitals-report.js?v=1"></script>
+</body>
+</html>

@@ -504,7 +504,7 @@ test('404: shows custom 404 page', async ({ page }) => {
   expect(res.status()).toBe(404);
   await expect(page.locator('.glitch-code')).toBeVisible();
   await expect(page.locator('.glitch-code')).toHaveText('404');
-  await expect(page.locator('.home-btn')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Take me home' })).toBeVisible();
 });
 
 test('404: table flip easter egg works', async ({ page }) => {
@@ -618,7 +618,7 @@ test('uses: has JSON-LD structured data', async ({ page }) => {
 });
 
 // ── Accessibility: skip-link target is focusable ──
-const A11Y_PAGES = ['/', '/projects.html', '/thoughts.html', '/uses.html', '/404.html'];
+const A11Y_PAGES = ['/', '/projects.html', '/thoughts.html', '/uses.html', '/404.html', '/colophon.html'];
 for (const path of A11Y_PAGES) {
   test(`${path}: <main> is focusable so the skip link lands`, async ({ page }) => {
     await page.goto(path);
@@ -710,8 +710,8 @@ test('boot.js references GeoCities assets root-relative', async ({ page }) => {
   const res = await page.request.get(src);
   expect(res.status()).toBe(200);
   const body = await res.text();
-  expect(body).toContain('"/geocities.css?v=7"');
-  expect(body).toContain('"/geocities.js?v=16"');
+  expect(body).toContain('"/geocities.css?v=8"');
+  expect(body).toContain('"/geocities.js?v=17"');
 });
 
 // ── Accessibility: aria-busy is cleared once content loads ──
@@ -1096,8 +1096,13 @@ test('manifest.json declares accurate icon sizes', async ({ page }) => {
   const sizes = manifest.icons.map(i => i.sizes);
   expect(sizes).toContain('180x180');
   expect(sizes).toContain('32x32');
-  // The old manifest lied about a non-existent 512x512 icon — guard against regressing.
-  expect(sizes).not.toContain('512x512');
+  expect(sizes).toContain('192x192');
+  expect(sizes).toContain('512x512');
+  expect(manifest.theme_color).toBe('#c84534');
+  for (const icon of manifest.icons) {
+    const img = await page.request.get('/' + icon.src.replace(/^\//, ''));
+    expect(img.status(), icon.src).toBe(200);
+  }
 });
 
 // ── Command palette (⌘K / Ctrl-K) ──
@@ -1316,6 +1321,45 @@ test('counter: increments once per session (POST first visit, GET thereafter)', 
   await expect(page.locator('.footer-visits')).toBeVisible();
   expect(methods[0]).toBe('POST');
   expect(methods.slice(1)).not.toContain('POST');
+});
+
+test('chrome: shared header names the fishhook and marks the current nav', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#site-header')).toContainText("Maui's fishhook");
+  await expect(page.locator('.site-nav a[aria-current="page"]')).toHaveAttribute('href', '/');
+  await page.goto('/thoughts.html');
+  await expect(page.locator('.site-nav a[aria-current="page"]')).toHaveAttribute('href', '/thoughts.html');
+});
+
+test('chrome: footer signs the book and links the colophon', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#sign-the-book')).toBeVisible();
+  await expect(page.locator('.footer-links a[href="/colophon.html"]')).toBeVisible();
+});
+
+test('colophon page exists', async ({ page }) => {
+  await page.goto('/colophon.html');
+  await expect(page).toHaveTitle(/Colophon/);
+  await expect(page.locator('#main')).toContainText('Azure Static Web Apps');
+  await expect(page.locator('#main')).toContainText('Guestbook');
+});
+
+test('404: Clippy and a search of the missing path', async ({ page }) => {
+  await page.goto('/404.html');
+  await expect(page.locator('img.clippy')).toBeVisible();
+  await expect(page.locator('#lost-search')).toBeVisible();
+  const scriptSrc = await page.locator('script[src*="script.js?v="]').first().getAttribute('src');
+  expect(scriptSrc).toMatch(/script\.js\?v=14/);
+});
+
+test('about uses the ʻokina in Hawaiʻi', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#about')).toContainText('Hawaiʻi');
+});
+
+test('uses: random tool button is present', async ({ page }) => {
+  await page.goto('/uses.html');
+  await expect(page.locator('#random-use-btn')).toBeVisible();
 });
 
 // ── Round 6: richer per-page social cards ──

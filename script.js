@@ -28,17 +28,25 @@
     }
 })();
 
-// Active Nav Link
+// Active Nav Link — /thoughts and /thoughts.html both count
 (function() {
-    var path = window.location.pathname;
+    var path = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
     var links = document.querySelectorAll('.site-nav a');
     links.forEach(function(link) {
         link.classList.remove('active');
         link.removeAttribute('aria-current');
-        var href = link.getAttribute('href');
-        var isHome = href === '/' && (path === '/' || path === '/index.html' || path.endsWith('/'));
-        var isPage = href !== '/' && path.endsWith(href);
-        if (isHome || isPage) {
+        var href = link.getAttribute('href') || '';
+        var file = href.replace(/^\//, '');
+        var isHome = href === '/' || file === '' || file === 'index.html';
+        var match = false;
+        if (isHome) {
+            match = path === '/' || path === '' || /\/index\.html$/.test(path);
+        } else {
+            var bare = file.replace(/\.html$/, '');
+            match = path === '/' + file || path === '/' + bare ||
+                path.endsWith('/' + file) || path.endsWith('/' + bare);
+        }
+        if (match) {
             link.classList.add('active');
             link.setAttribute('aria-current', 'page');
         }
@@ -222,9 +230,8 @@ if (typingEl) {
     // "Currently building" homepage widget: the most recently pushed-to repo.
     function renderCurrentlyBuilding(repos) {
         var container = document.getElementById('currently-building');
-        if (!container) return;
-        var section = container.closest('.currently-building-teaser');
-        container.setAttribute('aria-busy', 'false');
+        var section = container && container.closest('.currently-building-teaser');
+        if (container) container.setAttribute('aria-busy', 'false');
         var candidates = repos
             .filter(function (r) { return !r.fork && BUILDING_EXCLUDE.indexOf(r.name) === -1; })
             .sort(function (a, b) { return new Date(b.pushed_at || 0) - new Date(a.pushed_at || 0); });
@@ -235,21 +242,35 @@ if (typingEl) {
         var repo = candidates[0];
         var desc = repo.description ? '<p>' + escapeHtml(repo.description) + '</p>' : '';
         var updatedHtml = '';
+        var rel = '';
         if (repo.pushed_at) {
-            var rel = formatRelativeTime(new Date(repo.pushed_at));
+            rel = formatRelativeTime(new Date(repo.pushed_at));
             if (rel) {
                 updatedHtml = '<time class="building-updated" datetime="' + escapeHtml(repo.pushed_at) + '">Updated ' + rel + '</time>';
             }
         }
-        var hammer = (typeof mnkIcon === 'function') ? mnkIcon('hammer') : '';
-        container.innerHTML =
-            '<a href="' + escapeHtml(repo.html_url) + '" target="_blank" rel="noopener noreferrer" class="building-card">' +
-            '<span class="building-label">' + hammer + ' Currently building</span>' +
-            '<h3>' + escapeHtml(repo.name) + '</h3>' +
-            desc +
-            updatedHtml +
-            '</a>';
-        if (section) section.hidden = false;
+        if (container) {
+            var hammer = (typeof mnkIcon === 'function') ? mnkIcon('hammer') : '';
+            container.innerHTML =
+                '<a href="' + escapeHtml(repo.html_url) + '" target="_blank" rel="noopener noreferrer" class="building-card">' +
+                '<span class="building-label">' + hammer + ' Currently building</span>' +
+                '<h3>' + escapeHtml(repo.name) + '</h3>' +
+                desc +
+                updatedHtml +
+                '</a>';
+            if (section) section.hidden = false;
+        }
+        renderBuildingStatus(repo, rel);
+    }
+
+    function renderBuildingStatus(repo, rel) {
+        var el = document.getElementById('building-status');
+        if (!el || !repo) return;
+        var when = rel || (repo.pushed_at ? formatRelativeTime(new Date(repo.pushed_at)) : '');
+        el.hidden = false;
+        el.innerHTML = 'pushing <a href="' + escapeHtml(repo.html_url) + '" target="_blank" rel="noopener noreferrer">' +
+            escapeHtml(repo.name) + '</a>' + (when ? ' · ' + escapeHtml(when) : '');
+        window.mnkBuilding = { name: repo.name, rel: when, url: repo.html_url };
     }
 
     // Persistent reference for search/filter (item 9)
@@ -445,8 +466,7 @@ if (typingEl) {
         });
     }
 
-    // Only run if any target container exists
-    if (document.getElementById('featured-projects') || document.getElementById('all-projects') || document.getElementById('currently-building')) {
+    if (document.getElementById('featured-projects') || document.getElementById('all-projects') || document.getElementById('currently-building') || document.getElementById('building-status')) {
         loadRepos();
     }
 })();
@@ -580,13 +600,14 @@ if (typingEl) {
             pick.setAttribute('tabindex', '-1');
             pick.focus({ preventScroll: true });
         });
+        if (window.location.hash === '#random') randomBtn.click();
     }
 
     // When arriving via a shared permalink (#entry-id), briefly highlight the
     // target so the reader can see where the link landed them.
     function highlightFromHash() {
         var id = window.location.hash.slice(1);
-        if (!id) return;
+        if (!id || id === 'random') return;
         var target = document.getElementById(id);
         if (!target || entries.indexOf(target) === -1) return;
         entries.forEach(function (e) { e.classList.remove('thought-entry--highlight'); });
@@ -658,6 +679,144 @@ if (typingEl) {
     document.addEventListener('pointerover', warm, { passive: true });
     document.addEventListener('focusin', warm, { passive: true });
     document.addEventListener('touchstart', warm, { capture: true, passive: true });
+})();
+
+// --- Ask Clippy balloon ---
+(function () {
+    var lines = [
+        'It looks like you\'re trying to toggle 1997. Need help with that?',
+        'It looks like you\'re looking for a random thought.',
+        'It looks like you want the command menu. I can do that.',
+        'It looks like you\'re trying to build something useful.'
+    ];
+    var i = 0;
+
+    function ensureBalloon(anchor) {
+        var pop = document.querySelector('.clippy-pop');
+        if (pop) return pop;
+        pop = document.createElement('div');
+        pop.className = 'clippy-pop';
+        pop.hidden = true;
+        pop.setAttribute('role', 'dialog');
+        pop.setAttribute('aria-label', 'Clippy');
+        pop.innerHTML =
+            '<p class="clippy-pop-line"></p>' +
+            '<div class="clippy-pop-actions">' +
+                '<button type="button" data-clippy="retro">Toggle 1997</button>' +
+                '<button type="button" data-clippy="thought">Random thought</button>' +
+                '<button type="button" data-clippy="search">Search</button>' +
+            '</div>';
+        (anchor.closest('.about-text, .four-oh-four, main') || anchor.parentNode || document.body).appendChild(pop);
+        pop.addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-clippy]');
+            if (!btn) return;
+            var act = btn.getAttribute('data-clippy');
+            if (act === 'retro') {
+                var cone = document.querySelector('.geocities-toggle');
+                if (cone) cone.click();
+            } else if (act === 'thought') {
+                window.location.href = '/thoughts.html#random';
+            } else if (act === 'search') {
+                if (typeof window.openCommandPalette === 'function') window.openCommandPalette();
+            }
+            pop.hidden = true;
+        });
+        return pop;
+    }
+
+    function askClippy() {
+        var clippy = document.querySelector('img.clippy');
+        if (!clippy) {
+            window.location.href = '/#about';
+            return;
+        }
+        var pop = ensureBalloon(clippy);
+        var line = pop.querySelector('.clippy-pop-line');
+        if (line) {
+            line.textContent = lines[i % lines.length];
+            i += 1;
+        }
+        pop.hidden = !pop.hidden;
+        if (!pop.hidden) {
+            var first = pop.querySelector('button');
+            if (first) first.focus();
+        }
+    }
+
+    window.askClippy = askClippy;
+
+    var clippy = document.querySelector('img.clippy');
+    if (clippy) {
+        clippy.style.cursor = 'pointer';
+        clippy.setAttribute('tabindex', '0');
+        clippy.setAttribute('role', 'button');
+        clippy.addEventListener('click', askClippy);
+        clippy.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); askClippy(); }
+        });
+    }
+})();
+
+// --- Konami / typed "clippy" → GeoCities ---
+(function () {
+    var seq = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+    var progress = 0;
+    var typed = '';
+    function fire() {
+        var cone = document.querySelector('.geocities-toggle');
+        if (cone) cone.click();
+        progress = 0;
+        typed = '';
+    }
+    function isTyping(el) {
+        if (!el) return false;
+        var tag = el.tagName;
+        return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable;
+    }
+    document.addEventListener('keydown', function (e) {
+        if (isTyping(e.target)) { progress = 0; typed = ''; return; }
+        if (e.key === seq[progress]) {
+            progress += 1;
+            if (progress === seq.length) fire();
+        } else {
+            progress = e.key === seq[0] ? 1 : 0;
+        }
+        if (e.key.length === 1 && !e.metaKey && !e.ctrlKey) {
+            typed = (typed + e.key.toLowerCase()).slice(-6);
+            if (typed === 'clippy') fire();
+        }
+    });
+})();
+
+// --- Random Use (uses.html) ---
+(function () {
+    var list = document.querySelector('.uses-list');
+    if (!list) return;
+    var btn = document.getElementById('random-use-btn');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+        var items = Array.prototype.slice.call(document.querySelectorAll('.uses-list li'));
+        if (!items.length) return;
+        var pick = items[Math.floor(Math.random() * items.length)];
+        items.forEach(function (el) { el.classList.remove('uses-item--highlight'); });
+        void pick.offsetWidth;
+        pick.classList.add('uses-item--highlight');
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        pick.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+        var name = pick.querySelector('strong');
+        var live = document.getElementById('uses-status');
+        if (live) live.textContent = 'Showing ' + (name ? name.textContent : 'a random tool') + '.';
+    });
+})();
+
+// --- 404: open command palette on the missing path ---
+(function () {
+    var findBtn = document.getElementById('lost-search');
+    if (!findBtn) return;
+    findBtn.addEventListener('click', function () {
+        var q = (window.location.pathname || '').replace(/^\//, '').replace(/\.html$/, '');
+        if (typeof window.openCommandPalette === 'function') window.openCommandPalette(q);
+    });
 })();
 
 // --- Register the service worker for offline support (all pages) ---

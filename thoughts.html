@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!--
+  Aloha, view-source friend.
+  This page is a product: vanilla HTML, a CSP, a guestbook, and a cone that goes to 1997.
+  manaiakalani.com
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -39,7 +44,7 @@
     <!-- Self-hosted Doto: preload the latin subset used above the fold -->
     <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin>
     <!-- External CSS -->
-    <link rel="stylesheet" href="style.css?v=21">
+    <link rel="stylesheet" href="style.css?v=22">
 
     <!-- RSS Feed -->
     <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml">
@@ -48,7 +53,7 @@
     <link rel="manifest" href="/manifest.json">
     
     <!-- Prevent flash: apply saved theme/geocities before paint -->
-    <script src="boot.js?v=18"></script>
+    <script src="boot.js?v=19"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -174,25 +179,7 @@
 <body>
     <a href="#main" class="skip-link">Skip to main content</a>
     <!-- Header Section -->
-    <header>
-        <div class="container">
-            <span class="brand-text">MANAIAKALANI</span>
-            <p class="header-subtitle">Aloha, I'm Maximilian (Manaiakalani) Stein</p>
-            <nav class="site-nav" aria-label="Main">
-                <a href="/">About</a>
-                <a href="thoughts.html">Thoughts</a>
-                <a href="projects.html">Projects</a>
-                <a href="uses.html">Uses</a>
-            </nav>
-        </div>
-        <button class="theme-toggle" aria-label="Toggle dark mode">
-            <span class="theme-icon theme-icon--moon" data-icon="moon"></span>
-            <span class="theme-icon theme-icon--sun" data-icon="sun"></span>
-        </button>
-        <button class="geocities-toggle" aria-label="Toggle GeoCities mode" title="Welcome to 1997!">
-            <span class="gc-icon" data-icon="cone"></span>
-        </button>
-    </header>
+    <header id="site-header" data-variant="page"></header>
 
     <main id="main" tabindex="-1">
         <!-- Page Hero -->
@@ -268,7 +255,7 @@
                     <div class="thought-entry" id="the-tools-changed-the-job-didnt">
                         <div class="thought-date">2026.04.28</div>
                         <h2 class="thought-title"><a href="#the-tools-changed-the-job-didnt" class="thought-anchor">The Tools Changed, the Job Didn't</a></h2>
-                        <p class="thought-excerpt">Ten years ago I was racking servers in Hawai'i. Now I'm shaping social media strategy for enterprise security products at Microsoft. The tools are completely different but the job is exactly the same: figure out what someone needs and help them get it. Whether it's a cable run or a blog post about Zero Trust, the skill is empathy. Everything else is just execution.</p>
+                        <p class="thought-excerpt">Ten years ago I was racking servers in Hawaiʻi. Now I'm shaping social media strategy for enterprise security products at Microsoft. The tools are completely different but the job is exactly the same: figure out what someone needs and help them get it. Whether it's a cable run or a blog post about Zero Trust, the skill is empathy. Everything else is just execution.</p>
                     </div>
                 </li>
                 <li>
@@ -296,7 +283,7 @@
                     <div class="thought-entry" id="from-racking-servers-to-deploying-endpoints">
                         <div class="thought-date">2026.01.06</div>
                         <h2 class="thought-title"><a href="#from-racking-servers-to-deploying-endpoints" class="thought-anchor">From Racking Servers to Deploying Endpoints</a></h2>
-                        <p class="thought-excerpt">My career started in Hawai'i, racking servers and running cable. Desktop support, service technician — the kind of work where you learn that technology isn't about the technology. It's about the person on the other end who just wants their thing to work. That perspective followed me to Microsoft, where I now work at the intersection of product engineering and the global IT community. The tools changed, but the job is the same: help people get their work done.</p>
+                        <p class="thought-excerpt">My career started in Hawaiʻi, racking servers and running cable. Desktop support, service technician — the kind of work where you learn that technology isn't about the technology. It's about the person on the other end who just wants their thing to work. That perspective followed me to Microsoft, where I now work at the intersection of product engineering and the global IT community. The tools changed, but the job is the same: help people get their work done.</p>
                     </div>
                 </li>
                 <li>
@@ -325,8 +312,9 @@
     </footer>
 
     <!-- External JavaScript -->
-    <script defer src="icons.js?v=5"></script>
-    <script defer src="script.js?v=13"></script>
+    <script defer src="icons.js?v=6"></script>
+    <script defer src="components.js?v=9"></script>
+    <script defer src="script.js?v=14"></script>
 
     <!-- ASCII Cube -->
     <script type="importmap">
@@ -337,8 +325,7 @@
         }
     }
     </script>
-    <script defer src="components.js?v=8"></script>
-    <script defer src="command-palette.js?v=6"></script>
+    <script defer src="command-palette.js?v=7"></script>
     <script type="module" src="web-vitals-report.js?v=1"></script>
 </body>
 </html>

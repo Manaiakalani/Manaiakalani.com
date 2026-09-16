@@ -283,43 +283,12 @@ html[data-geocities="true"] .theme-toggle {
   display: none;
 }
 
-/* ---------- GeoCities Toggle ---------- */
-.geocities-toggle {
-  position: absolute;
-  top: 1.2rem;
-  right: 4.5rem;
-  background: var(--toggle-bg);
-  border: none;
-  color: var(--header-text);
-  font-size: 1.1rem;
-  width: 2.6rem;
-  height: 2.6rem;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.3s ease, transform 0.3s ease;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  z-index: 100;
-}
-
-.geocities-toggle:hover {
-  background: var(--toggle-hover);
-  transform: scale(1.1);
-}
-
-.geocities-toggle:active {
-  transform: scale(0.95);
-}
-
-.geocities-toggle .gc-icon {
+html[data-geocities="true"] .geocities-toggle .gc-icon {
   display: inline;
   line-height: 1;
 }
 
-/* When geocities active, style the toggle */
+/* When geocities active, style the toggle — leave position to style.css */
 html[data-geocities="true"] .geocities-toggle {
   background: var(--gc-accent);
   border: 2px solid var(--gc-border);
@@ -638,9 +607,16 @@ html[data-geocities="true"] .geocities-toggle {
   align-items: center;
 }
 
-.gc-midi-header span:last-child {
+.gc-midi-close {
   font-size: 0.6rem;
   cursor: pointer;
+  background: #c0c0c0;
+  color: #000;
+  border: 1px outset #fff;
+  width: 16px;
+  height: 16px;
+  line-height: 1;
+  padding: 0;
 }
 
 .gc-midi-body {
@@ -689,7 +665,12 @@ html[data-geocities="true"] .geocities-toggle {
 
 .gc-midi-eq-bar {
   width: 3px;
+  height: 6px;
   background: #00aa00;
+  animation: none;
+}
+
+.gc-midi-player.is-playing .gc-midi-eq-bar {
   animation: gc-eq-bar 0.4s ease-in-out infinite;
 }
 
