@@ -68,6 +68,23 @@ for (const path of PAGES) {
   });
 }
 
+test('active nav grey hugs the label instead of filling the 44px hit box', async ({ page }) => {
+  await page.goto('/');
+  const metrics = await page.locator('.site-nav a.active').evaluate(el => {
+    const r = el.getBoundingClientRect();
+    const pill = getComputedStyle(el, '::before');
+    return {
+      hit: r.height,
+      pill: parseFloat(pill.height),
+      fill: getComputedStyle(el).backgroundColor,
+    };
+  });
+  expect(metrics.hit).toBeGreaterThanOrEqual(TOUCH);
+  expect(metrics.pill).toBeGreaterThan(16);
+  expect(metrics.pill).toBeLessThan(metrics.hit);
+  expect(metrics.fill).toMatch(/rgba?\(0,\s*0,\s*0,\s*0\)|transparent/);
+});
+
 test('thought titles are left-aligned, not centered via h2 inheritance', async ({ page }) => {
   await page.goto('/thoughts.html');
   const align = await page.locator('.thought-title').first().evaluate(el => getComputedStyle(el).textAlign);
