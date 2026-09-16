@@ -1,4 +1,8 @@
 (function () {
+  // Mark JS as available before first paint so progressive-enhancement
+  // rules (Clippy balloon hidden until click, etc.) don't flash.
+  document.documentElement.classList.add("js");
+
   // One-time localStorage migration: unnamespaced → mnk: prefix
   try {
     var migrations = [['theme','mnk:theme'],['geocities','mnk:geocities'],['gh_repos_cache','mnk:gh_repos_cache'],['gc-visitors','mnk:gc-visitors']];

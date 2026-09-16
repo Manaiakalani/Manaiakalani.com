@@ -691,10 +691,12 @@ if (typingEl) {
             var row = anchor.closest('.clippy-row');
             bubble = document.createElement('div');
             bubble.className = 'clippy-bubble';
-            bubble.innerHTML = '<p class="clippy-bubble-line"></p>';
+            bubble.id = 'clippy-speech';
+            bubble.innerHTML = '<p class="clippy-bubble-line" aria-live="polite"></p>';
             if (row) row.appendChild(bubble);
             else anchor.parentNode.appendChild(bubble);
         }
+        if (!bubble.id) bubble.id = 'clippy-speech';
         if (!bubble.querySelector('.clippy-pop-actions')) {
             var actions = document.createElement('div');
             actions.className = 'clippy-pop-actions';
@@ -722,7 +724,27 @@ if (typingEl) {
         return bubble;
     }
 
-    function askClippy() {
+    function setOpen(bubble, clippy, open) {
+        if (open) {
+            bubble.classList.remove('is-open');
+            void bubble.offsetWidth;
+            bubble.classList.add('is-open');
+        } else {
+            bubble.classList.remove('is-open');
+        }
+        bubble.setAttribute('aria-hidden', open ? 'false' : 'true');
+        if (clippy) clippy.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    function closeBalloon(clippy) {
+        var bubble = document.querySelector('.clippy-bubble');
+        if (!bubble || !bubble.classList.contains('is-open')) return;
+        var actions = bubble.querySelector('.clippy-pop-actions');
+        if (actions) actions.hidden = true;
+        setOpen(bubble, clippy || document.querySelector('img.clippy'), false);
+    }
+
+    function askClippy(forceOpen, moveFocus) {
         var clippy = document.querySelector('img.clippy');
         if (!clippy) {
             window.location.href = '/#about';
@@ -731,29 +753,59 @@ if (typingEl) {
         var bubble = ensureBalloon(clippy);
         var line = bubble.querySelector('.clippy-bubble-line');
         var actions = bubble.querySelector('.clippy-pop-actions');
-        if (line) {
+        var isOpen = bubble.classList.contains('is-open');
+
+        if (isOpen && !forceOpen) {
+            closeBalloon(clippy);
+            if (moveFocus) clippy.focus();
+            return;
+        }
+
+        if (line && (isOpen || bubble.getAttribute('data-cycled') === '1')) {
             line.textContent = lines[i % lines.length];
             i += 1;
         }
+        bubble.setAttribute('data-cycled', '1');
+
+        setOpen(bubble, clippy, true);
         if (actions) {
-            actions.hidden = !actions.hidden;
-            if (!actions.hidden) {
+            actions.hidden = false;
+            if (moveFocus) {
                 var first = actions.querySelector('button');
                 if (first) first.focus();
             }
         }
     }
 
-    window.askClippy = askClippy;
+    window.askClippy = function () { askClippy(true, true); };
 
     var clippy = document.querySelector('img.clippy');
     if (clippy) {
+        var bubble = document.querySelector('.clippy-bubble');
         clippy.style.cursor = 'pointer';
         clippy.setAttribute('tabindex', '0');
         clippy.setAttribute('role', 'button');
-        clippy.addEventListener('click', askClippy);
+        clippy.setAttribute('aria-label', 'Ask Clippy');
+        clippy.setAttribute('aria-expanded', 'false');
+        clippy.setAttribute('aria-haspopup', 'true');
+        if (bubble) {
+            if (!bubble.id) bubble.id = 'clippy-speech';
+            clippy.setAttribute('aria-controls', bubble.id);
+            bubble.setAttribute('aria-hidden', 'true');
+            var live = bubble.querySelector('.clippy-bubble-line');
+            if (live) live.setAttribute('aria-live', 'polite');
+        }
+        clippy.addEventListener('click', function () { askClippy(false, false); });
         clippy.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); askClippy(); }
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); askClippy(false, true); }
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key !== 'Escape') return;
+            if (document.documentElement.classList.contains('cmdk-open')) return;
+            if (document.querySelector('dialog[open]')) return;
+            if (!document.querySelector('.clippy-bubble.is-open')) return;
+            closeBalloon(clippy);
+            clippy.focus();
         });
     }
 })();

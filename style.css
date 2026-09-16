@@ -392,6 +392,11 @@ footer {
     display: block;
     cursor: pointer;
     object-fit: contain;
+    border-radius: 10px;
+}
+
+html.js .clippy-bubble:not(.is-open) {
+    display: none;
 }
 
 .clippy-bubble {
@@ -409,6 +414,35 @@ footer {
     font-style: italic;
     line-height: 1.45;
     box-shadow: 3px 4px 0 rgba(18, 18, 24, 0.14);
+    transform-origin: 0 22px;
+}
+
+.clippy-bubble.is-open {
+    animation: clippy-pop 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes clippy-pop {
+    0% {
+        opacity: 0;
+        transform: scale(0.46) translate(-8px, 6px);
+        filter: blur(1.5px);
+    }
+    62% {
+        opacity: 1;
+        filter: none;
+        transform: scale(1.06);
+    }
+    100% {
+        opacity: 1;
+        filter: none;
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .clippy-bubble.is-open {
+        animation: none;
+    }
 }
 
 .clippy-bubble::before {
@@ -467,10 +501,40 @@ footer {
         flex-direction: column;
         align-items: flex-start;
     }
+    .clippy-bubble {
+        transform-origin: 28px 0;
+    }
     .clippy-bubble::before {
         left: 22px;
         top: -6px;
         transform: rotate(135deg);
+    }
+    .clippy-bubble.is-open {
+        animation-name: clippy-pop-stack;
+    }
+}
+
+@keyframes clippy-pop-stack {
+    0% {
+        opacity: 0;
+        transform: scale(0.46) translate(0, -8px);
+        filter: blur(1.5px);
+    }
+    62% {
+        opacity: 1;
+        filter: none;
+        transform: scale(1.06);
+    }
+    100% {
+        opacity: 1;
+        filter: none;
+        transform: none;
+    }
+}
+
+@media (max-width: 520px) and (prefers-reduced-motion: reduce) {
+    .clippy-bubble.is-open {
+        animation: none;
     }
 }
 

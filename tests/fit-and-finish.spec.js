@@ -84,7 +84,11 @@ test('index: Clippy is the Fluent 3D paperclip image, not the 🖇️ emoji', as
   expect(await clippy.evaluate(el => el.naturalWidth)).toBeGreaterThan(0);
   await expect(page.locator('#about')).not.toContainText('🖇️');
   const bubble = page.locator('#about .clippy-bubble');
+  await expect(bubble).toBeHidden();
+  await clippy.click();
+  await expect(bubble).toBeVisible();
   await expect(bubble).toContainText("It looks like you're trying to build something useful");
+  await expect(clippy).toHaveAttribute('aria-expanded', 'true');
   const imgBox = await clippy.boundingBox();
   const bubbleBox = await bubble.boundingBox();
   expect(imgBox).toBeTruthy();
@@ -94,6 +98,9 @@ test('index: Clippy is the Fluent 3D paperclip image, not the 🖇️ emoji', as
   } else {
     expect(bubbleBox.y).toBeGreaterThan(imgBox.y);
   }
+  await clippy.click();
+  await expect(bubble).toBeHidden();
+  await expect(clippy).toHaveAttribute('aria-expanded', 'false');
 });
 
 test('chrome: geocities toggle uses a globe glyph instead of an emoji', async ({ page }) => {
@@ -1358,8 +1365,14 @@ test('colophon page exists', async ({ page }) => {
 
 test('404: Clippy and a search of the missing path', async ({ page }) => {
   await page.goto('/404.html');
-  await expect(page.locator('img.clippy')).toBeVisible();
+  const clippy = page.locator('img.clippy');
+  await expect(clippy).toBeVisible();
   await expect(page.locator('#lost-search')).toBeVisible();
+  const bubble = page.locator('.clippy-bubble');
+  await expect(bubble).toBeHidden();
+  await clippy.click();
+  await expect(bubble).toBeVisible();
+  await expect(bubble).toContainText('Looks like that page got lost');
   const scriptSrc = await page.locator('script[src*="script.js?v="]').first().getAttribute('src');
   expect(scriptSrc).toMatch(/script\.js\?v=\d+/);
 });
