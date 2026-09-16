@@ -71,7 +71,8 @@ test('index: about section exists', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#about')).toBeVisible();
   await expect(page.locator('#about')).toContainText('Product Manager');
-  await expect(page.locator('#about')).toContainText('Social+');
+  await expect(page.locator('#about')).toContainText('social media');
+  await expect(page.locator('#about')).not.toContainText('Social+');
 });
 
 test('index: Clippy is the Fluent 3D paperclip image, not the 🖇️ emoji', async ({ page }) => {
