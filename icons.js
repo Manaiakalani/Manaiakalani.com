@@ -206,6 +206,26 @@
         speaker:
             '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
             '<path fill="currentColor" fill-rule="evenodd" d="M5.2 3.2h13.6v17.6H5.2V3.2ZM12 8.1a4.6 4.6 0 1 0 .1 9.2 4.6 4.6 0 0 0-.1-9.2Zm0 2.2a2.4 2.4 0 1 1 0 4.8 2.4 2.4 0 0 1 0-4.8ZM9.2 5h5.6v1.4H9.2V5Z"/>' +
+            '</svg>',
+
+        headphones:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M6.2 12.6V11a5.8 5.8 0 0 1 11.6 0v1.6h-2V11a3.8 3.8 0 0 0-7.6 0v1.6H6.2ZM3.6 12.8h3.4v8.2H5.2A1.6 1.6 0 0 1 3.6 19.4v-6.6Zm13.4 0h3.4v6.6a1.6 1.6 0 0 1-1.6 1.6h-1.8v-8.2Z"/>' +
+            '</svg>',
+
+        air:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M3.6 6.2A1.2 1.2 0 0 1 4.8 5h14.4A1.2 1.2 0 0 1 20.4 6.2V14H3.6V6.2ZM2 15.2h20v1.6a.8.8 0 0 1-.8.8H2.8a.8.8 0 0 1-.8-.8v-1.6Z"/>' +
+            '</svg>',
+
+        jupyter:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M8.2 4.4a3.4 3.4 0 1 1 0 6.8 3.4 3.4 0 0 1 0-6.8Zm7.6 0a3.4 3.4 0 1 1 0 6.8 3.4 3.4 0 0 1 0-6.8ZM12 12.6a3.6 3.6 0 1 1 0 7.2 3.6 3.6 0 0 1 0-7.2Z"/>' +
+            '</svg>',
+
+        phone:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" fill-rule="evenodd" d="M8 2h8a1.7 1.7 0 0 1 1.7 1.7v16.6A1.7 1.7 0 0 1 16 22H8a1.7 1.7 0 0 1-1.7-1.7V3.7A1.7 1.7 0 0 1 8 2Zm1.5 3.2h5v9.4h-5V5.2ZM11 18.6h2v1.3h-2v-1.3Z"/>' +
             '</svg>'
     };
 

@@ -163,13 +163,17 @@ test('uses: studio chain and item glyphs are present', async ({ page }) => {
   await expect(studio).toContainText('RODE PSA1+');
   await expect(studio).toContainText('Scarlett 2i2');
   await expect(studio).toContainText('KRK ROKIT 5 G4');
+  await expect(studio).toContainText('Koss KPH40');
+  await expect(page.locator('#hardware')).toContainText('MacBook Air');
+  await expect(page.locator('#editor-terminal')).toContainText('Jupyter Notebook');
+  await expect(page.locator('#productivity')).toContainText('iPhone Notes');
   const icons = page.locator('.uses-icon svg.icon');
-  expect(await icons.count()).toBeGreaterThanOrEqual(18);
-  expect(await page.locator('#studio [data-icon="mic"] svg').evaluate(el => el.ownerSVGElement ? 1 : el.tagName)).toBeTruthy();
+  expect(await icons.count()).toBeGreaterThanOrEqual(26);
   await expect(page.locator('#studio [data-icon="mic"] svg')).toBeVisible();
-  await expect(page.locator('#studio [data-icon="arm"] svg')).toBeVisible();
-  await expect(page.locator('#studio [data-icon="interface"] svg')).toBeVisible();
-  await expect(page.locator('#studio [data-icon="speaker"] svg')).toBeVisible();
+  await expect(page.locator('#studio [data-icon="headphones"] svg')).toBeVisible();
+  await expect(page.locator('#hardware [data-icon="air"] svg')).toBeVisible();
+  await expect(page.locator('#editor-terminal [data-icon="jupyter"] svg')).toBeVisible();
+  await expect(page.locator('#productivity [data-icon="phone"] svg')).toBeVisible();
 });
 
 test('projects: GitHub link is visible', async ({ page }) => {
