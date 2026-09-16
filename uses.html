@@ -39,7 +39,7 @@
     <!-- Self-hosted Doto: preload the latin subset used above the fold -->
     <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin>
     <!-- External CSS -->
-    <link rel="stylesheet" href="style.css?v=20">
+    <link rel="stylesheet" href="style.css?v=21">
 
     <!-- RSS Feed -->
     <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml">
@@ -112,17 +112,21 @@
         <section class="uses-section" id="editor-terminal">
             <h2>Editor &amp; Terminal</h2>
             <ul class="uses-list">
-                <li>
+                <li data-motion="pop">
                     <span class="uses-icon" data-icon="editor" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Visual Studio Code</strong><span class="uses-note">Primary editor for everything from HTML to Python</span></span>
                 </li>
-                <li>
+                <li data-motion="pop">
                     <span class="uses-icon" data-icon="terminal" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Windows Terminal</strong><span class="uses-note">PowerShell and WSL2 profiles</span></span>
                 </li>
-                <li>
+                <li data-motion="spin">
                     <span class="uses-icon" data-icon="spark" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>GitHub Copilot</strong><span class="uses-note">AI pair programming assistant</span></span>
+                </li>
+                <li data-motion="spin">
+                    <span class="uses-icon" data-icon="jupyter" aria-hidden="true"></span>
+                    <span class="uses-copy"><strong>Jupyter Notebook</strong><span class="uses-note">Notebooks for data and experiments</span></span>
                 </li>
             </ul>
         </section>
@@ -130,15 +134,19 @@
         <section class="uses-section" id="hardware">
             <h2>Hardware</h2>
             <ul class="uses-list">
-                <li>
+                <li data-motion="tilt">
                     <span class="uses-icon" data-icon="laptop" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Surface Laptop</strong><span class="uses-note">Daily driver for work</span></span>
                 </li>
-                <li>
+                <li data-motion="tilt">
+                    <span class="uses-icon" data-icon="air" aria-hidden="true"></span>
+                    <span class="uses-copy"><strong>MacBook Air</strong><span class="uses-note">Travel and personal laptop</span></span>
+                </li>
+                <li data-motion="pop">
                     <span class="uses-icon" data-icon="tower" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Custom Desktop</strong><span class="uses-note">Side projects and gaming</span></span>
                 </li>
-                <li>
+                <li data-motion="pop">
                     <span class="uses-icon" data-icon="screens" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Dual Monitors</strong><span class="uses-note">Essential for multitasking</span></span>
                 </li>
@@ -147,23 +155,27 @@
 
         <section class="uses-section uses-section--studio" id="studio">
             <h2>Studio</h2>
-            <p class="uses-lead">The recording chain: condenser on an arm, into a Scarlett, out to a pair of Rokits.</p>
+            <p class="uses-lead">The recording chain: condenser on an arm, into a Scarlett, out to Rokits — plus Koss KPH40s for close listening.</p>
             <ul class="uses-list">
-                <li>
+                <li data-motion="bob">
                     <span class="uses-icon" data-icon="mic" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Audio-Technica AT2020</strong><span class="uses-note">Cardioid condenser microphone — voice, streams, and calls</span></span>
                 </li>
-                <li>
+                <li data-motion="swing">
                     <span class="uses-icon" data-icon="arm" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>RODE PSA1+</strong><span class="uses-note">Professional studio arm</span></span>
                 </li>
-                <li>
+                <li data-motion="spin">
                     <span class="uses-icon" data-icon="interface" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Focusrite Scarlett 2i2</strong><span class="uses-note">2-in / 2-out audio interface</span></span>
                 </li>
-                <li>
+                <li data-motion="pulse">
                     <span class="uses-icon" data-icon="speaker" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>KRK ROKIT 5 G4</strong><span class="uses-note">Pair of 5&quot; studio monitors</span></span>
+                </li>
+                <li data-motion="swing">
+                    <span class="uses-icon" data-icon="headphones" aria-hidden="true"></span>
+                    <span class="uses-copy"><strong>Koss KPH40</strong><span class="uses-note">On-ear headphones for close listening</span></span>
                 </li>
             </ul>
         </section>
@@ -171,15 +183,19 @@
         <section class="uses-section" id="productivity">
             <h2>Productivity</h2>
             <ul class="uses-list">
-                <li>
+                <li data-motion="bob">
                     <span class="uses-icon" data-icon="chat" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Microsoft Teams</strong><span class="uses-note">Primary communication at work</span></span>
                 </li>
-                <li>
+                <li data-motion="tilt">
                     <span class="uses-icon" data-icon="notebook" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>OneNote</strong><span class="uses-note">Meeting notes and brainstorming</span></span>
                 </li>
-                <li>
+                <li data-motion="tilt">
+                    <span class="uses-icon" data-icon="phone" aria-hidden="true"></span>
+                    <span class="uses-copy"><strong>iPhone Notes</strong><span class="uses-note">Quick capture on the phone</span></span>
+                </li>
+                <li data-motion="pop">
                     <span class="uses-icon" data-icon="check" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Microsoft To Do</strong><span class="uses-note">Personal task tracking</span></span>
                 </li>
@@ -189,15 +205,15 @@
         <section class="uses-section" id="development">
             <h2>Development</h2>
             <ul class="uses-list">
-                <li>
+                <li data-motion="swing">
                     <span class="uses-icon" data-icon="branch" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Git + GitHub</strong><span class="uses-note">Version control and collaboration</span></span>
                 </li>
-                <li>
+                <li data-motion="bob">
                     <span class="uses-icon" data-icon="crate" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Docker</strong><span class="uses-note">Containerized dev environments and self-hosted services</span></span>
                 </li>
-                <li>
+                <li data-motion="bob">
                     <span class="uses-icon" data-icon="cloud" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Azure Static Web Apps</strong><span class="uses-note">Hosting for this site</span></span>
                 </li>
@@ -207,15 +223,15 @@
         <section class="uses-section" id="creative-media">
             <h2>Creative &amp; Media</h2>
             <ul class="uses-list">
-                <li>
+                <li data-motion="pulse">
                     <span class="uses-icon" data-icon="camera" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>OBS Studio</strong><span class="uses-note">Screen recording and streaming</span></span>
                 </li>
-                <li>
+                <li data-motion="spin">
                     <span class="uses-icon" data-icon="palette" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Canva</strong><span class="uses-note">Quick graphics and social media assets</span></span>
                 </li>
-                <li>
+                <li data-motion="pulse">
                     <span class="uses-icon" data-icon="wave" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Audacity</strong><span class="uses-note">Audio editing for content</span></span>
                 </li>
@@ -225,15 +241,15 @@
         <section class="uses-section" id="homelab-self-hosting">
             <h2>Homelab &amp; Self-Hosting</h2>
             <ul class="uses-list">
-                <li>
+                <li data-motion="pop">
                     <span class="uses-icon" data-icon="server" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Proxmox</strong><span class="uses-note">Hypervisor for VMs and containers</span></span>
                 </li>
-                <li>
+                <li data-motion="pulse">
                     <span class="uses-icon" data-icon="chart" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Rybbit Analytics</strong><span class="uses-note">Self-hosted web analytics for this site</span></span>
                 </li>
-                <li>
+                <li data-motion="pop">
                     <span class="uses-icon" data-icon="funnel" aria-hidden="true"></span>
                     <span class="uses-copy"><strong>Nginx Proxy Manager</strong><span class="uses-note">Reverse proxy and SSL termination</span></span>
                 </li>
@@ -247,7 +263,7 @@
     </footer>
 
     <!-- External JavaScript -->
-    <script defer src="icons.js?v=4"></script>
+    <script defer src="icons.js?v=5"></script>
     <script defer src="script.js?v=13"></script>
 
     <!-- ASCII Cube -->
