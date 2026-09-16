@@ -12,8 +12,8 @@
 
         cone:
             '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
-            '<path fill="currentColor" d="M12 3 3.2 21h17.6L12 3zm0 4.4 5.4 11.1H6.6L12 7.4zM2 21.8h20v1.6H2z"/>' +
-            '<path fill="currentColor" d="M7.4 14.2h9.2l.8 1.7H6.6z"/>' +
+            '<path fill="currentColor" fill-rule="evenodd" d="M12 2.3 19.15 18.5H4.85L12 2.3Zm2.55 5.95L15.7 10.4H8.3l1.15-2.15h5.1ZM16.85 13.15 18.05 15.4H5.95l1.2-2.25h9.7Z"/>' +
+            '<path fill="currentColor" d="M2.8 18.5h18.4v2.3c0 .45-.35.8-.8.8H3.6c-.45 0-.8-.35-.8-.8z"/>' +
             '</svg>',
 
         dice:
@@ -33,7 +33,7 @@
 
         search:
             '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
-            '<path fill="currentColor" d="M10.5 3a7.5 7.5 0 0 1 5.9 12.1l4.2 4.3-1.4 1.4-4.3-4.2A7.5 7.5 0 1 1 10.5 3zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z"/>' +
+            '<path fill="currentColor" fill-rule="evenodd" d="M10.4 2.4a8 8 0 1 1 5.2 14.1l.2.2 4.7 4.7a1.35 1.35 0 0 1-1.9 1.9l-4.7-4.7-.2-.2A8 8 0 0 1 10.4 2.4Zm0 2.7a5.3 5.3 0 1 0 0 10.6 5.3 5.3 0 0 0 0-10.6Z"/>' +
             '</svg>',
 
         home:
@@ -56,9 +56,20 @@
             '<path fill="currentColor" d="M21 7.2a5.4 5.4 0 0 1-7.2 5.1L6.4 19.7a2.1 2.1 0 0 1-3-3l7.4-7.4A5.4 5.4 0 0 1 16.8 3l-2.3 2.3 3.2 3.2 2.3-2.3c.4.6.7 1.3.9 2z"/>' +
             '</svg>',
 
+        gear:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" fill-rule="evenodd" d="M10.15 2.2h3.7l.45 2.55a7.6 7.6 0 0 1 2.05.85l2.3-1.25 2.6 2.6-1.25 2.3c.36.64.64 1.33.85 2.05L23 10.15v3.7l-2.55.45a7.6 7.6 0 0 1-.85 2.05l1.25 2.3-2.6 2.6-2.3-1.25a7.6 7.6 0 0 1-2.05.85L13.85 21.8h-3.7l-.45-2.55a7.6 7.6 0 0 1-2.05-.85l-2.3 1.25-2.6-2.6 1.25-2.3a7.6 7.6 0 0 1-.85-2.05L1 13.85v-3.7l2.55-.45c.21-.72.49-1.41.85-2.05l-1.25-2.3 2.6-2.6 2.3 1.25c.64-.36 1.33-.64 2.05-.85L10.15 2.2ZM12 8.4a3.6 3.6 0 1 0 0 7.2 3.6 3.6 0 0 0 0-7.2Z"/>' +
+            '</svg>',
+
         moon:
             '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
-            '<path fill="currentColor" d="M15.2 2.1A10 10 0 1 0 21.8 14 8.2 8.2 0 0 1 15.2 2.1z"/>' +
+            '<path fill="currentColor" d="M14.6 2.4A9.8 9.8 0 1 0 21.6 15.2 7.9 7.9 0 0 1 14.6 2.4Z"/>' +
+            '</svg>',
+
+        sun:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" d="M11 1.2h2v3.6h-2zM11 19.2h2v3.6h-2zM1.2 11h3.6v2H1.2zm17.99 0H22.8v2h-3.61zM4.22 3.16 5.64 1.75l2.55 2.55-1.42 1.41zM15.81 16.29l2.55 2.55-1.41 1.42-2.55-2.55zM3.16 19.78l1.41 1.41 2.55-2.55-1.41-1.41zM16.29 8.19l2.55-2.55 1.42 1.41-2.55 2.55z"/>' +
+            '<circle fill="currentColor" cx="12" cy="12" r="4.7"/>' +
             '</svg>',
 
         share:

@@ -27,7 +27,7 @@
     add({ icon: ic('home'), title: 'About', hint: 'Page', keys: 'home index start bio intro', run: function () { go('/'); } });
     add({ icon: ic('grid'), title: 'Projects', hint: 'Page', keys: 'work repos code github', run: function () { go('/projects.html'); } });
     add({ icon: ic('thought'), title: 'Thoughts', hint: 'Page', keys: 'blog posts writing notes', run: function () { go('/thoughts.html'); } });
-    add({ icon: ic('wrench'), title: 'Uses', hint: 'Page', keys: 'gear setup tools stack hardware', run: function () { go('/uses.html'); } });
+    add({ icon: ic('gear'), title: 'Uses', hint: 'Page', keys: 'gear setup tools stack hardware', run: function () { go('/uses.html'); } });
 
     var themeBtn = doc.querySelector('.theme-toggle');
     if (themeBtn) add({ icon: ic('moon'), title: 'Toggle light / dark theme', hint: 'Action', keys: 'dark light mode colour appearance', run: function () { themeBtn.click(); } });
