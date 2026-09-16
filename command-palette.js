@@ -22,36 +22,38 @@
 
     function go(path) { window.location.href = path; }
 
-    add({ icon: '\uD83C\uDFE0', title: 'About', hint: 'Page', keys: 'home index start bio intro', run: function () { go('/'); } });
-    add({ icon: '\uD83D\uDDC2\uFE0F', title: 'Projects', hint: 'Page', keys: 'work repos code github', run: function () { go('/projects.html'); } });
-    add({ icon: '\uD83D\uDCAD', title: 'Thoughts', hint: 'Page', keys: 'blog posts writing notes', run: function () { go('/thoughts.html'); } });
-    add({ icon: '\uD83D\uDEE0\uFE0F', title: 'Uses', hint: 'Page', keys: 'gear setup tools stack hardware', run: function () { go('/uses.html'); } });
+    function ic(name) { return (typeof mnkIcon === 'function') ? mnkIcon(name) : ''; }
+
+    add({ icon: ic('home'), title: 'About', hint: 'Page', keys: 'home index start bio intro', run: function () { go('/'); } });
+    add({ icon: ic('grid'), title: 'Projects', hint: 'Page', keys: 'work repos code github', run: function () { go('/projects.html'); } });
+    add({ icon: ic('thought'), title: 'Thoughts', hint: 'Page', keys: 'blog posts writing notes', run: function () { go('/thoughts.html'); } });
+    add({ icon: ic('wrench'), title: 'Uses', hint: 'Page', keys: 'gear setup tools stack hardware', run: function () { go('/uses.html'); } });
 
     var themeBtn = doc.querySelector('.theme-toggle');
-    if (themeBtn) add({ icon: '\uD83C\uDF17', title: 'Toggle light / dark theme', hint: 'Action', keys: 'dark light mode colour appearance', run: function () { themeBtn.click(); } });
+    if (themeBtn) add({ icon: ic('moon'), title: 'Toggle light / dark theme', hint: 'Action', keys: 'dark light mode colour appearance', run: function () { themeBtn.click(); } });
 
     var retroBtn = doc.querySelector('.geocities-toggle');
-    if (retroBtn) add({ icon: '\uD83D\uDD79\uFE0F', title: 'Toggle retro mode', hint: 'Action', keys: 'geocities 90s nostalgia web1 old', run: function () { retroBtn.click(); } });
+    if (retroBtn) add({ icon: ic('cone'), title: 'Toggle retro mode', hint: 'Action', keys: 'geocities 90s nostalgia web1 old', run: function () { retroBtn.click(); } });
 
-    add({ icon: '\uD83D\uDD17', title: 'Copy link to this page', hint: 'Action', keys: 'url share clipboard permalink', run: copyPageLink });
+    add({ icon: ic('link'), title: 'Copy link to this page', hint: 'Action', keys: 'url share clipboard permalink', run: copyPageLink });
 
     // Native share sheet — only offered where the browser supports it; elsewhere
     // the copy-link command above covers the same need.
     if (typeof navigator.share === 'function') {
-        add({ icon: '\uD83D\uDCE4', title: 'Share this page\u2026', hint: 'Action', keys: 'share send native sheet url social', run: sharePage });
+        add({ icon: ic('share'), title: 'Share this page\u2026', hint: 'Action', keys: 'share send native sheet url social', run: sharePage });
     }
 
     var randThought = doc.getElementById('random-thought-btn');
-    add({ icon: '\uD83C\uDFB2', title: 'Random thought', hint: randThought ? 'Action' : 'Thoughts', keys: 'shuffle surprise lucky', run: function () { randThought ? randThought.click() : go('/thoughts.html'); } });
+    add({ icon: ic('dice'), title: 'Random thought', hint: randThought ? 'Action' : 'Thoughts', keys: 'shuffle surprise lucky', run: function () { randThought ? randThought.click() : go('/thoughts.html'); } });
 
     var randProject = doc.getElementById('random-project-btn');
-    add({ icon: '\uD83C\uDFB2', title: 'Random project', hint: randProject ? 'Action' : 'Projects', keys: 'shuffle surprise lucky repo', run: function () { randProject ? randProject.click() : go('/projects.html'); } });
+    add({ icon: ic('dice'), title: 'Random project', hint: randProject ? 'Action' : 'Projects', keys: 'shuffle surprise lucky repo', run: function () { randProject ? randProject.click() : go('/projects.html'); } });
 
-    add({ icon: '\uD83D\uDCE1', title: 'Subscribe via RSS', hint: 'Feed', keys: 'feed rss atom follow updates', run: function () { go('/feed.xml'); } });
+    add({ icon: ic('rss'), title: 'Subscribe via RSS', hint: 'Feed', keys: 'feed rss atom follow updates', run: function () { go('/feed.xml'); } });
 
     var ghLink = doc.querySelector('a[href*="github.com"]');
     var ghHref = ghLink ? ghLink.href : 'https://github.com/manaiakalani';
-    add({ icon: '\uD83D\uDC19', title: 'Open GitHub profile', hint: 'External', keys: 'github source code repos', run: function () { window.open(ghHref, '_blank', 'noopener'); } });
+    add({ icon: ic('github'), title: 'Open GitHub profile', hint: 'External', keys: 'github source code repos', run: function () { window.open(ghHref, '_blank', 'noopener'); } });
 
     function copyPageLink() {
         var url = window.location.href;
@@ -90,7 +92,7 @@
     var contentLoading = false;
 
     function iconFor(kind) {
-        return { Thought: '\uD83D\uDCAD', Uses: '\uD83D\uDEE0\uFE0F', About: '\uD83D\uDC64' }[kind] || '\uD83D\uDCC4';
+        return { Thought: ic('thought'), Uses: ic('wrench'), About: ic('person') }[kind] || ic('page');
     }
 
     function loadContent() {
@@ -170,7 +172,7 @@
     dialog.innerHTML =
         '<div class="cmdk__box">' +
             '<div class="cmdk__search">' +
-                '<span class="cmdk__search-icon" aria-hidden="true">\uD83D\uDD0D</span>' +
+                '<span class="cmdk__search-icon" aria-hidden="true">' + ic('search') + '</span>' +
                 '<input type="text" class="cmdk__input" role="combobox" aria-expanded="true" aria-controls="cmdk-list" aria-autocomplete="list" placeholder="Search pages, actions, and writing\u2026" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search pages, actions, and writing" />' +
             '</div>' +
             '<ul class="cmdk__list" id="cmdk-list" role="listbox" aria-label="Commands"></ul>' +
@@ -327,7 +329,7 @@
     launcher.setAttribute('aria-controls', 'cmdk-dialog');
     launcher.setAttribute('aria-expanded', 'false');
     launcher.title = 'Command menu (' + modLabel + 'K)';
-    launcher.innerHTML = '<svg aria-hidden="true" width="1em" height="1em" viewBox="0 0 512 512" fill="currentColor"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>';
+    launcher.innerHTML = ic('search');
     launcher.addEventListener('click', function () { open(); });
     var header = doc.querySelector('header') || doc.body;
     header.appendChild(launcher);

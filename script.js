@@ -69,10 +69,12 @@ if (typingEl) {
     var GITHUB_USER = 'Manaiakalani';
     var API_URL = 'https://api.github.com/users/' + GITHUB_USER + '/repos?sort=pushed&per_page=100&type=owner';
     var CACHE_KEY = 'mnk:gh_repos_cache';
-    var CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+    var CACHE_TTL = 2 * 60 * 1000; // 2 minutes — currently-building should track new pushes
 
-    // Repos to exclude from display (e.g. profile repo, portfolio itself)
+    // Repos to exclude from the Projects grid / featured teaser (profile + this site).
     var EXCLUDE = ['Manaiakalani', 'Manaiakalani.com', 'manaiakalani.info', 'seatac.social', 'manaiakalani.github.io'];
+    // Currently-building should track the latest real push, including this site.
+    var BUILDING_EXCLUDE = ['Manaiakalani', 'manaiakalani.info', 'seatac.social', 'manaiakalani.github.io'];
 
     var LANG_COLORS = {
         TypeScript: '#3178c6',
@@ -224,7 +226,7 @@ if (typingEl) {
         var section = container.closest('.currently-building-teaser');
         container.setAttribute('aria-busy', 'false');
         var candidates = repos
-            .filter(function (r) { return !r.fork && EXCLUDE.indexOf(r.name) === -1; })
+            .filter(function (r) { return !r.fork && BUILDING_EXCLUDE.indexOf(r.name) === -1; })
             .sort(function (a, b) { return new Date(b.pushed_at || 0) - new Date(a.pushed_at || 0); });
         if (!candidates.length) {
             if (section) section.hidden = true;
@@ -235,11 +237,14 @@ if (typingEl) {
         var updatedHtml = '';
         if (repo.pushed_at) {
             var rel = formatRelativeTime(new Date(repo.pushed_at));
-            if (rel) updatedHtml = '<span class="building-updated">Updated ' + rel + '</span>';
+            if (rel) {
+                updatedHtml = '<time class="building-updated" datetime="' + escapeHtml(repo.pushed_at) + '">Updated ' + rel + '</time>';
+            }
         }
+        var hammer = (typeof mnkIcon === 'function') ? mnkIcon('hammer') : '';
         container.innerHTML =
             '<a href="' + escapeHtml(repo.html_url) + '" target="_blank" rel="noopener noreferrer" class="building-card">' +
-            '<span class="building-label">\uD83D\uDD28 Currently building</span>' +
+            '<span class="building-label">' + hammer + ' Currently building</span>' +
             '<h3>' + escapeHtml(repo.name) + '</h3>' +
             desc +
             updatedHtml +
@@ -321,12 +326,12 @@ if (typingEl) {
         try {
             cached = JSON.parse(localStorage.getItem(CACHE_KEY));
             cachedRepos = cached ? normalizeRepos(cached.data) : [];
-            if (cachedRepos.length && (Date.now() - cached.ts < CACHE_TTL)) {
+            if (cachedRepos.length) {
                 allLoadedRepos = cachedRepos;
                 renderFeatured(cachedRepos);
                 renderAll();
                 renderCurrentlyBuilding(cachedRepos);
-                return;
+                if (cached && (Date.now() - cached.ts < CACHE_TTL)) return;
             }
         } catch (e) { /* ignore */ }
 
@@ -471,7 +476,7 @@ if (typingEl) {
         btn.type = 'button';
         btn.className = 'copy-link-btn';
         btn.setAttribute('aria-label', 'Copy link to this entry');
-        btn.textContent = '🔗';
+        btn.innerHTML = (typeof mnkIcon === 'function') ? mnkIcon('link') : 'Link';
         btn.addEventListener('click', function () {
             var url = window.location.origin + window.location.pathname + '#' + entry.id;
             var reset = function () {
