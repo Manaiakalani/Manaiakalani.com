@@ -1,29 +1,10 @@
 /**
- * Site icons — Noun Project–style 24² glyphs (currentColor) plus a
- * Fluent-inspired Clippy (the paperclip assistant). Hydrates [data-icon].
+ * Site icons — Noun Project–style 24² glyphs (currentColor). Hydrates [data-icon].
  */
 (function (root) {
     'use strict';
 
     var GLYPHS = {
-        // Clippy: original tribute drawing (not the trademarked Office asset).
-        clippy:
-            '<svg class="icon icon-clippy" viewBox="0 0 64 64" aria-hidden="true" focusable="false">' +
-            '<defs><linearGradient id="mnk-clippy-metal" x1="0" y1="0" x2="1" y2="1">' +
-            '<stop offset="0" stop-color="#e8d5a3"/><stop offset="1" stop-color="#b08d4a"/>' +
-            '</linearGradient></defs>' +
-            '<path fill="none" stroke="url(#mnk-clippy-metal)" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" d="M22 46 V20.5 c0-8 7.2-12.5 14.2-12.5 7.4 0 13.3 5.2 13.3 12.8 0 6.4-4.2 11-10.4 11.6"/>' +
-            '<path fill="none" stroke="url(#mnk-clippy-metal)" stroke-width="6.5" stroke-linecap="round" d="M26.5 46 V24.5 c0-5.6 4.6-9.2 9.6-9.2 5.2 0 9.2 3.6 9.2 9 0 4.8-3.2 8.2-7.8 8.6"/>' +
-            '<ellipse cx="29.2" cy="22" rx="6.1" ry="7.2" fill="#fff" stroke="#1c1914" stroke-width="1.4"/>' +
-            '<ellipse cx="42.6" cy="22.2" rx="6.1" ry="7.2" fill="#fff" stroke="#1c1914" stroke-width="1.4"/>' +
-            '<circle cx="30.4" cy="23.4" r="2.35" fill="#1c1914"/>' +
-            '<circle cx="43.8" cy="23.6" r="2.35" fill="#1c1914"/>' +
-            '<circle cx="31.1" cy="22.6" r="0.7" fill="#fff"/>' +
-            '<circle cx="44.5" cy="22.8" r="0.7" fill="#fff"/>' +
-            '<path d="M24 13.2q6.2-5.4 12.2-.4" fill="none" stroke="#1c1914" stroke-width="2.1" stroke-linecap="round"/>' +
-            '<path d="M37.2 12.6q6.4-4.8 13.2.8" fill="none" stroke="#1c1914" stroke-width="2.1" stroke-linecap="round"/>' +
-            '</svg>',
-
         hammer:
             '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
             '<path fill="currentColor" d="M13.2 2.1 21 9.9l-1.8 1.8-2.4-2.4-6.7 6.7c-.5.5-1.3.5-1.8 0l-2.3-2.3c-.5-.5-.5-1.3 0-1.8l6.7-6.7-2.4-2.4 1.9-1.7zm-9 16.3 2.2 2.2H3.2v-2.2h1z"/>' +

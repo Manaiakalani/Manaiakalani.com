@@ -72,9 +72,13 @@ test('index: about section exists', async ({ page }) => {
   await expect(page.locator('#about')).toBeVisible();
 });
 
-test('index: Clippy is a fluent paperclip SVG, not the 🖇️ emoji', async ({ page }) => {
+test('index: Clippy is the Fluent 3D paperclip image, not the 🖇️ emoji', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.clippy svg.icon-clippy')).toBeVisible();
+  const clippy = page.locator('img.clippy');
+  await expect(clippy).toBeVisible();
+  await expect(clippy).toHaveAttribute('src', /clippy\.webp/);
+  await expect(clippy).toHaveAttribute('alt', 'Clippy');
+  expect(await clippy.evaluate(el => el.naturalWidth)).toBeGreaterThan(0);
   await expect(page.locator('#about')).not.toContainText('🖇️');
 });
 

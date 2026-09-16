@@ -407,18 +407,12 @@ footer {
 }
 
 .clippy {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.75em;
-    height: 1.75em;
-    vertical-align: -0.4em;
-    margin-left: 0.15em;
-}
-
-.clippy .icon-clippy {
-    width: 1.75em;
-    height: 1.75em;
+    display: inline-block;
+    width: 1.85em;
+    height: 1.85em;
+    vertical-align: -0.48em;
+    margin-left: 0.2em;
+    object-fit: contain;
 }
 
 .gc-icon {
