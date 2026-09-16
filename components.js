@@ -15,7 +15,7 @@
             '<div class="container">' +
                 brand +
                 '<p class="header-subtitle">Aloha, I\'m Maximilian (Manaiakalani) Stein</p>' +
-                '<p class="header-hook">Manaiakalani is Maui\'s fishhook \u2014 the Hawaiian name for Scorpius.</p>' +
+                '<p class="header-hook"><em>Manaiakalani is Maui\'s fishhook \u2014 the Hawaiian name for Scorpius.</em></p>' +
                 typing +
                 '<nav class="site-nav" aria-label="Main">' +
                     '<a href="/">About</a>' +
@@ -23,14 +23,13 @@
                     '<a href="/projects.html">Projects</a>' +
                     '<a href="/uses.html">Uses</a>' +
                 '</nav>' +
-                '<p class="building-status" id="building-status" hidden></p>' +
             '</div>' +
             '<button class="theme-toggle" aria-label="Toggle dark mode">' +
                 '<span class="theme-icon theme-icon--moon" data-icon="moon"></span>' +
                 '<span class="theme-icon theme-icon--sun" data-icon="sun"></span>' +
             '</button>' +
             '<button class="geocities-toggle" aria-label="Toggle GeoCities mode" title="Welcome to 1997!">' +
-                '<span class="gc-icon" data-icon="cone"></span>' +
+                '<span class="gc-icon" data-icon="geocities"></span>' +
             '</button>';
         header.dataset.injected = 'true';
         if (typeof mnkIconsHydrate === 'function') mnkIconsHydrate(header);

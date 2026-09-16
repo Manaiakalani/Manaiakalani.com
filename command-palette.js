@@ -34,7 +34,7 @@
     if (themeBtn) add({ icon: ic('moon'), title: 'Toggle light / dark theme', hint: 'Action', keys: 'dark light mode colour appearance', run: function () { themeBtn.click(); } });
 
     var retroBtn = doc.querySelector('.geocities-toggle');
-    if (retroBtn) add({ icon: ic('cone'), title: 'Toggle retro mode', hint: 'Action', keys: 'geocities 90s nostalgia web1 old', run: function () { retroBtn.click(); } });
+    if (retroBtn) add({ icon: ic('geocities'), title: 'Toggle retro mode', hint: 'Action', keys: 'geocities 90s nostalgia web1 old www globe', run: function () { retroBtn.click(); } });
 
     add({ icon: ic('link'), title: 'Copy link to this page', hint: 'Action', keys: 'url share clipboard permalink', run: copyPageLink });
     add({ icon: ic('book'), title: 'Sign the guestbook', hint: 'Action', keys: 'guestbook sign book visitors place', run: function () {
@@ -62,7 +62,7 @@
         else go('/uses.html');
     } });
     add({ icon: ic('hammer'), title: 'Currently building', hint: 'Status', keys: 'building github pushing now', run: function () {
-        var el = document.getElementById('building-status') || document.getElementById('currently-building');
+        var el = document.getElementById('currently-building');
         if (el) el.scrollIntoView({ block: 'center' });
         else go('/');
     } });
@@ -343,13 +343,15 @@
     var launcher = doc.createElement('button');
     launcher.type = 'button';
     launcher.className = 'cmdk-launcher';
-    launcher.setAttribute('aria-label', 'Open command menu (' + modLabel + ' K)');
+    launcher.setAttribute('aria-label', 'Search (' + modLabel + 'K)');
     launcher.setAttribute('aria-keyshortcuts', 'Control+K Meta+K');
     launcher.setAttribute('aria-haspopup', 'dialog');
     launcher.setAttribute('aria-controls', 'cmdk-dialog');
     launcher.setAttribute('aria-expanded', 'false');
-    launcher.title = 'Command menu (' + modLabel + 'K)';
-    launcher.innerHTML = ic('search');
+    launcher.title = 'Search (' + modLabel + 'K)';
+    launcher.innerHTML = ic('search') +
+        '<span class="cmdk-launcher-label">Search</span>' +
+        '<kbd class="cmdk-launcher-key">' + modLabel + 'K</kbd>';
     launcher.addEventListener('click', function () { open(); });
     window.openCommandPalette = open;
     var header = doc.querySelector('header') || doc.body;

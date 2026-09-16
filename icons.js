@@ -16,6 +16,11 @@
             '<path fill="currentColor" d="M2.8 18.5h18.4v2.3c0 .45-.35.8-.8.8H3.6c-.45 0-.8-.35-.8-.8z"/>' +
             '</svg>',
 
+        geocities:
+            '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path fill="currentColor" fill-rule="evenodd" d="M12 2.1a9.9 9.9 0 1 1 0 19.8 9.9 9.9 0 0 1 0-19.8Zm0 1.8a8.1 8.1 0 1 0 0 16.2 8.1 8.1 0 0 0 0-16.2Zm-6.4 7.3h12.8v1.6H5.6Zm6.4-5.4c1.5 1.9 2.4 4.2 2.4 6.6s-.9 4.7-2.4 6.6C10.5 15.7 9.6 13.4 9.6 11s.9-4.7 2.4-6.6Z"/>' +
+            '</svg>',
+
         dice:
             '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
             '<path fill="currentColor" d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm3.2 4.2a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6zm7.6 0a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6zM12 10.7a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6zM8.2 16.2a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6zm7.6 0a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6z"/>' +

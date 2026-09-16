@@ -260,17 +260,11 @@ if (typingEl) {
                 '</a>';
             if (section) section.hidden = false;
         }
-        renderBuildingStatus(repo, rel);
-    }
-
-    function renderBuildingStatus(repo, rel) {
-        var el = document.getElementById('building-status');
-        if (!el || !repo) return;
-        var when = rel || (repo.pushed_at ? formatRelativeTime(new Date(repo.pushed_at)) : '');
-        el.hidden = false;
-        el.innerHTML = 'pushing <a href="' + escapeHtml(repo.html_url) + '" target="_blank" rel="noopener noreferrer">' +
-            escapeHtml(repo.name) + '</a>' + (when ? ' · ' + escapeHtml(when) : '');
-        window.mnkBuilding = { name: repo.name, rel: when, url: repo.html_url };
+        window.mnkBuilding = {
+            name: repo.name,
+            rel: rel || '',
+            url: repo.html_url
+        };
     }
 
     // Persistent reference for search/filter (item 9)
@@ -466,7 +460,7 @@ if (typingEl) {
         });
     }
 
-    if (document.getElementById('featured-projects') || document.getElementById('all-projects') || document.getElementById('currently-building') || document.getElementById('building-status')) {
+    if (document.getElementById('featured-projects') || document.getElementById('all-projects') || document.getElementById('currently-building')) {
         loadRepos();
     }
 })();

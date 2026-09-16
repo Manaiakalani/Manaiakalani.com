@@ -85,15 +85,16 @@ test('index: Clippy is the Fluent 3D paperclip image, not the 🖇️ emoji', as
   await expect(page.locator('#about')).not.toContainText('🖇️');
 });
 
-test('chrome: geocities toggle uses a cone icon instead of an emoji', async ({ page }) => {
+test('chrome: geocities toggle uses a globe glyph instead of an emoji', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.geocities-toggle [data-icon="cone"] svg')).toBeVisible();
+  await expect(page.locator('.geocities-toggle [data-icon="geocities"] svg')).toBeVisible();
 });
 
 test('chrome: header icons are the site glyph set', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.geocities-toggle [data-icon="cone"] svg')).toBeVisible();
+  await expect(page.locator('.geocities-toggle [data-icon="geocities"] svg')).toBeVisible();
   await expect(page.locator('.cmdk-launcher svg.icon')).toBeVisible();
+  await expect(page.locator('.cmdk-launcher-label')).toHaveText('Search');
   await expect(page.locator('.theme-toggle [data-icon="moon"] svg')).toBeVisible();
   await expect(page.locator('.fa-moon, .fa-sun')).toHaveCount(0);
 });
@@ -1325,7 +1326,7 @@ test('counter: increments once per session (POST first visit, GET thereafter)', 
 
 test('chrome: shared header names the fishhook and marks the current nav', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#site-header')).toContainText("Maui's fishhook");
+  await expect(page.locator('#site-header .header-hook em')).toContainText("Maui's fishhook");
   await expect(page.locator('.site-nav a[aria-current="page"]')).toHaveAttribute('href', '/');
   await page.goto('/thoughts.html');
   await expect(page.locator('.site-nav a[aria-current="page"]')).toHaveAttribute('href', '/thoughts.html');
@@ -1349,7 +1350,7 @@ test('404: Clippy and a search of the missing path', async ({ page }) => {
   await expect(page.locator('img.clippy')).toBeVisible();
   await expect(page.locator('#lost-search')).toBeVisible();
   const scriptSrc = await page.locator('script[src*="script.js?v="]').first().getAttribute('src');
-  expect(scriptSrc).toMatch(/script\.js\?v=14/);
+  expect(scriptSrc).toMatch(/script\.js\?v=15/);
 });
 
 test('about uses the ʻokina in Hawaiʻi', async ({ page }) => {
