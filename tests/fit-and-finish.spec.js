@@ -1529,12 +1529,13 @@ test('scorpius overlay names tonight’s Hawaiian moon', async ({ page }) => {
   await expect(page.locator('.scorpius-moon')).toContainText('Tonight is');
 });
 
-test('scorpius overlay draws Antares as the red heart', async ({ page }) => {
+test('scorpius overlay is a cartoon hook over a starfield', async ({ page }) => {
   await page.goto('/');
   await page.locator('.scorpius-trigger').click();
-  await expect(page.locator('#scorpius-sky .scorpius-star--antares')).toBeVisible();
-  await expect(page.locator('#scorpius-sky')).toContainText('Antares');
-  await expect(page.locator('#scorpius-sky')).toContainText('Shaula');
+  await expect(page.locator('#scorpius-sky .scorpius-chart')).toBeVisible();
+  await expect(page.locator('#scorpius-sky .scorpius-star--heart')).toBeVisible();
+  await expect(page.locator('#scorpius-sky .scorpius-dot').first()).toBeVisible();
+  await expect(page.locator('#scorpius-sky .scorpius-close')).toHaveAttribute('aria-label', 'Close constellation');
 });
 
 test('footer has a public email', async ({ page }) => {

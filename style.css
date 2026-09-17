@@ -1899,60 +1899,73 @@ html.cmdk-open body {
     color: var(--accent);
 }
 .scorpius-sky {
-    width: min(94vw, 34rem);
+    width: min(94vw, 32rem);
     padding: 0;
     border: 1px solid rgba(80, 88, 110, 0.35);
     border-radius: 16px;
     background: #07080f;
     color: #f4ecd0;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    overflow: hidden;
 }
 .scorpius-sky::backdrop {
     background: rgba(4, 6, 12, 0.78);
 }
 .scorpius-sky-inner {
-    padding: 1.1rem 1.2rem 1.25rem;
+    position: relative;
+    padding: 1.15rem 1.2rem 1.3rem;
 }
-.scorpius-sky svg {
+.scorpius-stage {
+    position: relative;
+    overflow: hidden;
+    height: 16.5rem;
+    border-radius: 10px;
+    background:
+        radial-gradient(ellipse at 40% 30%, rgba(200, 69, 52, 0.12), transparent 55%),
+        #07080f;
+}
+.scorpius-parallax {
+    position: absolute;
+    inset: -18%;
+    pointer-events: none;
+    will-change: transform;
+}
+.scorpius-parallax--hook {
+    inset: 0;
+}
+.scorpius-drift {
+    position: absolute;
+    inset: 0;
+}
+.scorpius-dot {
+    position: absolute;
+    border-radius: 50%;
+    background: #f4ecd0;
+    box-shadow: 0 0 6px rgba(244, 236, 208, 0.35);
+    animation: scorpius-twinkle 3.4s ease-in-out infinite;
+}
+.scorpius-drift--far { animation: scorpius-drift-a 42s ease-in-out infinite; }
+.scorpius-drift--mid { animation: scorpius-drift-b 28s ease-in-out infinite; }
+.scorpius-drift--near { animation: scorpius-drift-c 18s ease-in-out infinite; }
+.scorpius-chart {
     display: block;
     width: 100%;
-    height: auto;
-    border-radius: 10px;
+    height: 100%;
 }
 .scorpius-line {
-    stroke: rgba(244, 236, 208, 0.32);
-    stroke-width: 0.55;
+    stroke: #c84534;
+    stroke-width: 1.35;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-dasharray: 280;
-    stroke-dashoffset: 280;
-    animation: scorpius-trace 1100ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    stroke-dasharray: 240;
+    stroke-dashoffset: 240;
+    animation: scorpius-trace 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 .scorpius-star {
     fill: #f4ecd0;
 }
-.scorpius-star--hot {
-    fill: #e8f0ff;
-}
-.scorpius-star--warm {
-    fill: #ffc48a;
-}
-.scorpius-star--antares {
-    fill: #ff6a2b;
-}
-.scorpius-halo {
-    fill: #ff6a2b;
-    opacity: 0.22;
-}
-.scorpius-field {
-    fill: #f4ecd0;
-    opacity: 0.28;
-}
-.scorpius-label {
-    fill: rgba(244, 236, 208, 0.72);
-    font-size: 3.4px;
-    font-family: Georgia, 'Times New Roman', serif;
-    letter-spacing: 0.04em;
+.scorpius-star--heart {
+    fill: #ff8a4a;
 }
 .scorpius-sky p {
     margin: 0.75rem 0 0;
@@ -1962,20 +1975,60 @@ html.cmdk-open body {
     color: #f4ecd0;
 }
 .scorpius-close {
-    font: inherit;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #c84534;
-    background: none;
-    border: none;
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+    z-index: 3;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid rgba(244, 236, 208, 0.32);
+    background: rgba(7, 8, 15, 0.72);
+    color: #f4ecd0;
     cursor: pointer;
-    float: right;
+}
+.scorpius-close svg {
+    width: 1rem;
+    height: 1rem;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+}
+.scorpius-close:hover,
+.scorpius-close:focus-visible {
+    background: #c84534;
+    border-color: #c84534;
+    color: #fff;
 }
 @keyframes scorpius-trace {
     to { stroke-dashoffset: 0; }
 }
+@keyframes scorpius-twinkle {
+    0%, 100% { opacity: 0.35; }
+    50% { opacity: 1; }
+}
+@keyframes scorpius-drift-a {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(2.4%, 1.6%, 0); }
+}
+@keyframes scorpius-drift-b {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(-2.8%, 2%, 0); }
+}
+@keyframes scorpius-drift-c {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(3.2%, -1.8%, 0); }
+}
 @media (prefers-reduced-motion: reduce) {
     .scorpius-line { animation: none; stroke-dashoffset: 0; }
+    .scorpius-dot,
+    .scorpius-drift--far,
+    .scorpius-drift--mid,
+    .scorpius-drift--near { animation: none; }
 }
 
 html[data-theme="dark"] body {
