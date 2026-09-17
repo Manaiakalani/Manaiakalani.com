@@ -1529,6 +1529,14 @@ test('scorpius overlay names tonight’s Hawaiian moon', async ({ page }) => {
   await expect(page.locator('.scorpius-moon')).toContainText('Tonight is');
 });
 
+test('scorpius overlay draws Antares as the red heart', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.scorpius-trigger').click();
+  await expect(page.locator('#scorpius-sky .scorpius-star--antares')).toBeVisible();
+  await expect(page.locator('#scorpius-sky')).toContainText('Antares');
+  await expect(page.locator('#scorpius-sky')).toContainText('Shaula');
+});
+
 test('footer has a public email', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('.footer-links a[href="mailto:webmaster@manaiakalani.com"]')).toBeVisible();

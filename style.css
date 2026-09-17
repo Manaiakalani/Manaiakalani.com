@@ -1899,16 +1899,16 @@ html.cmdk-open body {
     color: var(--accent);
 }
 .scorpius-sky {
-    width: min(92vw, 28rem);
+    width: min(94vw, 34rem);
     padding: 0;
-    border: 1px solid rgba(128, 128, 128, 0.28);
+    border: 1px solid rgba(80, 88, 110, 0.35);
     border-radius: 16px;
-    background: #121218;
+    background: #07080f;
     color: #f4ecd0;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
 }
 .scorpius-sky::backdrop {
-    background: rgba(6, 8, 16, 0.72);
+    background: rgba(4, 6, 12, 0.78);
 }
 .scorpius-sky-inner {
     padding: 1.1rem 1.2rem 1.25rem;
@@ -1917,18 +1917,42 @@ html.cmdk-open body {
     display: block;
     width: 100%;
     height: auto;
+    border-radius: 10px;
 }
 .scorpius-line {
-    stroke: #c84534;
-    stroke-width: 1.2;
+    stroke: rgba(244, 236, 208, 0.32);
+    stroke-width: 0.55;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-dasharray: 240;
-    stroke-dashoffset: 240;
-    animation: scorpius-trace 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    stroke-dasharray: 280;
+    stroke-dashoffset: 280;
+    animation: scorpius-trace 1100ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 .scorpius-star {
     fill: #f4ecd0;
+}
+.scorpius-star--hot {
+    fill: #e8f0ff;
+}
+.scorpius-star--warm {
+    fill: #ffc48a;
+}
+.scorpius-star--antares {
+    fill: #ff6a2b;
+}
+.scorpius-halo {
+    fill: #ff6a2b;
+    opacity: 0.22;
+}
+.scorpius-field {
+    fill: #f4ecd0;
+    opacity: 0.28;
+}
+.scorpius-label {
+    fill: rgba(244, 236, 208, 0.72);
+    font-size: 3.4px;
+    font-family: Georgia, 'Times New Roman', serif;
+    letter-spacing: 0.04em;
 }
 .scorpius-sky p {
     margin: 0.75rem 0 0;
