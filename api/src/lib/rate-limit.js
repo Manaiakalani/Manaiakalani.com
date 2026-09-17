@@ -2,28 +2,26 @@
 
 /*
  * Per-IP rate limiter shared by the anonymous POST endpoints (guestbook +
- * counter). Backed by its own Table Storage table so it never contends with the
- * data tables.
+ * counter). Backed by a Firestore collection so it never contends with the
+ * guestbook documents.
  *
- * Privacy-first: the client IP is salted-hashed into an opaque RowKey — raw
- * visitor IPs are never written to storage. This matches the site's
- * privacy-respecting posture (no raw PII at rest).
+ * Privacy-first: the client IP is salted-hashed into an opaque document id —
+ * raw visitor IPs are never written to storage.
  *
- * Fail-open by design: when storage is unconfigured, the client IP is unknown,
+ * Fail-open by design: when Firebase is unconfigured, the client IP is unknown,
  * or anything throws, the request is ALLOWED. A cosmetic personal-site
- * guestbook/counter must never break because the rate-limit backend hiccuped;
+ * guestbook/counter must never break because the limiter hiccuped;
  * Cloudflare's optional edge rule is the hard backstop (see api/README.md).
  */
 
 const crypto = require('crypto');
-const { TableClient } = require('@azure/data-tables');
 const core = require('./rate-limit-core');
 const { clientIpFrom } = require('./client-ip');
+const firebase = require('./firebase');
 
-const TABLE_NAME = 'ratelimit';
-// Optimistic-concurrency retry budget, mirroring the counter's read-modify-write
-// loop. Azure Tables has no atomic increment, so a burst against one IP can lose
-// the etag race; we re-read and retry rather than clobber a concurrent write.
+const COLLECTION = 'ratelimit';
+// Optimistic-concurrency retry budget. Firestore lastUpdateTime preconditions
+// can lose a race the same way Table etags did; we re-read and retry.
 const MAX_ATTEMPTS = 5;
 
 function intEnv(name, fallback) {
@@ -46,18 +44,8 @@ const POLICIES = {
   }
 };
 
-let tableReady = false;
-
 function getClient() {
-  const cs = process.env.TABLES_CONNECTION_STRING || process.env.AzureWebJobsStorage || '';
-  if (!cs) return null;
-  return TableClient.fromConnectionString(cs, TABLE_NAME);
-}
-
-async function ensureTable(client) {
-  if (tableReady) return;
-  await client.createTable(); // resolves if it already exists, rethrows otherwise
-  tableReady = true;
+  return firebase.tableLike(COLLECTION);
 }
 
 // Opaque, deterministic, fixed-width key. Never reversible to the raw IP.
@@ -155,7 +143,6 @@ async function checkRateLimit(bucket, request, now) {
     const ip = clientIpFrom(headerGetter(request));
     if (!ip) return { allowed: true, retryAfterSec: 0 }; // no IP to bucket by -> fail open
 
-    await ensureTable(client);
     return await commit(client, 'rl-' + bucket, hashIp(ip), policy, t);
   } catch (e) {
     return { allowed: true, retryAfterSec: 0 }; // fail open: never break the endpoint

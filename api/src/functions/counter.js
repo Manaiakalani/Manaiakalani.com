@@ -6,92 +6,38 @@
  * GET  /api/counter  -> { count }            (read only)
  * POST /api/counter  -> { count }            (increment, then read)
  *
- * A single Table Storage entity holds the running total. Azure Tables has no
- * atomic increment, so POST does an optimistic-concurrency read-modify-write:
- * read the entity + ETag, write the next value with If-Match, and retry on a
- * 412 (someone else incremented first). Like the guestbook it shares
- * TABLES_CONNECTION_STRING; with no storage configured it returns count:null so
- * the browser simply hides the counter — the page never breaks.
+ * A single Firestore document holds the running total. FieldValue.increment
+ * is atomic, so we don't need the Table Storage etag loop. If Firebase isn't
+ * configured, count is null and the browser hides the odometer.
  */
 
 const { app } = require('@azure/functions');
-const { TableClient } = require('@azure/data-tables');
+const { FieldValue } = require('firebase-admin/firestore');
 const core = require('../lib/counter-core');
 const { checkRateLimit } = require('../lib/rate-limit');
+const firebase = require('../lib/firebase');
 
-const TABLE_NAME = 'counter';
-const PARTITION = 'site';
-const ROW = 'hits';
-const MAX_ATTEMPTS = 5;
+const COLLECTION = 'counter';
+const DOC = 'hits';
 
-let tableReady = false;
-
-function getClient() {
-  const cs = process.env.TABLES_CONNECTION_STRING || process.env.AzureWebJobsStorage || '';
-  if (!cs) return null;
-  return TableClient.fromConnectionString(cs, TABLE_NAME);
+async function readCount(db) {
+  const snap = await db.collection(COLLECTION).doc(DOC).get();
+  if (!snap.exists) return 0;
+  return core.toCount(snap.get('count'));
 }
 
-async function ensureTable(client) {
-  if (tableReady) return;
-  // The SDK resolves createTable() when the table already exists and rethrows
-  // anything else, so a clean resolve is safe to cache for this warm instance.
-  await client.createTable();
-  tableReady = true;
-}
-
-async function readEntity(client) {
-  try {
-    return await client.getEntity(PARTITION, ROW);
-  } catch (e) {
-    if (e && e.statusCode === 404) return null;
-    throw e;
-  }
-}
-
-async function readCount(client) {
-  await ensureTable(client);
-  const cur = await readEntity(client);
-  return cur ? core.toCount(cur.count) : 0;
-}
-
-async function incrementCount(client) {
-  await ensureTable(client);
-  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    const cur = await readEntity(client);
-    if (!cur) {
-      try {
-        await client.createEntity({ partitionKey: PARTITION, rowKey: ROW, count: 1 });
-        return 1;
-      } catch (e) {
-        if (e && e.statusCode === 409) continue; // created concurrently → retry as an update
-        throw e;
-      }
-    }
-    const next = core.nextCount(cur.count);
-    try {
-      await client.updateEntity(
-        { partitionKey: PARTITION, rowKey: ROW, count: next },
-        'Replace',
-        { etag: cur.etag }
-      );
-      return next;
-    } catch (e) {
-      if (e && e.statusCode === 412) continue; // lost the race → re-read and retry
-      throw e;
-    }
-  }
-  // Gave up racing under heavy contention: report the current total, best effort.
-  return await readCount(client);
+async function incrementCount(db) {
+  const ref = db.collection(COLLECTION).doc(DOC);
+  await ref.set({ count: FieldValue.increment(1) }, { merge: true });
+  const snap = await ref.get();
+  return core.toCount(snap.exists ? snap.get('count') : 1);
 }
 
 async function respond(request, context) {
   try {
-    const client = getClient();
-    if (!client) return { jsonBody: { count: null, backend: 'unconfigured' } };
+    const db = firebase.getDb();
+    if (!db) return { jsonBody: { count: null, backend: 'unconfigured' } };
     if (request.method === 'POST') {
-      // Only the increment is throttled; reads (GET) stay open so a returning
-      // visitor always sees the number. The limiter fails open on any error.
       const limit = await checkRateLimit('counter', request);
       if (!limit.allowed) {
         return {
@@ -102,14 +48,11 @@ async function respond(request, context) {
       }
     }
     const count = request.method === 'POST'
-      ? await incrementCount(client)
-      : await readCount(client);
+      ? await incrementCount(db)
+      : await readCount(db);
     return { jsonBody: { count: count } };
   } catch (e) {
     context.error('counter handler failed', e);
-    // Never turn a backend hiccup (or a malformed connection string, which the
-    // SDK throws on synchronously) into a broken page: the client hides the
-    // counter when count is null.
     return { status: 200, jsonBody: { count: null, backend: 'error' } };
   }
 }
@@ -120,9 +63,6 @@ app.http('counter', {
   route: 'counter',
   handler: async (request, context) => {
     const res = await respond(request, context);
-    // Every reply is a live count or a rate-limit verdict — per-visitor and
-    // per-moment. Stamp no-store at this one choke point so neither the browser,
-    // the SWA CDN, nor Cloudflare ever serves a stale count.
     res.headers = { ...(res.headers || {}), 'Cache-Control': 'no-store' };
     return res;
   }

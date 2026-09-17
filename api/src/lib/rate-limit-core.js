@@ -5,7 +5,7 @@
  *
  * No I/O and no clock of its own: the caller passes the current time and the
  * previously stored record, so the security-critical decision can be tested
- * without Table Storage or the Functions runtime.
+ * without Firestore or the Functions runtime.
  *
  * A record is { windowStart: <epoch ms>, count: <n> }. evaluate() returns the
  * next record to persist, whether this request is allowed, and — when denied —

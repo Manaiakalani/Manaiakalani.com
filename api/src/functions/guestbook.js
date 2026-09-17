@@ -6,82 +6,40 @@
  * GET  /api/guestbook  -> { entries: [{name, message, date}, ...] }  (newest first)
  * POST /api/guestbook  -> { entries: [...] }  after appending {name, message}
  *
- * Storage is Azure Table Storage, addressed by the TABLES_CONNECTION_STRING app
- * setting (falls back to the built-in AzureWebJobsStorage). If neither is set the
- * function still responds 200 with a soft signal, so the browser keeps using its
- * localStorage copy and the guestbook never breaks.
+ * Storage is Cloud Firestore via Firebase Admin. Credentials come from
+ * FIREBASE_SERVICE_ACCOUNT (JSON) or FIREBASE_PROJECT_ID + CLIENT_EMAIL +
+ * PRIVATE_KEY. If none are set the function still responds 200 with a soft
+ * signal, so the browser keeps using its localStorage copy.
  */
 
 const { app } = require('@azure/functions');
-const { TableClient, odata } = require('@azure/data-tables');
 const core = require('../lib/guestbook-core');
 const { checkRateLimit } = require('../lib/rate-limit');
+const firebase = require('../lib/firebase');
 
-const TABLE_NAME = 'guestbook';
-const PARTITION = 'entries';
-// Upper bound on rows pulled into memory per request. toPublic caps the public
-// list to 100; 200 gives sorting headroom while stopping a spam flood from
-// forcing an unbounded full-partition scan on every read.
-const MAX_READ = 200;
-// RowKeys store an inverted timestamp so Table Storage's ascending RowKey order
-// yields newest-first. Base stays above Date.now() (keeping the value positive
-// and, after padStart, a fixed 16-digit width so lexicographic order matches
-// reverse-chronological order) until roughly the year 65,000 — no practical limit.
-const ROWKEY_BASE = 2e15;
+const COLLECTION = 'guestbook';
+const MAX_READ = 100;
 
-// Table creation is idempotent but costs a round-trip; cache success for the
-// lifetime of this warm function instance.
-let tableReady = false;
-
-function getClient() {
-  const cs = process.env.TABLES_CONNECTION_STRING || process.env.AzureWebJobsStorage || '';
-  if (!cs) return null;
-  return TableClient.fromConnectionString(cs, TABLE_NAME);
-}
-
-async function ensureTable(client) {
-  if (tableReady) return;
-  // The SDK resolves createTable() when the table already exists (409 +
-  // TableAlreadyExists) and rethrows every other error — including the rare
-  // 409 TableBeingDeleted. So a clean resolve means the table is usable and we
-  // can cache it; a throw propagates to the handler's catch (graceful degrade)
-  // and leaves tableReady false so the next request retries.
-  await client.createTable();
-  tableReady = true;
-}
-
-async function readRows(client) {
-  // Fetch a single page capped at MAX_READ so a spam flood can't force a
-  // full-partition scan. Newest-first RowKey ordering means this page holds the
-  // newest rows; toPublic() then sorts by seq and caps the public list to 100.
-  const iter = client
-    .listEntities({ queryOptions: { filter: odata`PartitionKey eq ${PARTITION}` } })
-    .byPage({ maxPageSize: MAX_READ });
-  const first = await iter.next();
-  const page = (first && first.value) || [];
+async function readRows(db) {
+  const snap = await db.collection(COLLECTION)
+    .orderBy('seq', 'desc')
+    .limit(MAX_READ)
+    .get();
   const rows = [];
-  for (const e of page) {
-    rows.push(core.projectRow(e));
-  }
+  snap.forEach(function (doc) {
+    rows.push(core.projectRow(doc.data()));
+  });
   return rows;
-}
-
-function newRowKey(now) {
-  return String(ROWKEY_BASE - now).padStart(16, '0') + '-' + Math.random().toString(36).slice(2, 8);
 }
 
 async function respond(request, context) {
   try {
-    const client = getClient();
+    const db = firebase.getDb();
     if (request.method === 'GET') {
-      if (!client) return { jsonBody: { entries: [], backend: 'unconfigured' } };
-      await ensureTable(client);
-      return { jsonBody: { entries: core.toPublic(await readRows(client)) } };
+      if (!db) return { jsonBody: { entries: [], backend: 'unconfigured' } };
+      return { jsonBody: { entries: core.toPublic(await readRows(db)) } };
     }
 
-    // POST — append a signature. Throttle first so a flood is shed before we
-    // touch storage; the limiter fails open, so a legit signer is never blocked
-    // by a backend hiccup.
     const limit = await checkRateLimit('guestbook', request);
     if (!limit.allowed) {
       return {
@@ -96,27 +54,20 @@ async function respond(request, context) {
     if (!incoming) {
       return { status: 400, jsonBody: { error: 'name and message are required' } };
     }
-    if (!client) {
-      // No storage configured: acknowledge without persisting; entries:null tells
-      // the client to keep the entry it already saved to localStorage.
+    if (!db) {
       return { status: 200, jsonBody: { entries: null, backend: 'unconfigured' } };
     }
-    await ensureTable(client);
     const now = Date.now();
-    await client.createEntity({
-      partitionKey: PARTITION,
-      rowKey: newRowKey(now),
+    await db.collection(COLLECTION).add({
       name: incoming.name,
       message: incoming.message,
       date: core.today(),
       id: incoming.id,
       seq: now
     });
-    return { status: 201, jsonBody: { entries: core.toPublic(await readRows(client)) } };
+    return { status: 201, jsonBody: { entries: core.toPublic(await readRows(db)) } };
   } catch (e) {
     context.error('guestbook handler failed', e);
-    // Never turn a backend hiccup into a broken guestbook: 200 + entries:null
-    // keeps the client on its localStorage copy.
     return { status: 200, jsonBody: { entries: null, backend: 'error' } };
   }
 }
@@ -127,9 +78,6 @@ app.http('guestbook', {
   route: 'guestbook',
   handler: async (request, context) => {
     const res = await respond(request, context);
-    // The signature list and rate-limit verdicts are per-visitor and per-moment.
-    // Stamp no-store at this one choke point so neither the browser, the SWA CDN,
-    // nor Cloudflare serves a cached guestbook.
     res.headers = { ...(res.headers || {}), 'Cache-Control': 'no-store' };
     return res;
   }

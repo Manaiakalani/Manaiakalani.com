@@ -1,7 +1,7 @@
 'use strict';
 
 /*
- * Tests for the Table Storage-backed rate limiter's I/O-free guarantees:
+ * Tests for the Firestore-backed rate limiter's I/O-free guarantees:
  * fail-open behaviour and the privacy-preserving IP hash. The concurrency /
  * windowing logic lives in rate-limit-core (separately unit-tested); here we
  * only assert the wrapper never breaks the endpoint and never stores a raw IP.
@@ -12,6 +12,10 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 
 // Guarantee the unconfigured path: no storage env for this test process.
+delete process.env.FIREBASE_SERVICE_ACCOUNT;
+delete process.env.FIREBASE_PROJECT_ID;
+delete process.env.FIREBASE_CLIENT_EMAIL;
+delete process.env.FIREBASE_PRIVATE_KEY;
 delete process.env.TABLES_CONNECTION_STRING;
 delete process.env.AzureWebJobsStorage;
 
