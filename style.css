@@ -258,7 +258,7 @@ header p {
 }
 
 .about-text {
-    margin-top: 2rem;
+    margin-top: 0;
 }
 
 .about-text p {
@@ -2099,7 +2099,7 @@ html[data-theme="dark"] body {
 .about-grid {
     display: grid;
     gap: 1.5rem 2rem;
-    align-items: start;
+    align-items: center;
 }
 @media (min-width: 720px) {
     .about-grid {
@@ -2125,8 +2125,13 @@ html[data-theme="dark"] body {
     text-align: center;
 }
 .about-text h2 {
-    text-align: left;
+    text-align: center;
     margin-top: 0;
+}
+@media (min-width: 720px) {
+    .about-text h2 {
+        text-align: left;
+    }
 }
 
 .scorpius-moon {
