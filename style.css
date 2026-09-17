@@ -393,6 +393,18 @@ footer {
     cursor: pointer;
     object-fit: contain;
     border-radius: 10px;
+    transform-origin: 50% 80%;
+    transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.clippy-row .clippy:hover,
+.clippy-row .clippy:focus-visible {
+    transform: rotate(-9deg) translateY(-3px);
+}
+@media (prefers-reduced-motion: reduce) {
+    .clippy-row .clippy:hover,
+    .clippy-row .clippy:focus-visible {
+        transform: none;
+    }
 }
 
 html.js .clippy-bubble:not(.is-open) {
@@ -2082,4 +2094,81 @@ html[data-theme="dark"] body {
     gap: 0.75rem 1rem;
     align-items: center;
     font-weight: 700;
+}
+
+.about-grid {
+    display: grid;
+    gap: 1.5rem 2rem;
+    align-items: start;
+}
+@media (min-width: 720px) {
+    .about-grid {
+        grid-template-columns: 11.5rem minmax(0, 1fr);
+    }
+}
+.about-figure {
+    margin: 0 auto;
+    max-width: 14rem;
+}
+.about-photo {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 14px;
+    box-shadow: 3px 4px 0 rgba(18, 18, 24, 0.14);
+}
+.about-figure .p-name {
+    margin: 0.45rem 0 0;
+    font-weight: 700;
+    text-align: center;
+}
+.about-text h2 {
+    text-align: left;
+    margin-top: 0;
+}
+
+.scorpius-moon {
+    margin-top: 0.5rem !important;
+    font-size: 0.9rem !important;
+    color: #c8bfa6 !important;
+}
+
+.visits-odometer {
+    cursor: pointer;
+}
+.visits-odometer.is-ticking .visits-digit:last-child {
+    animation: odo-tick 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes odo-tick {
+    0% { transform: translateY(0); }
+    35% { transform: translateY(-8px); }
+    100% { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .visits-odometer.is-ticking .visits-digit:last-child { animation: none; }
+}
+
+.shipped {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+@media print {
+    .skip-link,
+    .theme-toggle,
+    .geocities-toggle,
+    .cmdk-launcher,
+    .clippy-row,
+    footer,
+    .page-toolbar,
+    .scorpius-sky {
+        display: none !important;
+    }
+    header .site-nav { display: none; }
+    a { color: inherit; text-decoration: underline; }
+    .thought-entry { break-inside: avoid; }
+    body { background: #fff; color: #111; }
 }

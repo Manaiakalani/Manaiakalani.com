@@ -53,7 +53,7 @@ read('uses.html').split('<section class="uses-section').slice(1).forEach(functio
 });
 
 // ---- About (home page) ----
-const about = clean((read('index.html').match(/<section id="about">([\s\S]*?)<\/section>/) || [])[1] || '');
+const about = clean((read('index.html').match(/<section id="about"[^>]*>([\s\S]*?)<\/section>/) || [])[1] || '');
 if (about) items.push({ t: 'About Maximilian', u: '/#about', s: 'About', d: '', b: cap(about, 400) });
 
 const nowHero = clean((read('now.html').match(/<section class="page-hero">([\s\S]*?)<\/section>/) || [])[1] || '');

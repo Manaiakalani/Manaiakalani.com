@@ -1,5 +1,13 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    { "source": "/thoughts.html", "destination": "/thoughts" },
+    { "source": "/projects.html", "destination": "/projects" },
+    { "source": "/uses.html", "destination": "/uses" },
+    { "source": "/colophon.html", "destination": "/colophon" },
+    { "source": "/guestbook.html", "destination": "/guestbook" },
+    { "source": "/now.html", "destination": "/now" }
+  ],
   "rewrites": [
     { "source": "/thoughts", "destination": "/thoughts.html" },
     { "source": "/projects", "destination": "/projects.html" },
