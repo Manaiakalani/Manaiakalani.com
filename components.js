@@ -134,11 +134,104 @@
             .catch(function () { /* offline or no backend → stay hidden */ });
     }
 
-    // Manaiakalani is the fishhook of Scorpius. Click the italic line to trace it.
-    var SCORPIUS = [
-        [42, 18], [28, 28], [56, 24], [48, 42], [52, 56], [58, 70],
-        [66, 82], [78, 88], [90, 80], [88, 64], [80, 52], [70, 44], [64, 38]
+    // Bright Scorpius stars, J2000. North up, RA increasing to the right so the
+    // tail hooks like Maui's fishhook. Magnitudes set the disc size; Antares is M.
+    var SCORPIUS_STARS = [
+        { id: 'nu', ra: 16.200, dec: -19.460, mag: 4.00, kind: 'hot', name: 'Jabbah' },
+        { id: 'beta', ra: 16.090, dec: -19.805, mag: 2.62, kind: 'hot', name: 'Acrab' },
+        { id: 'delta', ra: 16.005, dec: -22.622, mag: 2.32, kind: 'hot', name: 'Dschubba' },
+        { id: 'pi', ra: 15.982, dec: -26.114, mag: 2.89, kind: 'hot', name: 'Fang' },
+        { id: 'sigma', ra: 16.357, dec: -25.593, mag: 2.91, kind: 'hot', name: 'Alniyat' },
+        { id: 'alpha', ra: 16.490, dec: -26.432, mag: 0.96, kind: 'antares', name: 'Antares' },
+        { id: 'tau', ra: 16.598, dec: -28.216, mag: 2.82, kind: 'hot', name: 'Paikauhale' },
+        { id: 'epsilon', ra: 16.837, dec: -34.293, mag: 2.29, kind: 'warm', name: 'Larawag' },
+        { id: 'mu', ra: 16.862, dec: -38.048, mag: 2.98, kind: 'hot', name: 'Xamidimura' },
+        { id: 'zeta', ra: 16.902, dec: -42.362, mag: 3.62, kind: 'hot', name: 'ζ Sco' },
+        { id: 'eta', ra: 17.204, dec: -43.239, mag: 3.33, kind: 'hot', name: 'η Sco' },
+        { id: 'theta', ra: 17.621, dec: -42.998, mag: 1.87, kind: 'hot', name: 'Sargas' },
+        { id: 'iota', ra: 17.794, dec: -40.127, mag: 2.99, kind: 'hot', name: 'ι Sco' },
+        { id: 'kappa', ra: 17.708, dec: -39.030, mag: 2.39, kind: 'hot', name: 'κ Sco' },
+        { id: 'lambda', ra: 17.560, dec: -37.104, mag: 1.63, kind: 'hot', name: 'Shaula' },
+        { id: 'upsilon', ra: 17.512, dec: -37.296, mag: 2.70, kind: 'hot', name: 'Lesath' }
     ];
+    var SCORPIUS_LINES = [
+        ['nu', 'beta', 'delta', 'pi'],
+        ['delta', 'sigma', 'alpha', 'tau', 'epsilon', 'mu', 'zeta', 'eta', 'theta'],
+        ['theta', 'iota', 'kappa', 'lambda'],
+        ['lambda', 'upsilon']
+    ];
+
+    function projectScorpius(ra, dec) {
+        return {
+            x: (ra - 15.82) * 48 + 6,
+            y: (-18.6 - dec) * 3.55 + 4
+        };
+    }
+
+    function starRadius(mag) {
+        return Math.max(0.55, 3.55 - mag * 0.82);
+    }
+
+    function scorpiusSvg() {
+        var pos = {};
+        SCORPIUS_STARS.forEach(function (s) { pos[s.id] = projectScorpius(s.ra, s.dec); });
+        var field = '';
+        var seed = 7;
+        for (var i = 0; i < 46; i++) {
+            seed = (seed * 16807 + i * 13) % 2147483647;
+            var fx = 4 + (seed % 1080) / 10;
+            seed = (seed * 48271) % 2147483647;
+            var fy = 3 + (seed % 1000) / 10;
+            seed = (seed * 69621) % 2147483647;
+            var fr = 0.18 + (seed % 28) / 100;
+            field += '<circle class="scorpius-field" cx="' + fx.toFixed(1) + '" cy="' + fy.toFixed(1) + '" r="' + fr.toFixed(2) + '" />';
+        }
+        var lines = SCORPIUS_LINES.map(function (chain) {
+            var pts = chain.map(function (id) { return pos[id].x.toFixed(1) + ',' + pos[id].y.toFixed(1); }).join(' ');
+            return '<polyline class="scorpius-line" fill="none" points="' + pts + '" />';
+        }).join('');
+        var stars = SCORPIUS_STARS.map(function (s) {
+            var p = pos[s.id];
+            var r = starRadius(s.mag);
+            var cls = 'scorpius-star scorpius-star--' + s.kind;
+            var glow = s.kind === 'antares'
+                ? '<circle class="scorpius-halo" cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="' + (r * 2.4).toFixed(1) + '" />'
+                : '';
+            return glow + '<circle class="' + cls + '" cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="' + r.toFixed(2) + '" />';
+        }).join('');
+        var antares = pos.alpha;
+        var shaula = pos.lambda;
+        var labels =
+            '<text class="scorpius-label" x="' + (antares.x + 4.2).toFixed(1) + '" y="' + (antares.y + 1.2).toFixed(1) + '">Antares</text>' +
+            '<text class="scorpius-label" x="' + (shaula.x + 3.6).toFixed(1) + '" y="' + (shaula.y - 2.4).toFixed(1) + '">Shaula</text>';
+        return (
+            '<svg viewBox="0 0 118 108" role="img" aria-labelledby="scorpius-caption">' +
+                '<title id="scorpius-caption">Manaiakalani — Maui\'s fishhook, the tail of Scorpius. Antares is the red heart; Shaula and Lesath are the stinger.</title>' +
+                '<defs>' +
+                    '<radialGradient id="scorpius-milky" cx="48%" cy="62%" r="58%">' +
+                        '<stop offset="0%" stop-color="#c8b89a" stop-opacity="0.16" />' +
+                        '<stop offset="70%" stop-color="#121218" stop-opacity="0" />' +
+                    '</radialGradient>' +
+                    '<filter id="scorpius-glow" x="-80%" y="-80%" width="260%" height="260%">' +
+                        '<feGaussianBlur stdDeviation="1.05" result="b" />' +
+                        '<feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>' +
+                    '</filter>' +
+                '</defs>' +
+                '<rect width="118" height="108" fill="#07080f" />' +
+                '<ellipse cx="62" cy="64" rx="48" ry="28" fill="url(#scorpius-milky)" />' +
+                field + lines +
+                '<g filter="url(#scorpius-glow)">' + stars + '</g>' +
+                labels +
+            '</svg>'
+        );
+    }
+
+    function paintScorpiusMoon(dlg) {
+        var el = dlg.querySelector('.scorpius-moon');
+        if (!el) return;
+        var moon = hawaiianMoon(new Date());
+        el.innerHTML = 'Tonight is <strong>' + moon.name + '</strong> — ' + moon.phase + '.';
+    }
 
     function bindScorpius() {
         var trigger = document.querySelector('.scorpius-trigger');
@@ -149,22 +242,12 @@
             dlg.id = 'scorpius-sky';
             dlg.className = 'scorpius-sky';
             dlg.setAttribute('aria-label', 'Scorpius, the fishhook');
-            var pts = SCORPIUS.map(function (p) { return p[0] + ',' + p[1]; }).join(' ');
-            var stars = SCORPIUS.map(function (p, i) {
-                var r = i === 3 ? 3.2 : 1.6;
-                return '<circle class="scorpius-star" cx="' + p[0] + '" cy="' + p[1] + '" r="' + r + '" />';
-            }).join('');
-            var moon = hawaiianMoon(new Date());
             dlg.innerHTML =
                 '<div class="scorpius-sky-inner">' +
                     '<button type="button" class="scorpius-close" aria-label="Close constellation">Close</button>' +
-                    '<svg viewBox="0 0 120 110" role="img" aria-labelledby="scorpius-caption">' +
-                        '<title id="scorpius-caption">Manaiakalani — Maui\'s fishhook, the tail of Scorpius. Antares is the larger star.</title>' +
-                        '<polyline class="scorpius-line" fill="none" points="' + pts + '" />' +
-                        stars +
-                    '</svg>' +
+                    scorpiusSvg() +
                     '<p>Maui fished the islands with this hook. The western sky still hangs it as Scorpius.</p>' +
-                    '<p class="scorpius-moon">Tonight is <strong>' + moon.name + '</strong> — ' + moon.phase + '.</p>' +
+                    '<p class="scorpius-moon"></p>' +
                 '</div>';
             document.body.appendChild(dlg);
             dlg.querySelector('.scorpius-close').addEventListener('click', function () { dlg.close(); });
@@ -172,6 +255,7 @@
             dlg.addEventListener('close', function () { trigger.setAttribute('aria-expanded', 'false'); });
         }
         trigger.addEventListener('click', function () {
+            paintScorpiusMoon(dlg);
             trigger.setAttribute('aria-expanded', 'true');
             if (typeof dlg.showModal === 'function') dlg.showModal();
             else dlg.setAttribute('open', '');
