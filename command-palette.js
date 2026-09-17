@@ -25,10 +25,12 @@
     function ic(name) { return (typeof mnkIcon === 'function') ? mnkIcon(name) : ''; }
 
     add({ icon: ic('home'), title: 'About', hint: 'Page', keys: 'home index start bio intro', run: function () { go('/'); } });
-    add({ icon: ic('grid'), title: 'Projects', hint: 'Page', keys: 'work repos code github', run: function () { go('/projects.html'); } });
-    add({ icon: ic('thought'), title: 'Thoughts', hint: 'Page', keys: 'blog posts writing notes', run: function () { go('/thoughts.html'); } });
-    add({ icon: ic('gear'), title: 'Uses', hint: 'Page', keys: 'gear setup tools stack hardware studio jupyter notes macbook koss microphone scarlett rokit', run: function () { go('/uses.html'); } });
-    add({ icon: ic('page'), title: 'Colophon', hint: 'Page', keys: 'colophon supply chain csp swa rybbit guestbook how its made', run: function () { go('/colophon.html'); } });
+    add({ icon: ic('grid'), title: 'Projects', hint: 'Page', keys: 'work repos code github', run: function () { go('/projects'); } });
+    add({ icon: ic('thought'), title: 'Thoughts', hint: 'Page', keys: 'blog posts writing notes', run: function () { go('/thoughts'); } });
+    add({ icon: ic('gear'), title: 'Uses', hint: 'Page', keys: 'gear setup tools stack hardware studio jupyter notes macbook koss microphone scarlett rokit', run: function () { go('/uses'); } });
+    add({ icon: ic('page'), title: 'Now', hint: 'Page', keys: 'now seattle desk currently building today', run: function () { go('/now'); } });
+    add({ icon: ic('book'), title: 'Guestbook', hint: 'Page', keys: 'guestbook sign book visitors place wall', run: function () { go('/guestbook'); } });
+    add({ icon: ic('page'), title: 'Colophon', hint: 'Page', keys: 'colophon supply chain csp swa rybbit guestbook how its made source', run: function () { go('/colophon'); } });
 
     var themeBtn = doc.querySelector('.theme-toggle');
     if (themeBtn) add({ icon: ic('moon'), title: 'Toggle light / dark theme', hint: 'Action', keys: 'dark light mode colour appearance', run: function () { themeBtn.click(); } });
@@ -38,8 +40,7 @@
 
     add({ icon: ic('link'), title: 'Copy link to this page', hint: 'Action', keys: 'url share clipboard permalink', run: copyPageLink });
     add({ icon: ic('book'), title: 'Sign the guestbook', hint: 'Action', keys: 'guestbook sign book visitors place', run: function () {
-        if (typeof window.openGuestbookFromChrome === 'function') window.openGuestbookFromChrome(true);
-        else if (typeof window.openGuestbook === 'function') window.openGuestbook(true);
+        go('/guestbook#sign');
     } });
     add({ icon: ic('page'), title: 'Ask Clippy', hint: 'Action', keys: 'clippy balloon help office assistant', run: function () {
         if (typeof window.askClippy === 'function') window.askClippy();
@@ -53,18 +54,18 @@
     }
 
     var randThought = doc.getElementById('random-thought-btn');
-    add({ icon: ic('dice'), title: 'Random thought', hint: randThought ? 'Action' : 'Thoughts', keys: 'shuffle surprise lucky', run: function () { randThought ? randThought.click() : go('/thoughts.html'); } });
+    add({ icon: ic('dice'), title: 'Random thought', hint: randThought ? 'Action' : 'Thoughts', keys: 'shuffle surprise lucky', run: function () { randThought ? randThought.click() : go('/thoughts'); } });
 
     var randProject = doc.getElementById('random-project-btn');
-    add({ icon: ic('dice'), title: 'Random project', hint: randProject ? 'Action' : 'Projects', keys: 'shuffle surprise lucky repo', run: function () { randProject ? randProject.click() : go('/projects.html'); } });
+    add({ icon: ic('dice'), title: 'Random project', hint: randProject ? 'Action' : 'Projects', keys: 'shuffle surprise lucky repo', run: function () { randProject ? randProject.click() : go('/projects'); } });
     add({ icon: ic('dice'), title: 'Random use', hint: 'Uses', keys: 'shuffle surprise lucky stack studio', run: function () {
         if (document.getElementById('random-use-btn')) document.getElementById('random-use-btn').click();
-        else go('/uses.html');
+        else go('/uses');
     } });
     add({ icon: ic('hammer'), title: 'Currently building', hint: 'Status', keys: 'building github pushing now', run: function () {
         var el = document.getElementById('currently-building');
         if (el) el.scrollIntoView({ block: 'center' });
-        else go('/');
+        else go('/now');
     } });
 
     add({ icon: ic('rss'), title: 'Subscribe via RSS', hint: 'Feed', keys: 'feed rss atom follow updates', run: function () { go('/feed.xml'); } });

@@ -2,9 +2,9 @@ const { test, expect } = require('@playwright/test');
 
 const PAGES = [
   { path: '/', title: 'Maximilian Stein', name: 'index' },
-  { path: '/projects.html', title: 'Projects — Maximilian Stein', name: 'projects' },
-  { path: '/thoughts.html', title: 'Thoughts — Maximilian Stein', name: 'thoughts' },
-  { path: '/uses.html', title: 'Uses — Maximilian Stein', name: 'uses' },
+  { path: '/projects', title: 'Projects — Maximilian Stein', name: 'projects' },
+  { path: '/thoughts', title: 'Thoughts — Maximilian Stein', name: 'thoughts' },
+  { path: '/uses', title: 'Uses — Maximilian Stein', name: 'uses' },
 ];
 
 // Block the analytics domain — its SSL cert is broken and hangs the load event in CI
@@ -53,9 +53,9 @@ test('nav links are present and correct on all pages', async ({ page }) => {
     const nav = page.locator('nav');
     await expect(nav).toBeVisible();
     await expect(nav.locator('a[href="/"]')).toBeVisible();
-    await expect(nav.locator('a[href="projects.html"], a[href="/projects.html"]')).toBeVisible();
-    await expect(nav.locator('a[href="thoughts.html"], a[href="/thoughts.html"]')).toBeVisible();
-    await expect(nav.locator('a[href="uses.html"], a[href="/uses.html"]')).toBeVisible();
+    await expect(nav.locator('a[href="/projects"], a[href="/projects.html"]')).toBeVisible();
+    await expect(nav.locator('a[href="/thoughts"], a[href="/thoughts.html"]')).toBeVisible();
+    await expect(nav.locator('a[href="/uses"], a[href="/uses.html"]')).toBeVisible();
   }
 });
 
@@ -159,7 +159,7 @@ test('index: currently building widget hides when GitHub API fails', async ({ pa
 
 // ── Projects page ──
 test('projects: has project cards', async ({ page }) => {
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   await page.waitForSelector('.project-card', { timeout: 10000 });
   const cards = page.locator('.project-card');
   const count = await cards.count();
@@ -167,7 +167,7 @@ test('projects: has project cards', async ({ page }) => {
 });
 
 test('projects: cards have title and description', async ({ page }) => {
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   await page.waitForSelector('.project-card', { timeout: 10000 });
   const firstCard = page.locator('.project-card').first();
   await expect(firstCard.locator('h2')).toBeVisible();
@@ -175,7 +175,7 @@ test('projects: cards have title and description', async ({ page }) => {
 });
 
 test('uses: studio chain and item glyphs are present', async ({ page }) => {
-  await page.goto('/uses.html');
+  await page.goto('/uses');
   const studio = page.locator('#studio');
   await expect(studio).toBeVisible();
   await expect(studio).toContainText('Audio-Technica AT2020');
@@ -196,13 +196,13 @@ test('uses: studio chain and item glyphs are present', async ({ page }) => {
 });
 
 test('projects: GitHub link is visible', async ({ page }) => {
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   const ghLink = page.locator('a.github-link');
   await expect(ghLink).toBeVisible();
 });
 
 test('projects: GitHub link is fully visible and sits above the footer', async ({ page }) => {
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   const ghLink = page.locator('a.github-link');
   await expect(ghLink).toBeVisible();
   await expect(ghLink).toContainText('View all repositories on GitHub');
@@ -224,7 +224,7 @@ test('projects: GitHub link is fully visible and sits above the footer', async (
 
 // ── Projects: search/filter ──
 test('projects: search filters visible cards', async ({ page }) => {
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   await page.waitForSelector('.project-card', { timeout: 10000 });
   const search = page.locator('#project-search');
   await expect(search).toBeVisible();
@@ -243,7 +243,7 @@ test('projects: search filters visible cards', async ({ page }) => {
 });
 
 test('projects: search shows no-results message', async ({ page }) => {
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   await page.waitForSelector('.project-card', { timeout: 10000 });
   await page.locator('#project-search').fill('zzz-no-match-zzz');
   await page.waitForTimeout(300);
@@ -252,7 +252,7 @@ test('projects: search shows no-results message', async ({ page }) => {
 
 // ── Projects: sort control ──
 test('projects: sort control reorders cards by impact, recency, and name', async ({ page }) => {
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   await page.waitForSelector('.project-card', { timeout: 10000 });
   const sortSelect = page.locator('#project-sort');
   await expect(sortSelect).toBeVisible();
@@ -270,7 +270,7 @@ test('projects: sort control reorders cards by impact, recency, and name', async
 });
 
 test('projects: sort note only shows for the impact sort', async ({ page }) => {
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   await page.waitForSelector('.project-card', { timeout: 10000 });
   const note = page.locator('#projects-sort-note');
   await expect(note).toBeVisible();
@@ -286,20 +286,20 @@ test('projects: sort note only shows for the impact sort', async ({ page }) => {
 
 // ── Thoughts page ──
 test('thoughts: has thought entries', async ({ page }) => {
-  await page.goto('/thoughts.html');
+  await page.goto('/thoughts');
   const entries = page.locator('.thought-entry');
   const count = await entries.count();
   expect(count).toBeGreaterThanOrEqual(3);
 });
 
 test('thoughts: reading time is shown for each entry', async ({ page }) => {
-  await page.goto('/thoughts.html');
+  await page.goto('/thoughts');
   const dateEl = page.locator('.thought-entry .thought-date').first();
   await expect(dateEl).toContainText('min read');
 });
 
 test('thoughts: search filters entries and shows no-results message', async ({ page }) => {
-  await page.goto('/thoughts.html');
+  await page.goto('/thoughts');
   const search = page.locator('#thought-search');
   await expect(search).toBeVisible();
 
@@ -320,7 +320,7 @@ test('thoughts: search filters entries and shows no-results message', async ({ p
 });
 
 test('thoughts: jump-to-entry nav lists all entries and navigates', async ({ page }) => {
-  await page.goto('/thoughts.html');
+  await page.goto('/thoughts');
   const jumpNav = page.locator('#thoughts-jump-nav');
   await expect(jumpNav).toBeVisible();
   const optionCount = await jumpNav.locator('option').count();
@@ -333,7 +333,7 @@ test('thoughts: jump-to-entry nav lists all entries and navigates', async ({ pag
 });
 
 test('thoughts: random thought button jumps to a valid entry', async ({ page }) => {
-  await page.goto('/thoughts.html');
+  await page.goto('/thoughts');
   const btn = page.locator('#random-thought-btn');
   await expect(btn).toBeVisible();
   await btn.click();
@@ -345,7 +345,7 @@ test('thoughts: random thought button jumps to a valid entry', async ({ page }) 
 
 test('thoughts: copy-link button copies the entry URL to the clipboard', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.goto('/thoughts.html');
+  await page.goto('/thoughts');
   const firstEntry = page.locator('.thought-entry').first();
   const entryId = await firstEntry.getAttribute('id');
   const copyBtn = firstEntry.locator('.copy-link-btn');
@@ -370,14 +370,14 @@ test('thoughts: copy-link button copies the entry URL to the clipboard', async (
 
 // ── Uses page ──
 test('uses: hero heading is visible', async ({ page }) => {
-  await page.goto('/uses.html');
+  await page.goto('/uses');
   const h1 = page.locator('h1');
   await expect(h1).toBeVisible();
   await expect(h1).toContainText('Uses');
 });
 
 test('uses: has content sections', async ({ page }) => {
-  await page.goto('/uses.html');
+  await page.goto('/uses');
   const sections = page.locator('.uses-section');
   const count = await sections.count();
   expect(count).toBeGreaterThanOrEqual(3);
@@ -564,7 +564,7 @@ test('active nav link has aria-current="page"', async ({ page }) => {
 
 // ── Accessibility: heading hierarchy ──
 test('subpages have correct h1 for page title', async ({ page }) => {
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   const h1 = page.locator('h1');
   await expect(h1).toBeVisible();
   await expect(h1).toContainText('Projects');
@@ -580,7 +580,7 @@ test('theme toggle has aria-pressed attribute', async ({ page }) => {
 
 // ── Projects: skeleton loading shows then replaces ──
 test('projects: skeleton cards are replaced by real content', async ({ page }) => {
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   // Wait for real project cards to appear
   await page.waitForSelector('.project-card', { timeout: 10000 });
   // Skeleton cards should be gone
@@ -598,7 +598,7 @@ test('projects: shows fallback when GitHub API fails', async ({ page }) => {
   await page.addInitScript(() => {
     try { localStorage.removeItem('mnk:gh_repos_cache'); } catch (e) {}
   });
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   await page.waitForSelector('.projects-fallback', { timeout: 10000 });
   const fallback = page.locator('.projects-fallback');
   await expect(fallback).toBeVisible();
@@ -619,7 +619,7 @@ test('index: has JSON-LD structured data', async ({ page }) => {
 });
 
 test('projects: has JSON-LD structured data', async ({ page }) => {
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   const jsonLd = page.locator('script[type="application/ld+json"]');
   await expect(jsonLd).toHaveCount(1);
   const content = await jsonLd.textContent();
@@ -628,7 +628,7 @@ test('projects: has JSON-LD structured data', async ({ page }) => {
 });
 
 test('uses: has JSON-LD structured data', async ({ page }) => {
-  await page.goto('/uses.html');
+  await page.goto('/uses');
   const jsonLd = page.locator('script[type="application/ld+json"]');
   await expect(jsonLd).toHaveCount(1);
   const content = await jsonLd.textContent();
@@ -637,7 +637,7 @@ test('uses: has JSON-LD structured data', async ({ page }) => {
 });
 
 // ── Accessibility: skip-link target is focusable ──
-const A11Y_PAGES = ['/', '/projects.html', '/thoughts.html', '/uses.html', '/404.html', '/colophon.html'];
+const A11Y_PAGES = ['/', '/projects', '/thoughts', '/uses', '/404.html', '/colophon', '/now', '/guestbook'];
 for (const path of A11Y_PAGES) {
   test(`${path}: <main> is focusable so the skip link lands`, async ({ page }) => {
     await page.goto(path);
@@ -660,7 +660,7 @@ test('index: projects status live region exists and is polite', async ({ page })
 });
 
 test('thoughts: status live region exists and announces filtered count', async ({ page }) => {
-  await page.goto('/thoughts.html');
+  await page.goto('/thoughts');
   const region = page.locator('#thoughts-status');
   await expect(region).toHaveCount(1);
   await expect(region).toHaveAttribute('aria-live', 'polite');
@@ -670,7 +670,7 @@ test('thoughts: status live region exists and announces filtered count', async (
 });
 
 test('projects: live region announces result count on search', async ({ page }) => {
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   await page.waitForSelector('.project-card', { timeout: 10000 });
   await page.locator('#project-search').fill('alpha');
   await page.waitForTimeout(300);
@@ -693,7 +693,7 @@ test('projects: empty GitHub response shows a consistent empty state (not a load
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' })
   );
   await page.addInitScript(() => { try { localStorage.removeItem('mnk:gh_repos_cache'); } catch (e) {} });
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   await page.waitForSelector('.projects-fallback', { timeout: 10000 });
   await expect(page.locator('.projects-fallback')).toContainText(/No public projects/i);
   // Visible message and the screen-reader announcement must agree (no "loading"/"failed" mismatch).
@@ -703,7 +703,7 @@ test('projects: empty GitHub response shows a consistent empty state (not a load
 
 // ── No-JS: dynamic skeleton loaders are hidden so they don't spin forever ──
 for (const { path, sel } of [
-  { path: '/projects.html', sel: '#all-projects' },
+  { path: '/projects', sel: '#all-projects' },
   { path: '/', sel: '#featured-projects' },
 ]) {
   test(`${path}: <noscript> hides the dynamic loader (${sel})`, async ({ page }) => {
@@ -729,19 +729,19 @@ test('boot.js references GeoCities assets root-relative', async ({ page }) => {
   const res = await page.request.get(src);
   expect(res.status()).toBe(200);
   const body = await res.text();
-  expect(body).toContain('"/geocities.css?v=8"');
-  expect(body).toContain('"/geocities.js?v=17"');
+  expect(body).toMatch(/"\/geocities\.css\?v=[0-9a-f]+"/);
+  expect(body).toMatch(/"\/geocities\.js\?v=[0-9a-f]+"/);
 });
 
 // ── Accessibility: aria-busy is cleared once content loads ──
 test('projects: grid clears aria-busy after cards render', async ({ page }) => {
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   await page.waitForSelector('.project-card', { timeout: 10000 });
   await expect(page.locator('#all-projects')).toHaveAttribute('aria-busy', 'false');
 });
 
 // ── Analytics coverage on every page ──
-for (const path of ['/projects.html', '/thoughts.html', '/404.html']) {
+for (const path of ['/projects', '/thoughts', '/404.html']) {
   test(`${path}: analytics script is present`, async ({ page }) => {
     await page.goto(path);
     const analytics = page.locator('script[src="https://analytics.manaiakalani.info/api/script.js"]');
@@ -1157,7 +1157,7 @@ test('command palette: launcher is present on every page', async ({ page }) => {
 // ── Prefetch on intent ──
 test('prefetch: hovering an internal link injects a document prefetch hint', async ({ page }) => {
   await page.goto('/');
-  const link = page.locator('nav a[href="projects.html"], nav a[href="/projects.html"]').first();
+  const link = page.locator('nav a[href="/projects"], nav a[href="/projects.html"]').first();
   await link.hover();
   await expect.poll(() => page.locator('head link[rel="prefetch"]').count()).toBeGreaterThan(0);
   const hrefs = await page.locator('head link[rel="prefetch"]').evaluateAll(els => els.map(e => e.getAttribute('href')));
@@ -1186,15 +1186,15 @@ test('view transitions: cross-document navigation opt-in is present', async ({ p
 
 // ── Per-thought permalink arrival highlight ──
 test('thoughts: arriving via a permalink highlights the target entry', async ({ page }) => {
-  await page.goto('/thoughts.html');
+  await page.goto('/thoughts');
   const id = await page.locator('.thought-entry[id]').first().getAttribute('id');
   expect(id).toBeTruthy();
-  await page.goto('/thoughts.html#' + id);
+  await page.goto('/thoughts#' + id);
   await expect(page.locator('#' + id)).toHaveClass(/thought-entry--highlight/);
 });
 
 test('thoughts: every entry has a copy-link button', async ({ page }) => {
-  await page.goto('/thoughts.html');
+  await page.goto('/thoughts');
   const entries = await page.locator('.thought-entry[id]').count();
   const buttons = await page.locator('.thought-entry .copy-link-btn').count();
   expect(entries).toBeGreaterThan(0);
@@ -1212,12 +1212,12 @@ test('search index: search.json is served with thoughts, uses, and about entries
   expect(kinds.has('Uses')).toBe(true);
   expect(kinds.has('About')).toBe(true);
   // Content deep-links to permalinks / section anchors.
-  expect(data.items.find(i => i.s === 'Thought').u).toMatch(/\/thoughts\.html#/);
-  expect(data.items.find(i => i.s === 'Uses').u).toMatch(/\/uses\.html#/);
+  expect(data.items.find(i => i.s === 'Thought').u).toMatch(/\/thoughts#/);
+  expect(data.items.find(i => i.s === 'Uses').u).toMatch(/\/uses#/);
 });
 
 test('uses: each section has a deep-link anchor id', async ({ page }) => {
-  await page.goto('/uses.html');
+  await page.goto('/uses');
   const ids = await page.locator('.uses-section[id]').evaluateAll(els => els.map(e => e.id));
   expect(ids).toEqual(expect.arrayContaining([
     'editor-terminal', 'hardware', 'productivity', 'development', 'creative-media', 'homelab-self-hosting'
@@ -1291,7 +1291,7 @@ test('config: web-share is allowed, api runtime is pinned, and the api build is 
   const root = path.join(__dirname, '..');
   const cfg = fs.readFileSync(path.join(root, 'staticwebapp.config.json'), 'utf8');
   expect(cfg).toContain('web-share=(self)');
-  expect(cfg).toContain('"apiRuntime": "node:20"');
+  expect(cfg).toContain('"apiRuntime": "node:22"');
   const wf = fs.readFileSync(path.join(root, '.github', 'workflows', 'azure-static-web-apps-gray-smoke-07ceed71e.yml'), 'utf8');
   expect(wf).toMatch(/api_location:\s*"api"/);
 });
@@ -1336,7 +1336,7 @@ test('counter: increments once per session (POST first visit, GET thereafter)', 
   });
   await page.goto('/');
   await expect(page.locator('.footer-visits')).toBeVisible();
-  await page.goto('/uses.html'); // same tab → sessionStorage guard is set
+  await page.goto('/uses'); // same tab → sessionStorage guard is set
   await expect(page.locator('.footer-visits')).toBeVisible();
   expect(methods[0]).toBe('POST');
   expect(methods.slice(1)).not.toContain('POST');
@@ -1346,18 +1346,19 @@ test('chrome: shared header names the fishhook and marks the current nav', async
   await page.goto('/');
   await expect(page.locator('#site-header .header-hook em')).toContainText("Maui's fishhook");
   await expect(page.locator('.site-nav a[aria-current="page"]')).toHaveAttribute('href', '/');
-  await page.goto('/thoughts.html');
-  await expect(page.locator('.site-nav a[aria-current="page"]')).toHaveAttribute('href', '/thoughts.html');
+  await page.goto('/thoughts');
+  await expect(page.locator('.site-nav a[aria-current="page"]')).toHaveAttribute('href', '/thoughts');
 });
 
 test('chrome: footer signs the book and links the colophon', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#sign-the-book')).toBeVisible();
-  await expect(page.locator('.footer-links a[href="/colophon.html"]')).toBeVisible();
+  await expect(page.locator('.footer-links a[href="/colophon"]')).toBeVisible();
+  await expect(page.locator('#sign-the-book')).toHaveAttribute('href', '/guestbook#sign');
 });
 
 test('colophon page exists', async ({ page }) => {
-  await page.goto('/colophon.html');
+  await page.goto('/colophon');
   await expect(page).toHaveTitle(/Colophon/);
   await expect(page.locator('#main')).toContainText('Azure Static Web Apps');
   await expect(page.locator('#main')).toContainText('Guestbook');
@@ -1374,7 +1375,7 @@ test('404: Clippy and a search of the missing path', async ({ page }) => {
   await expect(bubble).toBeVisible();
   await expect(bubble).toContainText('Looks like that page got lost');
   const scriptSrc = await page.locator('script[src*="script.js?v="]').first().getAttribute('src');
-  expect(scriptSrc).toMatch(/script\.js\?v=\d+/);
+  expect(scriptSrc).toMatch(/script\.js\?v=[0-9a-f]+/);
 });
 
 test('about uses the ʻokina in Hawaiʻi', async ({ page }) => {
@@ -1383,16 +1384,19 @@ test('about uses the ʻokina in Hawaiʻi', async ({ page }) => {
 });
 
 test('uses: random tool button is present', async ({ page }) => {
-  await page.goto('/uses.html');
+  await page.goto('/uses');
   await expect(page.locator('#random-use-btn')).toBeVisible();
 });
 
 // ── Round 6: richer per-page social cards ──
 const OG_CARDS = [
   { path: '/', img: 'og-home.png', alt: 'Maximilian Stein — Product Manager' },
-  { path: '/thoughts.html', img: 'og-thoughts.png', alt: 'Maximilian Stein — Thoughts' },
-  { path: '/uses.html', img: 'og-uses.png', alt: 'Maximilian Stein — Uses' },
-  { path: '/projects.html', img: 'og-projects.png', alt: 'Maximilian Stein — Projects' },
+  { path: '/thoughts', img: 'og-thoughts.png', alt: 'Maximilian Stein — Thoughts' },
+  { path: '/uses', img: 'og-uses.png', alt: 'Maximilian Stein — Uses' },
+  { path: '/projects', img: 'og-projects.png', alt: 'Maximilian Stein — Projects' },
+  { path: '/colophon', img: 'og-colophon.png', alt: 'Maximilian Stein — Colophon' },
+  { path: '/now', img: 'og-now.png', alt: 'Maximilian Stein — Now' },
+  { path: '/guestbook', img: 'og-guestbook.png', alt: 'Maximilian Stein — Guestbook' },
 ];
 for (const o of OG_CARDS) {
   test(`${o.path}: ships a per-page social card with dimensions and alt text`, async ({ page }) => {
@@ -1417,10 +1421,81 @@ test('404: carries social card tags and stays noindex', async ({ page }) => {
 });
 
 test('social cards: every per-page OG image is served as a PNG', async ({ page }) => {
-  for (const img of ['og-home.png', 'og-thoughts.png', 'og-uses.png', 'og-projects.png']) {
+  for (const img of ['og-home.png', 'og-thoughts.png', 'og-uses.png', 'og-projects.png', 'og-colophon.png', 'og-now.png', 'og-guestbook.png']) {
     const res = await page.request.get('/' + img);
     expect(res.status()).toBe(200);
     expect(res.headers()['content-type']).toContain('image/png');
   }
+});
+
+test('pretty URLs rewrite to the html files', async ({ page }) => {
+  for (const path of ['/thoughts', '/projects', '/uses', '/colophon', '/now', '/guestbook']) {
+    const res = await page.goto(path);
+    expect(res.status()).toBe(200);
+  }
+});
+
+test('guestbook wall signs without loading GeoCities', async ({ page }) => {
+  await page.goto('/guestbook');
+  await expect(page.locator('#gb-form')).toBeVisible();
+  await page.locator('#gb-form input[name="name"]').fill('WallVisitor');
+  await page.locator('#gb-form textarea[name="message"]').fill('signed the modern book');
+  await page.locator('#gb-form button[type="submit"]').click();
+  await expect(page.locator('.gb-entry').first()).toContainText('WallVisitor');
+  await expect(page.locator('html')).not.toHaveAttribute('data-geocities', 'true');
+});
+
+test('uses: Clippy pops a page-aware line', async ({ page }) => {
+  await page.goto('/uses');
+  const bubble = page.locator('.clippy-bubble');
+  await expect(bubble).toBeHidden();
+  await page.locator('img.clippy').click();
+  await expect(bubble).toBeVisible();
+  await expect(bubble).toContainText('peek at the desk');
+});
+
+test('now page has Seattle and Hawaiʻi clocks', async ({ page }) => {
+  await page.goto('/now');
+  await expect(page.locator('#clock-seattle')).not.toHaveText('America/Los_Angeles');
+  await expect(page.locator('#clock-hst')).not.toHaveText('Pacific/Honolulu');
+});
+
+test('header fishhook opens the Scorpius sky', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.scorpius-trigger').click();
+  const sky = page.locator('#scorpius-sky');
+  await expect(sky).toBeVisible();
+  await expect(sky).toContainText('Maui');
+});
+
+test('colophon links the source and hosts an 88x31', async ({ page }) => {
+  await page.goto('/colophon');
+  await expect(page.locator('#main a[href="https://github.com/Manaiakalani/Manaiakalani.com"]')).toBeVisible();
+  await expect(page.locator('#badge img[src="/badge-88x31.png"]')).toBeVisible();
+  await expect(page.locator('#main')).toContainText('globe');
+  await expect(page.locator('#main')).not.toContainText('The cone');
+});
+
+test('footer Source and Now links are present', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.footer-links a[href="/now"]')).toBeVisible();
+  await expect(page.locator('.footer-links a[href="https://github.com/Manaiakalani/Manaiakalani.com"]')).toBeVisible();
+  await expect(page.locator('#sign-the-book')).toHaveAttribute('href', '/guestbook#sign');
+});
+
+test('humans.txt and llms.txt are served', async ({ page }) => {
+  const humans = await page.request.get('/humans.txt');
+  expect(humans.status()).toBe(200);
+  expect(await humans.text()).toContain('Maximilian');
+  const llms = await page.request.get('/llms.txt');
+  expect(llms.status()).toBe(200);
+  expect(await llms.text()).toContain('manaiakalani.com');
+});
+
+test('geocities: minesweeper board is in 1997', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.geocities-toggle').click();
+  await expect(page.locator('.gc-mines-grid')).toBeVisible();
+  await expect(page.locator('.gc-mines-cell')).toHaveCount(81);
 });
 

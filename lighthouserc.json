@@ -5,11 +5,13 @@
       "startServerReadyPattern": "Accepting connections at",
       "url": [
         "http://localhost:4173/",
-        "http://localhost:4173/thoughts.html",
-        "http://localhost:4173/projects.html",
+        "http://localhost:4173/thoughts",
+        "http://localhost:4173/projects",
         "http://localhost:4173/404.html",
-        "http://localhost:4173/uses.html",
-        "http://localhost:4173/colophon.html"
+        "http://localhost:4173/uses",
+        "http://localhost:4173/colophon",
+        "http://localhost:4173/now",
+        "http://localhost:4173/guestbook"
       ],
       "numberOfRuns": 1
     },

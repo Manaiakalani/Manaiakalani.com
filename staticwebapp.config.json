@@ -1,6 +1,6 @@
 {
   "globalHeaders": {
-    "Content-Security-Policy": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'sha256-BphLCwsL2YGbH7fpRGMsqZUeq/To4YyljkP/5YhJZSU=' 'sha256-3KVHnvTk5sYDVIYJqnsBJ8CbM1TbNkTY7jYJfX4iwUc=' 'sha256-n6+q2lB0PPdIfsON0+zHhUL4MkYYqjX0CGiJ4x0tAMo=' 'sha256-QK8PjOVkvHvhnpGoZVx84hPyLm2E7kUYx6G5oSARpRo=' 'sha256-6jKOON7pW0xLacvYakfdiEu7ust7mveoJNZ+DZ8Iqek=' 'sha256-Z5JBo+o0XdHc7H+9NEOkcr188jwHJd8LSxVSqQZ8RTE=' 'sha256-nfyqPxeyRT2vXJQfP2HuX7LgTaltKslP8uFfd2PggbE=' https://cdn.jsdelivr.net https://analytics.manaiakalani.info; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://analytics.manaiakalani.info; font-src 'self' data:; connect-src 'self' https://analytics.manaiakalani.info https://api.github.com https://cdn.jsdelivr.net; manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests",
+    "Content-Security-Policy": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'sha256-BphLCwsL2YGbH7fpRGMsqZUeq/To4YyljkP/5YhJZSU=' 'sha256-3KVHnvTk5sYDVIYJqnsBJ8CbM1TbNkTY7jYJfX4iwUc=' 'sha256-n6+q2lB0PPdIfsON0+zHhUL4MkYYqjX0CGiJ4x0tAMo=' 'sha256-nJCl0CDAf/vsCPEQ9QPCg55dqpGY+ZWTUJlGkcVk5Qw=' 'sha256-0tf9U+vkJCU6vaU0JgsYVVIYmrTVpnVD21vOHa7ba24=' 'sha256-az2YG8iFP/BEashb03Z/O6wm4fwvLxV9VQ5xofGN+Bg=' 'sha256-qRswKRw4xdDzRGFhQahNvdn/gYaETQJ7GCudy0bLFNM=' 'sha256-ASex7ejpZaUszNX1bg7tjwhiRcCcOfMWGn6VmNIpjdU=' 'sha256-s09SyBHd10Sq+gKkWWm+zKOg+2SZy86od6t5fTsjFzE=' https://cdn.jsdelivr.net https://analytics.manaiakalani.info; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://analytics.manaiakalani.info; font-src 'self' data:; connect-src 'self' https://analytics.manaiakalani.info https://api.github.com https://cdn.jsdelivr.net; manifest-src 'self'; media-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests",
     "Permissions-Policy": "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), clipboard-read=(), clipboard-write=(self), display-capture=(), encrypted-media=(), geolocation=(), gyroscope=(), hid=(), magnetometer=(), microphone=(), midi=(), payment=(), publickey-credentials-get=(), serial=(), usb=(), web-share=(self), xr-spatial-tracking=()",
     "X-Frame-Options": "DENY",
     "X-Content-Type-Options": "nosniff",
@@ -8,9 +8,16 @@
     "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload"
   },
   "platform": {
-    "apiRuntime": "node:20"
+    "apiRuntime": "node:22"
   },
   "routes": [
+    { "route": "/thoughts", "rewrite": "/thoughts.html" },
+    { "route": "/projects", "rewrite": "/projects.html" },
+    { "route": "/uses", "rewrite": "/uses.html" },
+    { "route": "/colophon", "rewrite": "/colophon.html" },
+    { "route": "/guestbook", "rewrite": "/guestbook.html" },
+    { "route": "/now", "rewrite": "/now.html" },
+    { "route": "/stamp-assets.js", "rewrite": "/404.html" },
     { "route": "/tests/*", "rewrite": "/404.html" },
     { "route": "/package.json", "rewrite": "/404.html" },
     { "route": "/package-lock.json", "rewrite": "/404.html" },

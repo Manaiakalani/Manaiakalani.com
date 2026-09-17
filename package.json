@@ -9,7 +9,9 @@
     "audit:spacing": "node scripts/puppeteer-spacing-audit.mjs",
     "check:csp": "node compute-hashes.js --check",
     "check:search": "node build-search-index.js --check",
-    "build:search": "node build-search-index.js"
+    "check:assets": "node stamp-assets.js --check",
+    "build:search": "node build-search-index.js",
+    "stamp": "node stamp-assets.js"
   },
   "engines": {
     "node": ">=22.19"

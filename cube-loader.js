@@ -9,7 +9,7 @@ if (canvas) {
   let cubePromise = null;
   const loadCube = () => {
     if (!cubePromise) {
-      cubePromise = import("/cube.js?v=2")
+      cubePromise = import("/cube.js?v=1a1846a1")
         .then(({ initCube }) => {
           initCube(canvas, "/cube-texture.webp");
           return true;

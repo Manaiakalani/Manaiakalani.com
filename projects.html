@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   Aloha, view-source friend.
-  This page is a product: vanilla HTML, a CSP, a guestbook, and a cone that goes to 1997.
+  This page is a product: vanilla HTML, a CSP, a guestbook, and a globe that goes to 1997.
   manaiakalani.com
 -->
 <html lang="en">
@@ -12,7 +12,7 @@
     <meta name="description" content="Projects by Maximilian Stein (Manaiakalani) — gaming utilities, public health dashboards, creative experiments, and homelab docs.">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Maximilian Stein">
-    <meta property="og:url" content="https://manaiakalani.com/projects.html">
+    <meta property="og:url" content="https://manaiakalani.com/projects">
     <meta property="og:title" content="Projects — Maximilian Stein">
     <meta property="og:description" content="Projects by Maximilian Stein (Manaiakalani) — gaming utilities, public health dashboards, creative experiments, and homelab docs.">
     <meta property="og:image" content="https://manaiakalani.com/og-projects.png">
@@ -24,10 +24,10 @@
     <meta property="twitter:description" content="Projects by Maximilian Stein (Manaiakalani) — gaming utilities, public health dashboards, creative experiments, and homelab docs.">
     <meta property="twitter:image" content="https://manaiakalani.com/og-projects.png">
     <meta property="twitter:image:alt" content="Maximilian Stein — Projects">
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0f4c81">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#c84534">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121218">
     <meta name="author" content="Maximilian Stein">
-    <link rel="canonical" href="https://manaiakalani.com/projects.html">
+    <link rel="canonical" href="https://manaiakalani.com/projects">
     <link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
@@ -35,19 +35,19 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://api.github.com">
     <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="style.css?v=25">
+    <link rel="stylesheet" href="style.css?v=45d1123e">
 
     <!-- RSS Feed -->
     <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml">
 
-    <script src="boot.js?v=20"></script>
+    <script src="boot.js?v=7f658faa"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "CollectionPage",
         "name": "Projects — Maximilian Stein",
         "description": "A selection of projects by Maximilian Stein — from gaming utilities and public health dashboards to creative experiments.",
-        "url": "https://manaiakalani.com/projects.html",
+        "url": "https://manaiakalani.com/projects",
         "author": {
           "@type": "Person",
           "name": "Maximilian Stein",
@@ -78,6 +78,12 @@
             <h1>Projects</h1>
             <p>A selection of projects I've built — from gaming utilities and public health dashboards to creative experiments and homelab docs.</p>
             <button type="button" id="random-project-btn" class="random-project-btn"><span data-icon="dice" aria-hidden="true"></span> Random project</button>
+            <div class="clippy-row clippy-row--hero">
+                <img class="clippy" src="/clippy.webp?v=1b255ca3" width="64" height="64" alt="Clippy" />
+                <div class="clippy-bubble" id="clippy-speech">
+                    <p class="clippy-bubble-line">It looks like you're trying to ship something. Need a repo?</p>
+                </div>
+            </div>
         </section>
 
         <p class="sort-note" id="projects-sort-note" hidden>Sorted by community impact — most-starred first, then most recent.</p>
@@ -120,9 +126,10 @@
         <div class="container" id="footer-content"></div>
     </footer>
 
-    <script defer src="icons.js?v=7"></script>
-    <script defer src="components.js?v=10"></script>
-    <script defer src="script.js?v=17"></script>
+    <script defer src="icons.js?v=269f2e81"></script>
+    <script defer src="components.js?v=50fd029d"></script>
+    <script defer src="guestbook.js?v=a26600a0"></script>
+    <script defer src="script.js?v=9f4687a5"></script>
     <script type="importmap">
     {
         "imports": {
@@ -131,7 +138,7 @@
         }
     }
     </script>
-    <script defer src="command-palette.js?v=8"></script>
-    <script type="module" src="web-vitals-report.js?v=1"></script>
+    <script defer src="command-palette.js?v=8f48885b"></script>
+    <script type="module" src="web-vitals-report.js?v=181e07e2"></script>
 </body>
 </html>

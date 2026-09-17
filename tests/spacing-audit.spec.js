@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-const PAGES = ['/', '/projects.html', '/thoughts.html', '/uses.html', '/404.html', '/colophon.html'];
+const PAGES = ['/', '/projects', '/thoughts', '/uses', '/404.html', '/colophon'];
 const TOUCH = 44;
 
 test.beforeEach(async ({ page }) => {
@@ -86,13 +86,13 @@ test('active nav grey hugs the label instead of filling the 44px hit box', async
 });
 
 test('thought titles are left-aligned, not centered via h2 inheritance', async ({ page }) => {
-  await page.goto('/thoughts.html');
+  await page.goto('/thoughts');
   const align = await page.locator('.thought-title').first().evaluate(el => getComputedStyle(el).textAlign);
   expect(align).toBe('left');
 });
 
 test('copy-link buttons meet 44px touch target', async ({ page }) => {
-  await page.goto('/thoughts.html');
+  await page.goto('/thoughts');
   const first = page.locator('.copy-link-btn').first();
   await expect(first).toBeVisible();
   const r = await box(first);
@@ -117,7 +117,7 @@ test('footer social icons meet 44px touch target', async ({ page }) => {
 });
 
 test('search and sort controls meet 44px touch height', async ({ page }) => {
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   const search = await box(page.locator('#project-search'));
   const sort = await box(page.locator('#project-sort'));
   expect(search.h).toBeGreaterThanOrEqual(TOUCH);
@@ -125,7 +125,7 @@ test('search and sort controls meet 44px touch height', async ({ page }) => {
 });
 
 test('projects: sort dropdown is centered under Sort projects', async ({ page }) => {
-  await page.goto('/projects.html');
+  await page.goto('/projects');
   await expect(page.locator('label[for="project-sort"]')).toHaveText('Sort projects');
   const toolbar = await box(page.locator('.page-toolbar'));
   const sort = await box(page.locator('#project-sort'));
