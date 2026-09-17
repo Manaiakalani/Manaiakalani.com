@@ -5,6 +5,9 @@ playwright-report/
 .env
 .env.local
 .env*.local
+api/.firebase-sa.json
+**/service-account*.json
+**/*firebase-adminsdk*.json
 *.log
 .vscode/
 .idea/

@@ -1,7 +1,7 @@
 {
   "name": "manaiakalani-api",
   "version": "1.0.0",
-  "description": "Shared guestbook API for manaiakalani.com — an Azure Static Web Apps managed function backed by Azure Table Storage. Degrades gracefully: if no storage connection string is set, the site's guestbook simply stays local (localStorage) and nothing breaks.",
+  "description": "Shared guestbook API for manaiakalani.com — Azure Functions in front of Cloud Firestore. Degrades gracefully: if Firebase credentials are missing, the guestbook stays local and the counter stays hidden.",
   "private": true,
   "main": "src/functions/*.js",
   "scripts": {
@@ -9,8 +9,8 @@
     "test": "node --test"
   },
   "dependencies": {
-    "@azure/data-tables": "^13.3.0",
-    "@azure/functions": "^4.5.0"
+    "@azure/functions": "^4.5.0",
+    "firebase-admin": "^13.10.0"
   },
   "engines": {
     "node": ">=20"

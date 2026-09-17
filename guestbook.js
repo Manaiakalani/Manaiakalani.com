@@ -326,7 +326,7 @@
                 .then(function (d) {
                     if (!status || !d) return;
                     if (d.backend === 'unconfigured') {
-                        status.textContent = 'The shared book is off. Your signature stays in this browser until Table Storage is connected — see api/README.md.';
+                        status.textContent = 'The shared book is off. Your signature stays in this browser until Firebase is connected — see api/README.md.';
                     }
                 })
                 .catch(function () { /* stay quiet */ });
