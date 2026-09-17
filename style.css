@@ -1872,3 +1872,214 @@ html.cmdk-open body {
     .cmdk[open]::backdrop { animation: none; }
     .cmdk-launcher:hover { transform: none; }
 }
+
+.scorpius-trigger {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-align: inherit;
+}
+.scorpius-trigger:hover em,
+.scorpius-trigger:focus-visible em {
+    color: var(--accent);
+}
+.scorpius-sky {
+    width: min(92vw, 28rem);
+    padding: 0;
+    border: 1px solid rgba(128, 128, 128, 0.28);
+    border-radius: 16px;
+    background: #121218;
+    color: #f4ecd0;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+.scorpius-sky::backdrop {
+    background: rgba(6, 8, 16, 0.72);
+}
+.scorpius-sky-inner {
+    padding: 1.1rem 1.2rem 1.25rem;
+}
+.scorpius-sky svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.scorpius-line {
+    stroke: #c84534;
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 240;
+    stroke-dashoffset: 240;
+    animation: scorpius-trace 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.scorpius-star {
+    fill: #f4ecd0;
+}
+.scorpius-sky p {
+    margin: 0.75rem 0 0;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    text-align: left;
+    color: #f4ecd0;
+}
+.scorpius-close {
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #c84534;
+    background: none;
+    border: none;
+    cursor: pointer;
+    float: right;
+}
+@keyframes scorpius-trace {
+    to { stroke-dashoffset: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .scorpius-line { animation: none; stroke-dashoffset: 0; }
+}
+
+html[data-theme="dark"] body {
+    background-image:
+        radial-gradient(1px 1px at 12% 16%, rgba(244, 236, 208, 0.35), transparent 2px),
+        radial-gradient(1px 1px at 78% 22%, rgba(244, 236, 208, 0.28), transparent 2px),
+        radial-gradient(1.5px 1.5px at 64% 8%, rgba(200, 69, 52, 0.45), transparent 3px),
+        radial-gradient(1px 1px at 30% 72%, rgba(244, 236, 208, 0.22), transparent 2px),
+        radial-gradient(1px 1px at 88% 64%, rgba(244, 236, 208, 0.3), transparent 2px);
+}
+
+.page-hero .clippy-row {
+    justify-content: center;
+    margin-top: 1.25rem;
+}
+
+.footer-badge {
+    margin-top: 1rem;
+    text-align: center;
+}
+.footer-badge img {
+    display: inline-block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    vertical-align: middle;
+}
+
+.gb-layout {
+    display: grid;
+    gap: 2rem;
+    max-width: 42rem;
+    margin: 0 auto 3rem;
+}
+.gb-form {
+    display: grid;
+    gap: 0.75rem;
+}
+.gb-form label {
+    display: grid;
+    gap: 0.3rem;
+    font-weight: 700;
+}
+.gb-form input,
+.gb-form textarea {
+    font: inherit;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid rgba(128, 128, 128, 0.35);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+.gb-form button,
+.gb-tools button {
+    font: inherit;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--bg-secondary);
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    border-radius: 6px;
+    min-height: var(--touch);
+    padding: 0 1rem;
+    cursor: pointer;
+}
+.gb-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.gb-status {
+    min-height: 1.3em;
+    color: var(--text-secondary);
+}
+.gb-count {
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+}
+.gb-wall {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.85rem;
+}
+.gb-entry {
+    padding: 0.85rem 0;
+    border-top: 1px solid rgba(128, 128, 128, 0.2);
+}
+.gb-who {
+    font-weight: 700;
+}
+.gb-when {
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+.gb-msg {
+    margin-top: 0.25rem;
+    line-height: 1.45;
+}
+
+.now-clocks {
+    display: grid;
+    gap: 0.75rem 2rem;
+    max-width: 36rem;
+    margin: 0 auto 2rem;
+}
+@media (min-width: 640px) {
+    .now-clocks { grid-template-columns: 1fr 1fr; }
+}
+.now-clocks dt {
+    font-weight: 700;
+    margin: 0;
+}
+.now-clocks dd {
+    margin: 0.2rem 0 0;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+}
+.now-desk {
+    max-width: 36rem;
+    margin: 0 auto 2rem;
+}
+
+.webring-modern {
+    max-width: 36rem;
+    margin: 2rem auto 0;
+    text-align: center;
+}
+.webring-modern p {
+    margin: 0.4rem 0;
+}
+.webring-modern code {
+    font-size: 0.78rem;
+    word-break: break-all;
+}
+
+.site-webring {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem 1rem;
+    align-items: center;
+    font-weight: 700;
+}

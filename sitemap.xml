@@ -7,28 +7,40 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://manaiakalani.com/thoughts.html</loc>
+    <loc>https://manaiakalani.com/thoughts</loc>
     <lastmod>2026-09-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://manaiakalani.com/projects.html</loc>
+    <loc>https://manaiakalani.com/projects</loc>
     <lastmod>2026-09-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://manaiakalani.com/uses.html</loc>
+    <loc>https://manaiakalani.com/uses</loc>
     <lastmod>2026-09-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://manaiakalani.com/colophon.html</loc>
+    <loc>https://manaiakalani.com/colophon</loc>
     <lastmod>2026-09-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/now</loc>
+    <lastmod>2026-09-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/guestbook</loc>
+    <lastmod>2026-09-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
   </url>
   <url>
     <loc>https://manaiakalani.com/feed.xml</loc>

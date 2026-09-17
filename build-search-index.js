@@ -40,7 +40,7 @@ read('thoughts.html').split('<div class="thought-entry"').slice(1).forEach(funct
   const date = clean((chunk.match(/class="thought-date">([\s\S]*?)<\/div>/) || [])[1] || '');
   const body = clean((chunk.match(/class="thought-excerpt">([\s\S]*?)<\/p>/) || [])[1] || '');
   if (!title) return;
-  items.push({ t: title, u: '/thoughts.html#' + id, s: 'Thought', d: date, b: cap(body, 400) });
+  items.push({ t: title, u: '/thoughts#' + id, s: 'Thought', d: date, b: cap(body, 400) });
 });
 
 // ---- Uses: one entry per .uses-section, linked to its anchor ----
@@ -49,12 +49,18 @@ read('uses.html').split('<section class="uses-section').slice(1).forEach(functio
   const h2 = clean((chunk.match(/<h2>([\s\S]*?)<\/h2>/) || [])[1] || '');
   const list = (chunk.match(/<ul class="uses-list">([\s\S]*?)<\/ul>/) || [])[1] || '';
   if (!h2) return;
-  items.push({ t: h2, u: '/uses.html' + (id ? '#' + id : ''), s: 'Uses', d: '', b: cap(clean(list), 400) });
+  items.push({ t: h2, u: '/uses' + (id ? '#' + id : ''), s: 'Uses', d: '', b: cap(clean(list), 400) });
 });
 
 // ---- About (home page) ----
 const about = clean((read('index.html').match(/<section id="about">([\s\S]*?)<\/section>/) || [])[1] || '');
 if (about) items.push({ t: 'About Maximilian', u: '/#about', s: 'About', d: '', b: cap(about, 400) });
+
+const nowHero = clean((read('now.html').match(/<section class="page-hero">([\s\S]*?)<\/section>/) || [])[1] || '');
+if (nowHero) items.push({ t: 'Now', u: '/now', s: 'Now', d: '', b: cap(nowHero, 400) });
+
+const gbHero = clean((read('guestbook.html').match(/<section class="page-hero">([\s\S]*?)<\/section>/) || [])[1] || '');
+if (gbHero) items.push({ t: 'Guestbook', u: '/guestbook', s: 'Guestbook', d: '', b: cap(gbHero, 400) });
 
 // Guard against silent markup drift.
 if (items.filter(function (i) { return i.s === 'Thought'; }).length === 0) {

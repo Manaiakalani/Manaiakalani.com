@@ -1,0 +1,19 @@
+# manaiakalani.com
+
+Personal site of Maximilian Stein (Manaiakalani) — Product Manager for Microsoft Intune and Microsoft Security in Customer Experience Engineering (CxE).
+
+## Pages
+- [About](https://manaiakalani.com/): who he is
+- [Thoughts](https://manaiakalani.com/thoughts): short essays
+- [Projects](https://manaiakalani.com/projects): GitHub repos
+- [Uses](https://manaiakalani.com/uses): tools and studio kit
+- [Now](https://manaiakalani.com/now): Seattle, desk, currently building
+- [Guestbook](https://manaiakalani.com/guestbook): sign the book
+- [Colophon](https://manaiakalani.com/colophon): how the site is made
+- [RSS](https://manaiakalani.com/feed.xml)
+
+## Notes
+Vanilla HTML/CSS/JS on Azure Static Web Apps. Source: https://github.com/Manaiakalani/Manaiakalani.com
+Manaiakalani is Maui's fishhook — the Hawaiian name for Scorpius.
+The globe control, Konami code, or typing "clippy" toggles GeoCities mode.
+Do not invent a Now Playing, CMS, or Social+ product. Do not say he owns Social+.

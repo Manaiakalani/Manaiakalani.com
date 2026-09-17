@@ -350,6 +350,25 @@ if (typingEl) {
             }
         } catch (e) { /* ignore */ }
 
+        function applyRepos(normalized) {
+            try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: normalized })); } catch (e) { /* quota */ }
+            allLoadedRepos = normalized;
+            renderFeatured(normalized);
+            renderAll();
+            renderCurrentlyBuilding(normalized);
+        }
+
+        function fetchFromProxy() {
+            if (typeof fetch !== 'function') return Promise.resolve([]);
+            return fetch('/api/repos', { headers: { accept: 'application/json' } })
+                .then(function (res) { return res.ok ? res.json() : null; })
+                .then(function (data) {
+                    var list = data && (Array.isArray(data.repos) ? data.repos : Array.isArray(data) ? data : []);
+                    return normalizeRepos(list);
+                })
+                .catch(function () { return []; });
+        }
+
         var allRepos = [];
         var MAX_PAGES = 10; // safety cap (10 * per_page=100 = 1,000 repos); guards against a malformed/cyclical Link header
         function fetchPage(url, pageNum) {
@@ -371,47 +390,49 @@ if (typingEl) {
                 });
         }
 
-        fetchPage(API_URL, 1)
-            .then(function () {
-                var normalized = normalizeRepos(allRepos);
-                if (!normalized.length) {
-                    // API responded but returned nothing usable — use stale cache or show a message
-                    // rather than leaving skeleton placeholders on screen indefinitely.
-                    if (cachedRepos.length) {
-                        allLoadedRepos = cachedRepos;
-                        renderFeatured(cachedRepos);
-                        renderAll();
-                        renderCurrentlyBuilding(cachedRepos);
-                    } else {
-                        // A valid-but-empty response isn't an error — say so consistently
-                        // in both the visible message and the screen-reader announcement.
-                        showFallback(
-                            'No public projects to show right now — <a href="https://github.com/Manaiakalani" style="color:var(--accent)">view them on GitHub</a>.',
-                            'No public projects to show right now. Visit github.com/Manaiakalani to view them.'
-                        );
-                    }
+        function fetchFromGitHub() {
+            return fetchPage(API_URL, 1).then(function () { return normalizeRepos(allRepos); });
+        }
+
+        function failOrStale(err) {
+            if (cachedRepos.length) {
+                allLoadedRepos = cachedRepos;
+                renderFeatured(cachedRepos);
+                renderAll();
+                renderCurrentlyBuilding(cachedRepos);
+                return;
+            }
+            var msg = err && err.message === 'rate-limited'
+                ? 'GitHub API rate limit reached — projects will reload shortly. <a href="https://github.com/Manaiakalani" style="color:var(--accent)">View them directly</a>.'
+                : 'Projects are loading from GitHub — <a href="https://github.com/Manaiakalani" style="color:var(--accent)">view them directly</a>.';
+            showFallback(msg);
+        }
+
+        fetchFromProxy()
+            .then(function (proxied) {
+                if (proxied && proxied.length) {
+                    applyRepos(proxied);
                     return;
                 }
-                try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: normalized })); } catch (e) { /* quota */ }
-                allLoadedRepos = normalized;
-                renderFeatured(normalized);
-                renderAll();
-                renderCurrentlyBuilding(normalized);
+                return fetchFromGitHub().then(function (normalized) {
+                    if (!normalized.length) {
+                        if (cachedRepos.length) {
+                            allLoadedRepos = cachedRepos;
+                            renderFeatured(cachedRepos);
+                            renderAll();
+                            renderCurrentlyBuilding(cachedRepos);
+                        } else {
+                            showFallback(
+                                'No public projects to show right now — <a href="https://github.com/Manaiakalani" style="color:var(--accent)">view them on GitHub</a>.',
+                                'No public projects to show right now. Visit github.com/Manaiakalani to view them.'
+                            );
+                        }
+                        return;
+                    }
+                    applyRepos(normalized);
+                });
             })
-            .catch(function (err) {
-                // Use stale cache if available, otherwise show fallback
-                if (cachedRepos.length) {
-                    allLoadedRepos = cachedRepos;
-                    renderFeatured(cachedRepos);
-                    renderAll();
-                    renderCurrentlyBuilding(cachedRepos);
-                } else {
-                    var msg = err && err.message === 'rate-limited'
-                        ? 'GitHub API rate limit reached — projects will reload shortly. <a href="https://github.com/Manaiakalani" style="color:var(--accent)">View them directly</a>.'
-                        : 'Projects are loading from GitHub — <a href="https://github.com/Manaiakalani" style="color:var(--accent)">view them directly</a>.';
-                    showFallback(msg);
-                }
-            });
+            .catch(failOrStale);
     }
 
     // --- Project search/sort controls (projects.html only) ---
@@ -653,7 +674,8 @@ if (typingEl) {
         try { url = new URL(a.href, location.href); } catch (e) { return false; }
         if (url.origin !== location.origin) return false;          // external
         if (url.pathname === location.pathname) return false;      // same page / hash
-        return url.pathname === '/' || /\.html$/.test(url.pathname); // documents only
+        if (/\.(css|js|png|jpe?g|webp|woff2|json|xml|txt|svg)$/i.test(url.pathname)) return false;
+        return true;
     }
 
     function warm(e) {
@@ -714,7 +736,7 @@ if (typingEl) {
                     var cone = document.querySelector('.geocities-toggle');
                     if (cone) cone.click();
                 } else if (act === 'thought') {
-                    window.location.href = '/thoughts.html#random';
+                    window.location.href = '/thoughts#random';
                 } else if (act === 'search') {
                     if (typeof window.openCommandPalette === 'function') window.openCommandPalette();
                 }
@@ -879,4 +901,19 @@ if (typingEl) {
         navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
             .catch(function () { /* offline support simply unavailable */ });
     });
+})();
+
+// --- /now clocks (Seattle + Hawaiʻi) ---
+(function () {
+    var seattle = document.getElementById('clock-seattle');
+    var hst = document.getElementById('clock-hst');
+    if (!seattle && !hst) return;
+    function tick() {
+        var now = new Date();
+        var opts = { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' };
+        if (seattle) seattle.textContent = now.toLocaleString('en-US', Object.assign({ timeZone: 'America/Los_Angeles' }, opts));
+        if (hst) hst.textContent = now.toLocaleString('en-US', Object.assign({ timeZone: 'Pacific/Honolulu' }, opts));
+    }
+    tick();
+    setInterval(tick, 30000);
 })();

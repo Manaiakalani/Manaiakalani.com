@@ -6,7 +6,7 @@ Personal website for **Maximilian Stein** — Product Manager for **Microsoft In
 
 ## Overview
 
-A lightweight, static personal site built with vanilla HTML, CSS, and JavaScript. Home/about, Thoughts, Projects (GitHub API), Uses, a colophon, ⌘K, a guestbook, and a GeoCities mode behind the cone (or Konami, or typing `clippy`). Hosted on **Azure Static Web Apps** and deployed via GitHub Actions on every push to `main`.
+A lightweight, static personal site built with vanilla HTML, CSS, and JavaScript. Home/about, Thoughts, Projects (GitHub API), Uses, Now, a guestbook wall, a colophon, ⌘K, and a GeoCities mode behind the globe (or Konami, or typing `clippy`). Hosted on **Azure Static Web Apps** and deployed via GitHub Actions on every push to `main`. Pretty URLs (`/thoughts`, `/now`, …) rewrite to the `.html` files.
 
 ## Tech Stack
 
@@ -36,8 +36,12 @@ A lightweight, static personal site built with vanilla HTML, CSS, and JavaScript
 ├── thoughts.html               # Thoughts
 ├── projects.html               # GitHub projects
 ├── uses.html                   # Tools / studio kit
+├── now.html                    # Seattle, desk, currently building
+├── guestbook.html              # Sign the book
 ├── colophon.html               # How the site is made
 ├── 404.html                    # Custom 404
+├── humans.txt / llms.txt
+├── badge-88x31.png             # Hotlinkable homepage badge
 ├── style.css / geocities.css
 ├── icons.js                    # currentColor glyph set
 ├── components.js               # Shared header + footer

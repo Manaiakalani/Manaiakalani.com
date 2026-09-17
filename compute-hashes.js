@@ -4,7 +4,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const path = require('path');
 
-const htmlFiles = ['index.html', 'thoughts.html', 'projects.html', '404.html', 'uses.html', 'colophon.html'];
+const htmlFiles = ['index.html', 'thoughts.html', 'projects.html', '404.html', 'uses.html', 'colophon.html', 'guestbook.html', 'now.html'];
 const dir = __dirname;
 const checkMode = process.argv.includes('--check');
 const log = checkMode ? () => {} : console.log;

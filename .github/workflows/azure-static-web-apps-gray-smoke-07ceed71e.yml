@@ -34,6 +34,8 @@ jobs:
         run: node compute-hashes.js --check
       - name: Verify search index is current
         run: node build-search-index.js --check
+      - name: Verify asset query strings match file hashes
+        run: node stamp-assets.js --check
       - name: Install API dependencies
         run: npm ci --prefix api
       - name: Run API unit tests

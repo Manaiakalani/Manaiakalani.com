@@ -1,0 +1,11 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/thoughts", "destination": "/thoughts.html" },
+    { "source": "/projects", "destination": "/projects.html" },
+    { "source": "/uses", "destination": "/uses.html" },
+    { "source": "/colophon", "destination": "/colophon.html" },
+    { "source": "/guestbook", "destination": "/guestbook.html" },
+    { "source": "/now", "destination": "/now.html" }
+  ]
+}

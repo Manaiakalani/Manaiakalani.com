@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   Aloha, view-source friend.
-  This page is a product: vanilla HTML, a CSP, a guestbook, and a cone that goes to 1997.
+  This page is a product: vanilla HTML, a CSP, a guestbook, and a globe that goes to 1997.
   manaiakalani.com
 -->
 <html lang="en">
@@ -14,7 +14,7 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Maximilian Stein">
-    <meta property="og:url" content="https://manaiakalani.com/uses.html">
+    <meta property="og:url" content="https://manaiakalani.com/uses">
     <meta property="og:title" content="Uses — Maximilian Stein">
     <meta property="og:description" content="Tools, hardware, and software that Maximilian Stein uses day-to-day.">
     <meta property="og:image" content="https://manaiakalani.com/og-uses.png">
@@ -26,12 +26,12 @@
     <meta property="twitter:description" content="Tools, hardware, and software that Maximilian Stein uses day-to-day.">
     <meta property="twitter:image" content="https://manaiakalani.com/og-uses.png">
     <meta property="twitter:image:alt" content="Maximilian Stein — Uses">
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0f4c81">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#c84534">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121218">
     <meta name="author" content="Maximilian Stein">
 
     <!-- Canonical -->
-    <link rel="canonical" href="https://manaiakalani.com/uses.html">
+    <link rel="canonical" href="https://manaiakalani.com/uses">
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
@@ -44,7 +44,7 @@
     <!-- Self-hosted Doto: preload the latin subset used above the fold -->
     <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin>
     <!-- External CSS -->
-    <link rel="stylesheet" href="style.css?v=25">
+    <link rel="stylesheet" href="style.css?v=45d1123e">
 
     <!-- RSS Feed -->
     <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml">
@@ -53,7 +53,7 @@
     <link rel="manifest" href="/manifest.json">
 
     <!-- Prevent flash: apply saved theme/geocities before paint -->
-    <script src="boot.js?v=20"></script>
+    <script src="boot.js?v=7f658faa"></script>
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -62,7 +62,7 @@
         "@type": "WebPage",
         "name": "Uses — Maximilian Stein",
         "description": "Tools, hardware, and software that Maximilian Stein uses day-to-day for product management, development, and content creation.",
-        "url": "https://manaiakalani.com/uses.html",
+        "url": "https://manaiakalani.com/uses",
         "author": {
           "@type": "Person",
           "name": "Maximilian Stein",
@@ -98,6 +98,12 @@
                 <button type="button" id="random-use-btn">Random tool</button>
             </div>
             <p id="uses-status" class="visually-hidden" role="status" aria-live="polite"></p>
+            <div class="clippy-row clippy-row--hero">
+                <img class="clippy" src="/clippy.webp?v=1b255ca3" width="64" height="64" alt="Clippy" />
+                <div class="clippy-bubble" id="clippy-speech">
+                    <p class="clippy-bubble-line">It looks like you're trying to peek at the desk.</p>
+                </div>
+            </div>
         </section>
 
         <section class="uses-section" id="editor-terminal">
@@ -254,9 +260,10 @@
     </footer>
 
     <!-- External JavaScript -->
-    <script defer src="icons.js?v=7"></script>
-    <script defer src="components.js?v=10"></script>
-    <script defer src="script.js?v=17"></script>
+    <script defer src="icons.js?v=269f2e81"></script>
+    <script defer src="components.js?v=50fd029d"></script>
+    <script defer src="guestbook.js?v=a26600a0"></script>
+    <script defer src="script.js?v=9f4687a5"></script>
 
     <!-- ASCII Cube -->
     <script type="importmap">
@@ -267,7 +274,7 @@
         }
     }
     </script>
-    <script defer src="command-palette.js?v=8"></script>
-    <script type="module" src="web-vitals-report.js?v=1"></script>
+    <script defer src="command-palette.js?v=8f48885b"></script>
+    <script type="module" src="web-vitals-report.js?v=181e07e2"></script>
 </body>
 </html>

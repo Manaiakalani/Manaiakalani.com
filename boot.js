@@ -15,8 +15,8 @@
     }
   } catch (e) { /* localStorage unavailable */ }
 
-  var GEO_CSS_HREF = "/geocities.css?v=8";
-  var GEO_JS_HREF = "/geocities.js?v=17";
+  var GEO_CSS_HREF = "/geocities.css?v=81f08739";
+  var GEO_JS_HREF = "/geocities.js?v=9424b7d2";
   var GEO_KEY = "mnk:geocities";
   var geoCssPromise;
   var geoJsPromise;

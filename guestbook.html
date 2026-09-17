@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<!--
+  Aloha, view-source friend.
+  This page is a product: vanilla HTML, a CSP, a guestbook, and a globe that goes to 1997.
+  manaiakalani.com
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Guestbook — Maximilian Stein</title>
+    <meta name="description" content="Sign the book on manaiakalani.com — a real guestbook, no fake names.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Maximilian Stein">
+    <meta property="og:url" content="https://manaiakalani.com/guestbook">
+    <meta property="og:title" content="Guestbook — Maximilian Stein">
+    <meta property="og:description" content="Sign the book. Leave a mark.">
+    <meta property="og:image" content="https://manaiakalani.com/og-guestbook.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Maximilian Stein — Guestbook">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Guestbook — Maximilian Stein">
+    <meta property="twitter:description" content="Sign the book. Leave a mark.">
+    <meta property="twitter:image" content="https://manaiakalani.com/og-guestbook.png">
+    <meta property="twitter:image:alt" content="Maximilian Stein — Guestbook">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#c84534">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121218">
+    <meta name="author" content="Maximilian Stein">
+    <link rel="canonical" href="https://manaiakalani.com/guestbook">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/style.css?v=45d1123e">
+    <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml">
+    <link rel="manifest" href="/manifest.json">
+    <script src="/boot.js?v=7f658faa"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Guestbook — Maximilian Stein",
+        "url": "https://manaiakalani.com/guestbook",
+        "author": { "@type": "Person", "name": "Maximilian Stein", "url": "https://manaiakalani.com" }
+      }
+    </script>
+    <script src="https://analytics.manaiakalani.info/api/script.js" data-site-id="c24b6c864956" defer></script>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <header id="site-header" data-variant="page"></header>
+    <main class="container" id="main" tabindex="-1">
+        <section class="page-hero">
+            <h1>Guestbook</h1>
+            <p>A homepage should have a door someone can knock on. Sign it. If the lights in the back are off, your note still lives in this browser.</p>
+            <div class="clippy-row clippy-row--hero">
+                <img class="clippy" src="/clippy.webp?v=1b255ca3" width="64" height="64" alt="Clippy" />
+                <div class="clippy-bubble" id="clippy-speech">
+                    <p class="clippy-bubble-line">It looks like you want to sign the book. Need a pen?</p>
+                </div>
+            </div>
+        </section>
+        <div class="gb-layout">
+            <form class="gb-form" id="gb-form">
+                <label>Your name
+                    <input type="text" name="name" maxlength="40" required autocomplete="nickname" placeholder="Aloha">
+                </label>
+                <label>Your message
+                    <textarea name="message" maxlength="200" required rows="3" placeholder="Nice homepage."></textarea>
+                </label>
+                <div class="gb-tools">
+                    <button type="submit">Sign the book</button>
+                    <button type="button" id="gb-export">Export</button>
+                    <button type="button" id="gb-import">Import</button>
+                    <input type="file" id="gb-file" accept="application/json,.json" hidden>
+                </div>
+                <p class="gb-status" id="gb-status" role="status" aria-live="polite"></p>
+            </form>
+            <div>
+                <p class="gb-count" id="gb-count" aria-live="polite"></p>
+                <ul class="gb-wall" id="gb-list"></ul>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="container" id="footer-content"></div>
+    </footer>
+    <script defer src="/icons.js?v=269f2e81"></script>
+    <script defer src="/components.js?v=50fd029d"></script>
+    <script defer src="/guestbook.js?v=a26600a0"></script>
+    <script defer src="/script.js?v=9f4687a5"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script defer src="/command-palette.js?v=8f48885b"></script>
+    <script type="module" src="/web-vitals-report.js?v=181e07e2"></script>
+</body>
+</html>

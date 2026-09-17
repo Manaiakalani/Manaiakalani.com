@@ -1,0 +1,13 @@
+/* TEAM */
+Name: Maximilian (Manaiakalani) Stein
+Site: https://manaiakalani.com
+Location: Seattle, WA / Hawaiʻi
+GitHub: https://github.com/Manaiakalani
+
+/* SITE */
+Standards: HTML, CSS, JS
+Software: Azure Static Web Apps, GitHub Actions, Playwright
+Doctype: HTML5
+Language: English
+Colophon: https://manaiakalani.com/colophon
+Source: https://github.com/Manaiakalani/Manaiakalani.com
