@@ -34,10 +34,24 @@ function parseServiceAccount(raw) {
   }
 }
 
+function credentialsFromFile() {
+  const fs = require('fs');
+  const path = require('path');
+  const p = path.join(__dirname, '..', '..', '.firebase-sa.json');
+  try {
+    if (!fs.existsSync(p)) return null;
+    return parseServiceAccount(fs.readFileSync(p, 'utf8'));
+  } catch (e) {
+    return null;
+  }
+}
+
 function credentialsFromEnv(env) {
   env = env || process.env;
   const fromJson = parseServiceAccount(env.FIREBASE_SERVICE_ACCOUNT || '');
   if (fromJson) return fromJson;
+  const fromFile = credentialsFromFile();
+  if (fromFile) return fromFile;
   const projectId = env.FIREBASE_PROJECT_ID || '';
   const clientEmail = env.FIREBASE_CLIENT_EMAIL || '';
   let privateKey = env.FIREBASE_PRIVATE_KEY || '';
