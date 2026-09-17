@@ -15,17 +15,33 @@
  *     network — the worker never intercepts them.
  * Bump CACHE on every deploy so the activate step purges the previous cache.
  */
-var CACHE = 'mnk-cache-v10';
+var CACHE = 'mnk-cache-v11';
+var PRETTY = {
+    '/thoughts': '/thoughts.html',
+    '/projects': '/projects.html',
+    '/uses': '/uses.html',
+    '/colophon': '/colophon.html',
+    '/guestbook': '/guestbook.html',
+    '/now': '/now.html'
+};
+function isDocPath(pathname) {
+    if (pathname === '/') return true;
+    if (/\.html$/.test(pathname)) return true;
+    return Object.prototype.hasOwnProperty.call(PRETTY, pathname);
+}
+function htmlTwin(pathname) {
+    return PRETTY[pathname] || pathname;
+}
 // The offline shell (home + 404) MUST land before activate purges the old cache;
 // the rest are best-effort niceties.
 var CORE_ESSENTIAL = ['/', '/404.html'];
 var CORE_EXTRA = [
-    '/projects.html',
-    '/thoughts.html',
-    '/uses.html',
-    '/colophon.html',
-    '/guestbook.html',
-    '/now.html',
+    '/projects', '/projects.html',
+    '/thoughts', '/thoughts.html',
+    '/uses', '/uses.html',
+    '/colophon', '/colophon.html',
+    '/guestbook', '/guestbook.html',
+    '/now', '/now.html',
     '/humans.txt',
     '/llms.txt',
     '/badge-88x31.png',
@@ -77,7 +93,7 @@ self.addEventListener('fetch', function (event) {
     // NOT req.mode==='navigate') as network-first so a new deploy is picked up and
     // a prefetch can never pin a stale page into the cache-first bucket.
     var isDoc = req.mode === 'navigate' || req.destination === 'document' ||
-        url.pathname === '/' || /\.html$/.test(url.pathname);
+        isDocPath(url.pathname);
 
     if (isDoc) {
         event.respondWith(
@@ -92,8 +108,12 @@ self.addEventListener('fetch', function (event) {
             }).catch(function () {
                 return caches.match(req, { ignoreSearch: true }).then(function (hit) {
                     if (hit) return hit;
-                    return caches.match('/404.html').then(function (f404) {
-                        return f404 || caches.match('/');
+                    var twin = htmlTwin(url.pathname);
+                    return caches.match(twin).then(function (alt) {
+                        if (alt) return alt;
+                        return caches.match('/404.html').then(function (f404) {
+                            return f404 || caches.match('/');
+                        });
                     });
                 });
             })

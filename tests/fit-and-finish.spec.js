@@ -705,6 +705,7 @@ test('projects: empty GitHub response shows a consistent empty state (not a load
 for (const { path, sel } of [
   { path: '/projects', sel: '#all-projects' },
   { path: '/', sel: '#featured-projects' },
+  { path: '/now', sel: '.currently-building-teaser' },
 ]) {
   test(`${path}: <noscript> hides the dynamic loader (${sel})`, async ({ page }) => {
     // page.content() serialises the DOM including the (inert-with-JS) <noscript> text,
@@ -1497,5 +1498,44 @@ test('geocities: minesweeper board is in 1997', async ({ page }) => {
   await page.locator('.geocities-toggle').click();
   await expect(page.locator('.gc-mines-grid')).toBeVisible();
   await expect(page.locator('.gc-mines-cell')).toHaveCount(81);
+});
+
+test('guestbook wall does not show the 1998 kitsch seed', async ({ page }) => {
+  await page.addInitScript(() => { try { localStorage.removeItem('mnk:guestbook'); } catch (e) {} });
+  await page.goto('/guestbook');
+  await expect(page.locator('#gb-list')).not.toContainText('CoolDude99');
+  await expect(page.locator('#gb-list')).not.toContainText('SurfGirl2000');
+});
+
+test('.html addresses 301 to pretty URLs', async ({ page }) => {
+  const res = await page.request.get('/thoughts.html', { maxRedirects: 0 });
+  expect([301, 302]).toContain(res.status());
+  const loc = res.headers()['location'] || '';
+  expect(loc).toMatch(/\/thoughts$/);
+});
+
+test('about is an h-card with a real photo', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#about.h-card .u-photo')).toBeVisible();
+  await expect(page.locator('#about .p-name')).toHaveText('Maximilian Stein');
+  const img = page.locator('#about .u-photo');
+  expect(await img.evaluate(el => el.naturalWidth)).toBeGreaterThan(0);
+});
+
+test('scorpius overlay names tonight’s Hawaiian moon', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.scorpius-trigger').click();
+  await expect(page.locator('.scorpius-moon')).toBeVisible();
+  await expect(page.locator('.scorpius-moon')).toContainText('Tonight is');
+});
+
+test('footer has a public email', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.footer-links a[href="mailto:webmaster@manaiakalani.com"]')).toBeVisible();
+});
+
+test('colophon records when the site last shipped', async ({ page }) => {
+  await page.goto('/colophon');
+  await expect(page.locator('#site-updated')).toHaveAttribute('datetime', /\d{4}-\d{2}-\d{2}/);
 });
 

@@ -54,7 +54,7 @@
     <!-- Self-hosted Doto: preload the latin subset used above the fold -->
     <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin />
     <!-- External CSS -->
-    <link rel="stylesheet" href="style.css?v=45d1123e" />
+    <link rel="stylesheet" href="style.css?v=29c45a8a" />
 
     <!-- RSS Feed -->
     <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml" />
@@ -80,7 +80,8 @@
           "name": "Microsoft",
           "url": "https://www.microsoft.com"
         },
-        "image": "https://manaiakalani.com/og-image.png",
+        "image": "https://manaiakalani.com/max.webp",
+        "email": "webmaster@manaiakalani.com",
         "sameAs": [
           "https://www.linkedin.com/in/manaiakalani/",
           "https://x.com/manaiakalani",
@@ -129,10 +130,16 @@
     <main id="main" tabindex="-1">
       <div id="projects-status" class="visually-hidden" role="status" aria-live="polite"></div>
       <!-- About Me Section -->
-    <section id="about">
-      <div class="container">
-        <h2>About Me</h2>
+    <section id="about" class="h-card">
+      <div class="container about-grid">
+        <figure class="about-figure">
+          <img class="u-photo about-photo" src="/max.webp" width="400" height="400" alt="Maximilian Stein, back to camera, looking out at Elliott Bay and the Space Needle" />
+          <figcaption class="p-name">Maximilian Stein</figcaption>
+        </figure>
         <div class="about-text">
+          <h2>About Me</h2>
+          <a class="u-url visually-hidden" href="https://manaiakalani.com/">manaiakalani.com</a>
+          <a class="u-email visually-hidden" href="mailto:webmaster@manaiakalani.com">webmaster@manaiakalani.com</a>
           <p>
             I'm a <strong>Product Manager</strong> for
             <strong>Microsoft Intune</strong> and
@@ -211,8 +218,8 @@
 
     <!-- External JavaScript -->
     <script defer src="icons.js?v=269f2e81"></script>
-    <script defer src="components.js?v=50fd029d"></script>
-    <script defer src="guestbook.js?v=a26600a0"></script>
+    <script defer src="components.js?v=ecbf952b"></script>
+    <script defer src="guestbook.js?v=9a69a345"></script>
     <script defer src="script.js?v=9f4687a5"></script>
 
     <!-- ASCII Cube -->

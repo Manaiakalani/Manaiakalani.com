@@ -14,7 +14,7 @@ const NAVY = [18, 18, 24, 255];
 const CORAL = [200, 69, 52, 255];
 const CREAM = [244, 236, 208, 255];
 const MUTED = [186, 176, 160, 255];
-const EDGE = [80, 72, 68, 255];
+const EDGE = [90, 82, 74, 255];
 
 const px = Buffer.alloc(W * H * 4);
 function set(x, y, c) {
@@ -25,51 +25,45 @@ function set(x, y, c) {
 function fill(x, y, w, h, c) {
   for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) set(xx, yy, c);
 }
-
 fill(0, 0, W, H, NAVY);
 fill(0, 0, W, 1, EDGE);
 fill(0, H - 1, W, 1, EDGE);
 fill(0, 0, 1, H, EDGE);
 fill(W - 1, 0, 1, H, EDGE);
-fill(2, 2, 6, H - 4, CORAL);
-fill(3, 12, 4, 2, CREAM);
+fill(1, 1, 8, H - 2, CORAL);
 
-// 3×5 bitmap, columns left-to-right in bits 2..0
+// 5×7 caps, rows of 5 bits as strings
 const FONT = {
-  C: ['011', '100', '100', '100', '011'],
-  E: ['111', '100', '110', '100', '111'],
-  G: ['011', '100', '101', '101', '011'],
-  H: ['101', '101', '111', '101', '101'],
-  M: ['101', '111', '111', '101', '101'],
-  N: ['110', '101', '101', '101', '101'],
-  O: ['010', '101', '101', '101', '010'],
-  P: ['110', '101', '110', '100', '100'],
-  A: ['010', '101', '111', '101', '101'],
-  K: ['101', '101', '110', '101', '101'],
-  L: ['100', '100', '100', '100', '111'],
-  I: ['111', '010', '010', '010', '111'],
-  '.': ['000', '000', '000', '000', '010'],
-  ' ': ['000', '000', '000', '000', '000']
+  A: ['01110', '10001', '10001', '11111', '10001', '10001', '10001'],
+  C: ['01110', '10001', '10000', '10000', '10000', '10001', '01110'],
+  G: ['01110', '10001', '10000', '10111', '10001', '10001', '01110'],
+  E: ['11111', '10000', '10000', '11110', '10000', '10000', '11111'],
+  H: ['10001', '10001', '10001', '11111', '10001', '10001', '10001'],
+  I: ['11111', '00100', '00100', '00100', '00100', '00100', '11111'],
+  K: ['10001', '10010', '10100', '11000', '10100', '10010', '10001'],
+  L: ['10000', '10000', '10000', '10000', '10000', '10000', '11111'],
+  M: ['10001', '11011', '10101', '10101', '10001', '10001', '10001'],
+  N: ['10001', '11001', '10101', '10011', '10001', '10001', '10001'],
+  O: ['01110', '10001', '10001', '10001', '10001', '10001', '01110'],
+  P: ['11110', '10001', '10001', '11110', '10000', '10000', '10000'],
+  '.': ['00000', '00000', '00000', '00000', '00000', '00100', '00100']
 };
 
-function text(str, x, y, color, scale) {
-  scale = scale || 1;
+function text(str, x, y, color) {
   let cx = x;
   for (const ch of str) {
-    const rows = FONT[ch] || FONT[' '];
-    for (let r = 0; r < 5; r++) {
-      for (let b = 0; b < 3; b++) {
-        if (rows[r][b] === '1') {
-          fill(cx + b * scale, y + r * scale, scale, scale, color);
-        }
-      }
+    if (ch === ' ') { cx += 4; continue; }
+    const rows = FONT[ch];
+    if (!rows) { cx += 6; continue; }
+    for (let r = 0; r < 7; r++) {
+      for (let b = 0; b < 5; b++) if (rows[r][b] === '1') set(cx + b, y + r, color);
     }
-    cx += 4 * scale;
+    cx += 6;
   }
 }
 
-text('MANAIA', 12, 5, CREAM, 2);
-text('KALANI', 12, 18, MUTED, 2);
+text('MNK', 12, 4, CREAM);
+text('A HOMEPAGE', 12, 18, MUTED);
 
 function crc32(buf) {
   let c = ~0;
@@ -87,7 +81,6 @@ function chunk(type, data) {
   crc.writeUInt32BE(crc32(td), 0);
   return Buffer.concat([len, td, crc]);
 }
-
 const raw = Buffer.alloc((W * 4 + 1) * H);
 for (let y = 0; y < H; y++) {
   raw[y * (W * 4 + 1)] = 0;
@@ -107,6 +100,5 @@ const png = Buffer.concat([
   chunk('IDAT', zlib.deflateSync(raw)),
   chunk('IEND', Buffer.alloc(0))
 ]);
-const out = path.join(__dirname, '..', 'badge-88x31.png');
-fs.writeFileSync(out, png);
-console.log('wrote ' + out);
+fs.writeFileSync(path.join(__dirname, '..', 'badge-88x31.png'), png);
+console.log('wrote badge-88x31.png');

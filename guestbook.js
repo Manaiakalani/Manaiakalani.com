@@ -36,16 +36,33 @@
         return out;
     }
 
+    function isKitschSeed(e) {
+        if (!e) return false;
+        for (var i = 0; i < GB_SEED.length; i++) {
+            if (GB_SEED[i].name === e.name && GB_SEED[i].message === e.message) return true;
+        }
+        return false;
+    }
+
     function loadGuestbook() {
         try {
             var raw = localStorage.getItem(GB_KEY);
             if (raw) {
                 var parsed = JSON.parse(raw);
-                if (Array.isArray(parsed)) return sanitizeEntries(parsed);
+                if (Array.isArray(parsed)) {
+                    var clean = sanitizeEntries(parsed).filter(function (e) { return !isKitschSeed(e); });
+                    if (clean.length !== parsed.length) saveGuestbook(clean);
+                    return clean;
+                }
             }
         } catch (e) { /* fall through */ }
-        saveGuestbook(GB_SEED);
-        return GB_SEED.slice();
+        return [];
+    }
+
+    function displayEntries(listEl, entries, authoritative) {
+        var retro = listEl && listEl.classList.contains('gc-gb-list');
+        if (retro && !entries.length && !authoritative) return GB_SEED;
+        return entries;
     }
 
     function saveGuestbook(entries) {
@@ -179,7 +196,7 @@
     }
 
     function renderGuestbookEntries(listEl, countEl) {
-        paintEntries(listEl, countEl, loadGuestbook());
+        paintEntries(listEl, countEl, displayEntries(listEl, loadGuestbook(), false));
         var seq = nextSyncSeq();
         var token = guestbookToken();
         apiGet().then(function (server) {
@@ -187,7 +204,7 @@
             if (!isLatestSync(seq, token)) return;
             var merged = applyServerList(server, token);
             if (!merged) return;
-            paintEntries(listEl, countEl, merged);
+            paintEntries(listEl, countEl, displayEntries(listEl, merged, true));
         });
     }
 
@@ -302,6 +319,17 @@
         if (window.location.hash === '#sign' && form) {
             var nameInput = form.querySelector('input[name="name"]');
             if (nameInput) nameInput.focus();
+        }
+        if (typeof fetch === 'function') {
+            fetch(GB_API, { headers: { Accept: 'application/json' } })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (d) {
+                    if (!status || !d) return;
+                    if (d.backend === 'unconfigured') {
+                        status.textContent = 'The shared book is off. Your signature stays in this browser until Table Storage is connected — see api/README.md.';
+                    }
+                })
+                .catch(function () { /* stay quiet */ });
         }
     }
 

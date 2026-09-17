@@ -61,6 +61,7 @@
                 '<a href="/now">Now</a>' +
                 '<a href="/colophon">Colophon</a>' +
                 '<a href="https://github.com/Manaiakalani/Manaiakalani.com">Source</a>' +
+                '<a href="mailto:webmaster@manaiakalani.com">Email</a>' +
                 '<a href="/feed.xml">RSS</a>' +
             '</p>' +
             '<p class="footer-badge">' +
@@ -74,6 +75,8 @@
         ensureCubeLoader();
         initVisitorCounter();
         bindScorpius();
+        bindOdometer();
+        fillHandmadeHomepages();
     }
 
     function ensureCubeLoader() {
@@ -151,6 +154,7 @@
                 var r = i === 3 ? 3.2 : 1.6;
                 return '<circle class="scorpius-star" cx="' + p[0] + '" cy="' + p[1] + '" r="' + r + '" />';
             }).join('');
+            var moon = hawaiianMoon(new Date());
             dlg.innerHTML =
                 '<div class="scorpius-sky-inner">' +
                     '<button type="button" class="scorpius-close" aria-label="Close constellation">Close</button>' +
@@ -160,6 +164,7 @@
                         stars +
                     '</svg>' +
                     '<p>Maui fished the islands with this hook. The western sky still hangs it as Scorpius.</p>' +
+                    '<p class="scorpius-moon">Tonight is <strong>' + moon.name + '</strong> — ' + moon.phase + '.</p>' +
                 '</div>';
             document.body.appendChild(dlg);
             dlg.querySelector('.scorpius-close').addEventListener('click', function () { dlg.close(); });
@@ -170,6 +175,70 @@
             trigger.setAttribute('aria-expanded', 'true');
             if (typeof dlg.showModal === 'function') dlg.showModal();
             else dlg.setAttribute('open', '');
+        });
+    }
+
+    var MAHINA = [
+        'Hilo', 'Hoaka', 'Kūkahi', 'Kūlua', 'Kūkolu', 'Kūpau',
+        'ʻOle kūkahi', 'ʻOle kūlua', 'ʻOle kūkolu', 'ʻOle pau',
+        'Huna', 'Mōhalu', 'Hua', 'Akua', 'Hoku',
+        'Māhealani', 'Kulu',
+        'Lāʻau kūkahi', 'Lāʻau kūlua', 'Lāʻau pau',
+        'ʻOle kūkahi', 'ʻOle kūlua', 'ʻOle pau',
+        'Kāloa kūkahi', 'Kāloa kūlua', 'Kāloa pau',
+        'Kāne', 'Lono', 'Mauli', 'Muku'
+    ];
+
+    function hawaiianMoon(d) {
+        var syn = 29.530588853;
+        var known = Date.UTC(2000, 0, 6, 18, 14);
+        var age = ((d.getTime() - known) / 86400000) % syn;
+        if (age < 0) age += syn;
+        var i = Math.min(29, Math.floor(age / syn * 30));
+        var illum = (1 - Math.cos(2 * Math.PI * age / syn)) / 2;
+        var phase = illum < 0.05 ? 'new moon' : illum < 0.35 ? 'crescent' : illum < 0.65 ? 'quarter' : illum < 0.95 ? 'gibbous' : 'full moon';
+        return { name: MAHINA[i], phase: phase };
+    }
+
+    var HANDMADE = [
+        { name: 'This homepage', href: 'https://manaiakalani.com/' },
+        { name: "Cameron's World", href: 'https://www.cameronsworld.net/' },
+        { name: 'Space Jam 1996', href: 'https://www.spacejam.com/1996/' },
+        { name: 'The Restart Page', href: 'https://therestartpage.com/' },
+        { name: 'Zombo.com', href: 'https://zombo.com/' }
+    ];
+
+    function fillHandmadeHomepages() {
+        var navs = document.querySelectorAll('.site-webring');
+        if (!navs.length) return;
+        var here = 0;
+        var host = (window.location.hostname || '').replace(/^www\./, '');
+        for (var i = 0; i < HANDMADE.length; i++) {
+            if (HANDMADE[i].href.indexOf(host) !== -1) { here = i; break; }
+        }
+        var prev = HANDMADE[(here - 1 + HANDMADE.length) % HANDMADE.length];
+        var next = HANDMADE[(here + 1) % HANDMADE.length];
+        var html = '<a href="' + prev.href + '" rel="noopener noreferrer">' + prev.name + '</a>' +
+            '<span>handmade homepages</span>' +
+            '<a href="' + next.href + '" rel="noopener noreferrer">' + next.name + '</a>';
+        for (var n = 0; n < navs.length; n++) navs[n].innerHTML = html;
+    }
+
+    function bindOdometer() {
+        var odo = document.querySelector('.visits-odometer');
+        if (!odo || odo.dataset.tick === 'true') return;
+        odo.dataset.tick = 'true';
+        odo.setAttribute('role', 'button');
+        odo.setAttribute('tabindex', '0');
+        odo.setAttribute('title', 'Click to tick');
+        function tick() {
+            odo.classList.remove('is-ticking');
+            void odo.offsetWidth;
+            odo.classList.add('is-ticking');
+        }
+        odo.addEventListener('click', tick);
+        odo.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tick(); }
         });
     }
 
