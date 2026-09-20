@@ -14,7 +14,8 @@
  * keeps Firestore talking over HTTPS.
  */
 
-const admin = require('firebase-admin');
+const { initializeApp, getApps, cert } = require('firebase-admin/app');
+const { getFirestore } = require('firebase-admin/firestore');
 
 let cachedDb = null;
 let initAttempted = false;
@@ -67,16 +68,16 @@ function getDb() {
   const cred = credentialsFromEnv();
   if (!cred) return null;
   try {
-    if (!admin.apps.length) {
-      admin.initializeApp({
-        credential: admin.credential.cert({
+    if (!getApps().length) {
+      initializeApp({
+        credential: cert({
           projectId: cred.projectId,
           clientEmail: cred.clientEmail,
           privateKey: cred.privateKey
         })
       });
     }
-    const db = admin.firestore();
+    const db = getFirestore();
     db.settings({ ignoreUndefinedProperties: true, preferRest: true });
     cachedDb = db;
     return cachedDb;
