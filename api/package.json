@@ -9,7 +9,7 @@
     "test": "node --test"
   },
   "dependencies": {
-    "@azure/functions": "^4.5.0",
+    "@azure/functions": "^4.16.5",
     "firebase-admin": "^14.4.0"
   },
   "engines": {
