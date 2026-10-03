@@ -1,7 +1,7 @@
 {
   "name": "manaiakalani-api",
   "version": "1.0.0",
-  "description": "Shared guestbook API for manaiakalani.com — Azure Functions in front of Cloud Firestore. Degrades gracefully: if Firebase credentials are missing, the guestbook stays local and the counter stays hidden.",
+  "description": "Shared guestbook API for manaiakalani.com - Azure Functions in front of Cloud Firestore. Degrades gracefully: if Firebase credentials are missing, the guestbook stays local and the counter stays hidden.",
   "private": true,
   "main": "src/functions/*.js",
   "scripts": {

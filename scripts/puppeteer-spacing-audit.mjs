@@ -177,7 +177,7 @@ async function collect(page, meta) {
           kind: 'measure',
           severity: 'P2',
           selector: about.className ? '.' + String(about.className).trim().split(/\s+/)[0] : about.tagName.toLowerCase(),
-          detail: `line measure ~${widthCh.toFixed(0)}ch (prefer 65–75ch)`,
+          detail: `line measure ~${widthCh.toFixed(0)}ch (prefer 65-75ch)`,
         });
       }
     }

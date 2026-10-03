@@ -28,7 +28,7 @@
     }
 })();
 
-// Active Nav Link — /thoughts and /thoughts.html both count
+// Active Nav Link - /thoughts and /thoughts.html both count
 (function() {
     var path = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
     var links = document.querySelectorAll('.site-nav a');
@@ -81,7 +81,7 @@ if (typingEl) {
     var GITHUB_USER = 'Manaiakalani';
     var API_URL = 'https://api.github.com/users/' + GITHUB_USER + '/repos?sort=pushed&per_page=100&type=owner';
     var CACHE_KEY = 'mnk:gh_repos_cache';
-    var CACHE_TTL = 2 * 60 * 1000; // 2 minutes — currently-building should track new pushes
+    var CACHE_TTL = 2 * 60 * 1000; // 2 minutes - currently-building should track new pushes
 
     // Repos to exclude from the Projects grid / featured teaser (profile + this site).
     var EXCLUDE = ['Manaiakalani', 'Manaiakalani.com', 'manaiakalani.info', 'seatac.social', 'manaiakalani.github.io'];
@@ -404,8 +404,8 @@ if (typingEl) {
                 return;
             }
             var msg = err && err.message === 'rate-limited'
-                ? 'GitHub API rate limit reached — projects will reload shortly. <a href="https://github.com/Manaiakalani" style="color:var(--accent)">View them directly</a>.'
-                : 'Projects are loading from GitHub — <a href="https://github.com/Manaiakalani" style="color:var(--accent)">view them directly</a>.';
+                ? 'GitHub API rate limit reached. Projects will reload shortly. <a href="https://github.com/Manaiakalani" style="color:var(--accent)">View them directly</a>.'
+                : 'Projects are loading from GitHub; <a href="https://github.com/Manaiakalani" style="color:var(--accent)">view them directly</a>.';
             showFallback(msg);
         }
 
@@ -424,7 +424,7 @@ if (typingEl) {
                             renderCurrentlyBuilding(cachedRepos);
                         } else {
                             showFallback(
-                                'No public projects to show right now — <a href="https://github.com/Manaiakalani" style="color:var(--accent)">view them on GitHub</a>.',
+                                'No public projects to show right now; <a href="https://github.com/Manaiakalani" style="color:var(--accent)">view them on GitHub</a>.',
                                 'No public projects to show right now. Visit github.com/Manaiakalani to view them.'
                             );
                         }
@@ -494,7 +494,7 @@ if (typingEl) {
 
     var entries = Array.prototype.slice.call(thoughtsList.querySelectorAll('.thought-entry'));
 
-    // Reading time — derived from the excerpt (which is the full entry content on this site).
+    // Reading time - derived from the excerpt (which is the full entry content on this site).
     entries.forEach(function (entry) {
         var excerpt = entry.querySelector('.thought-excerpt');
         var dateEl = entry.querySelector('.thought-date');
@@ -541,7 +541,7 @@ if (typingEl) {
         titleEl.appendChild(btn);
     });
 
-    // Search/filter over existing entries (no re-fetch — content is static).
+    // Search/filter over existing entries (no re-fetch - content is static).
     var searchInput = document.getElementById('thought-search');
     var noResults = document.getElementById('thoughts-no-results');
     var thoughtsStatus = document.getElementById('thoughts-status');

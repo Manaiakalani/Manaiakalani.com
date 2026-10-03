@@ -1,4 +1,4 @@
-// GeoCities Mode — Welcome to 1997! 🚧🔥
+// GeoCities Mode: Welcome to 1997! 🚧🔥
 (function () {
   'use strict';
 

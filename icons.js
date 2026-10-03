@@ -1,5 +1,5 @@
 /**
- * Site icons — Noun Project–style 24² glyphs (currentColor). Hydrates [data-icon].
+ * Site icons - Noun Project-style 24² glyphs (currentColor). Hydrates [data-icon].
  */
 (function (root) {
     'use strict';

@@ -4,7 +4,7 @@
  * Zero-dependency unit tests for the visitor-counter core logic.
  * Run: node test/counter-core.test.js  (or `npm test` inside api/)
  * Validates the integer coercion that keeps the odometer from going negative,
- * fractional, or unbounded — without needing the Functions runtime or Azure.
+ * fractional, or unbounded - without needing the Functions runtime or Azure.
  */
 
 const assert = require('assert');

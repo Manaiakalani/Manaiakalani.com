@@ -1,5 +1,5 @@
 /*
- * Shared guestbook data layer — modern wall + GeoCities dialog.
+ * Shared guestbook data layer - modern wall + GeoCities dialog.
  * CSP-safe, no inline handlers. Degrades to localStorage when /api/guestbook
  * is missing, matching the "no fake numbers" rule.
  */
@@ -155,7 +155,7 @@
             who.textContent = entry.name;
             var when = document.createElement('span');
             when.className = cls.when;
-            when.textContent = entry.date ? ' — ' + entry.date : '';
+            when.textContent = entry.date ? ' · ' + entry.date : '';
             who.appendChild(when);
             var msg = document.createElement('div');
             msg.className = cls.msg;
@@ -282,11 +282,11 @@
                 } else if (res.reason === 'rate_limited') {
                     if (status) {
                         status.textContent = res.retryAfter
-                            ? 'Saved locally. The shared book is busy — try again in ' + res.retryAfter + 's.'
-                            : 'Saved locally. The shared book is busy — try again shortly.';
+                            ? 'Saved locally. The shared book is busy. Try again in ' + res.retryAfter + 's.'
+                            : 'Saved locally. The shared book is busy. Try again shortly.';
                     }
                 } else if (res.reason === 'failed') {
-                    if (status) status.textContent = 'Saved in this browser — the shared book is unavailable right now.';
+                    if (status) status.textContent = 'Saved in this browser. The shared book is unavailable right now.';
                 }
             });
         });
@@ -326,7 +326,7 @@
                 .then(function (d) {
                     if (!status || !d) return;
                     if (d.backend === 'unconfigured') {
-                        status.textContent = 'The shared book is off. Your signature stays in this browser until Firebase is connected — see api/README.md.';
+                        status.textContent = 'The shared book is off. Your signature stays in this browser until Firebase is connected (see api/README.md).';
                     }
                 })
                 .catch(function () { /* stay quiet */ });

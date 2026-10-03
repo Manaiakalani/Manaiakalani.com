@@ -1,7 +1,7 @@
 'use strict';
 
 /*
- * Visitor-counter core logic — pure, dependency-free, and unit-testable.
+ * Visitor-counter core logic - pure, dependency-free, and unit-testable.
  * The Azure Function wrapper (../functions/counter.js) owns the Firestore
  * increment; these helpers just coerce a possibly-garbage stored value
  * into a safe integer so the count can never go negative, fractional, or wild.

@@ -2,12 +2,12 @@ const { test, expect } = require('@playwright/test');
 
 const PAGES = [
   { path: '/', title: 'Maximilian Stein', name: 'index' },
-  { path: '/projects', title: 'Projects — Maximilian Stein', name: 'projects' },
-  { path: '/thoughts', title: 'Thoughts — Maximilian Stein', name: 'thoughts' },
-  { path: '/uses', title: 'Uses — Maximilian Stein', name: 'uses' },
+  { path: '/projects', title: 'Projects | Maximilian Stein', name: 'projects' },
+  { path: '/thoughts', title: 'Thoughts | Maximilian Stein', name: 'thoughts' },
+  { path: '/uses', title: 'Uses | Maximilian Stein', name: 'uses' },
 ];
 
-// Block the analytics domain — its SSL cert is broken and hangs the load event in CI
+// Block the analytics domain - its SSL cert is broken and hangs the load event in CI
 // Mock GitHub API to avoid rate limits and make tests deterministic
 // pushed_at/stargazers_count are staggered so sort order (impact/recent/name) and the
 // "currently building" widget (most recent pushed_at) are all independently deterministic.
@@ -136,7 +136,7 @@ test('index: currently building widget shows most recently active project', asyn
   await page.goto('/');
   await page.waitForSelector('#currently-building .building-card', { timeout: 10000 });
   await expect(page.locator('.currently-building-teaser')).toBeVisible();
-  // The portfolio repo is the most recently pushed — currently-building must
+  // The portfolio repo is the most recently pushed - currently-building must
   // include it even though the Projects grid still excludes it.
   await expect(page.locator('#currently-building .building-card h3')).toHaveText('Manaiakalani.com');
   await expect(page.locator('#currently-building time.building-updated')).toHaveAttribute('datetime', /20/);
@@ -257,7 +257,7 @@ test('projects: sort control reorders cards by impact, recency, and name', async
   const sortSelect = page.locator('#project-sort');
   await expect(sortSelect).toBeVisible();
 
-  // Default sort is "impact" — most stars first (project-delta has the most in mock data)
+  // Default sort is "impact" - most stars first (project-delta has the most in mock data)
   await expect(page.locator('.project-card h2').first()).toHaveText('project-delta');
 
   await sortSelect.selectOption('recent');
@@ -726,7 +726,7 @@ test('boot.js references GeoCities assets root-relative', async ({ page }) => {
   await page.goto('/');
   // Fetch the exact URL the page loads. A bare /boot.js is a separate cache key
   // and, being served immutable, an edge cache can pin an old copy there that no
-  // visitor ever receives — so asserting against it says nothing useful.
+  // visitor ever receives - so asserting against it says nothing useful.
   const src = await page.locator('script[src*="boot.js"]').first().getAttribute('src');
   expect(src).toBeTruthy();
   const res = await page.request.get(src);
@@ -833,7 +833,7 @@ test('geocities: a slow GET cannot roll back a signature the backend already con
   expect(saved).toContain('RaceVisitor');
 });
 
-// An empty list from a *configured* backend is authoritative — the shared book is
+// An empty list from a *configured* backend is authoritative - the shared book is
 // genuinely empty, so the 1998 seed entries must clear. An `unconfigured` backend
 // also answers with `entries: []`, and that one must leave local entries alone.
 test('geocities: an empty configured backend clears seed entries, but unconfigured does not', async ({ page }) => {
@@ -937,7 +937,7 @@ test('geocities: an out-of-order POST response cannot roll back a newer signatur
 // backend processes the *second-issued* one first. So the first-issued POST comes
 // back with the complete list and arrives first, while the second-issued POST's
 // older single-entry list lands last. Issue order and arrival order disagree, and
-// neither identifies the fresher list — so only the latest-issued sync may apply,
+// neither identifies the fresher list - so only the latest-issued sync may apply,
 // and the superseded entry stays pending and is preserved.
 test('geocities: reversed backend processing order cannot drop a signature', async ({ page }) => {
   await page.addInitScript(() => {
@@ -1010,7 +1010,7 @@ test('geocities: a held GET in one tab cannot wipe an entry another tab confirme
   const block = p => p.addInitScript(() => {
     try { navigator.serviceWorker.register = () => Promise.reject(new Error('sw blocked in test')); } catch (e) {}
     // Count settled guestbook fetches so the test can wait on the response
-    // actually being processed rather than on a wall-clock guess — a backgrounded
+    // actually being processed rather than on a wall-clock guess - a backgrounded
     // tab is throttled, which makes a fixed timeout race the wipe it checks for.
     window.__gbFetches = 0;
     const originalFetch = window.fetch;
@@ -1036,7 +1036,7 @@ test('geocities: a held GET in one tab cannot wipe an entry another tab confirme
   });
 
   // GeoCities mode is itself persisted in the shared localStorage, so the second
-  // tab loads with it already enabled — only toggle when it is actually off.
+  // tab loads with it already enabled - only toggle when it is actually off.
   const ensureGeocities = async (p) => {
     const toggle = p.locator('.geocities-toggle');
     await expect(toggle).toBeVisible();
@@ -1077,7 +1077,7 @@ test('geocities: a held GET in one tab cannot wipe an entry another tab confirme
 
   // Now let tab A's stale empty list arrive. Focus it first so it is not throttled
   // as a background tab, then wait for the held fetch to actually settle and its
-  // handlers to run — otherwise the assertion can win a race against the wipe.
+  // handlers to run - otherwise the assertion can win a race against the wipe.
   await tabA.bringToFront();
   releaseTabAGet();
   await tabA.waitForFunction(() => window.__gbFetches >= 1, null, { timeout: 10000 });
@@ -1309,7 +1309,7 @@ test('counter: footer counter stays hidden when no backend is configured', async
   await expect(panel).toBeHidden();
 });
 
-test('counter: reveals an amber odometer with the count when the backend responds', async ({ page }) => {
+test('counter: odometer only shows in GeoCities mode once the backend responds', async ({ page }) => {
   // Neutralize the SW so the counter fetch hits the route mock, not the SW's
   // network-first passthrough to the (mock-less) real dev server.
   await page.addInitScript(() => {
@@ -1320,6 +1320,10 @@ test('counter: reveals an amber odometer with the count when the backend respond
   );
   await page.goto('/');
   const panel = page.locator('.footer-visits');
+  await expect(panel).toHaveJSProperty('hidden', false);
+  await expect(panel).toBeHidden();
+  await page.locator('.geocities-toggle').click();
+  await expect(page.locator('html')).toHaveAttribute('data-geocities', 'true');
   await expect(panel).toBeVisible();
   const odo = panel.locator('.visits-odometer');
   await expect(odo).toHaveAttribute('aria-label', /12,483 visitors/);
@@ -1338,9 +1342,9 @@ test('counter: increments once per session (POST first visit, GET thereafter)', 
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ count: 7 }) });
   });
   await page.goto('/');
-  await expect(page.locator('.footer-visits')).toBeVisible();
+  await expect(page.locator('.footer-visits')).toHaveJSProperty('hidden', false);
   await page.goto('/uses'); // same tab → sessionStorage guard is set
-  await expect(page.locator('.footer-visits')).toBeVisible();
+  await expect(page.locator('.footer-visits')).toHaveJSProperty('hidden', false);
   expect(methods[0]).toBe('POST');
   expect(methods.slice(1)).not.toContain('POST');
 });
@@ -1351,6 +1355,14 @@ test('chrome: shared header names the fishhook and marks the current nav', async
   await expect(page.locator('.site-nav a[aria-current="page"]')).toHaveAttribute('href', '/');
   await page.goto('/thoughts');
   await expect(page.locator('.site-nav a[aria-current="page"]')).toHaveAttribute('href', '/thoughts');
+});
+
+test('chrome: footer links sit under the social icons and the 88x31 is gone', async ({ page }) => {
+  await page.goto('/');
+  const icons = await page.locator('footer .social-icons').boundingBox();
+  const links = await page.locator('footer .footer-links').boundingBox();
+  expect(links.y).toBeGreaterThanOrEqual(icons.y + icons.height - 1);
+  await expect(page.locator('footer img[src*="badge-88x31"]')).toHaveCount(0);
 });
 
 test('chrome: footer signs the book and links the colophon', async ({ page }) => {
@@ -1393,13 +1405,13 @@ test('uses: random tool button is present', async ({ page }) => {
 
 // ── Round 6: richer per-page social cards ──
 const OG_CARDS = [
-  { path: '/', img: 'og-home.png', alt: 'Maximilian Stein — Product Manager' },
-  { path: '/thoughts', img: 'og-thoughts.png', alt: 'Maximilian Stein — Thoughts' },
-  { path: '/uses', img: 'og-uses.png', alt: 'Maximilian Stein — Uses' },
-  { path: '/projects', img: 'og-projects.png', alt: 'Maximilian Stein — Projects' },
-  { path: '/colophon', img: 'og-colophon.png', alt: 'Maximilian Stein — Colophon' },
-  { path: '/now', img: 'og-now.png', alt: 'Maximilian Stein — Now' },
-  { path: '/guestbook', img: 'og-guestbook.png', alt: 'Maximilian Stein — Guestbook' },
+  { path: '/', img: 'og-home.png', alt: 'Maximilian Stein, Product Manager' },
+  { path: '/thoughts', img: 'og-thoughts.png', alt: 'Maximilian Stein, Thoughts' },
+  { path: '/uses', img: 'og-uses.png', alt: 'Maximilian Stein, Uses' },
+  { path: '/projects', img: 'og-projects.png', alt: 'Maximilian Stein, Projects' },
+  { path: '/colophon', img: 'og-colophon.png', alt: 'Maximilian Stein, Colophon' },
+  { path: '/now', img: 'og-now.png', alt: 'Maximilian Stein, Now' },
+  { path: '/guestbook', img: 'og-guestbook.png', alt: 'Maximilian Stein, Guestbook' },
 ];
 for (const o of OG_CARDS) {
   test(`${o.path}: ships a per-page social card with dimensions and alt text`, async ({ page }) => {

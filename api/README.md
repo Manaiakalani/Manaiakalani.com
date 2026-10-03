@@ -18,7 +18,7 @@ backend never breaks the page.
 
 | Method | Body | Response |
 | --- | --- | --- |
-| `GET`  | — | `{ "entries": [{ "name", "message", "date" }, …] }` newest-first |
+| `GET`  | - | `{ "entries": [{ "name", "message", "date" }, …] }` newest-first |
 | `POST` | `{ "name", "message" }` | `{ "entries": [ … ] }` with the new signature prepended |
 
 All input is sanitized and length-capped server-side (`name` ≤ 40,
@@ -29,9 +29,9 @@ All input is sanitized and length-capped server-side (`name` ≤ 40,
 
 Collections (created on first write):
 
-- `guestbook` — one document per signature (`name`, `message`, `date`, `id`, `seq`)
-- `counter/hits` — `{ count }` with atomic `increment`
-- `ratelimit/{bucket}_{hash}` — per-IP windows (hashed, never a raw IP)
+- `guestbook` - one document per signature (`name`, `message`, `date`, `id`, `seq`)
+- `counter/hits` - `{ count }` with atomic `increment`
+- `ratelimit/{bucket}_{hash}` - per-IP windows (hashed, never a raw IP)
 
 ## Abuse protection (rate limiting)
 
@@ -39,7 +39,7 @@ Both anonymous `POST` endpoints are throttled per client IP
 (`src/lib/rate-limit.js`, decision logic in `src/lib/rate-limit-core.js`).
 
 - **Defaults:** guestbook **5 posts / 10 min**, counter **20 increments / 5 min**
-  per IP. Only writes are limited — `GET` reads stay open.
+  per IP. Only writes are limited - `GET` reads stay open.
 - **Privacy-first:** the client IP is **salted-hashed** into an opaque document
   id. Set `RATE_LIMIT_SALT` to a long random secret.
 - **Fail-open:** if Firebase is unconfigured or errors, requests are allowed.
@@ -52,7 +52,7 @@ Both anonymous `POST` endpoints are throttled per client IP
 ## One-time Firebase setup
 
 1. In [Firebase Console](https://console.firebase.google.com/) create a project
-   (or reuse one). Enable **Cloud Firestore** (production mode is fine — rules
+   (or reuse one). Enable **Cloud Firestore** (production mode is fine - rules
    below deny the client SDK).
 
 2. Project settings → **Service accounts** → Generate new private key.

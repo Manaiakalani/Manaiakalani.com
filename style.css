@@ -3,10 +3,10 @@
     navigation: auto;
 }
 
-/* Doto — self-hosted (was Google Fonts). Same v3 woff2 subsets Google served,
+/* Doto - self-hosted (was Google Fonts). Same v3 woff2 subsets Google served,
    now first-party for privacy + one fewer third-party origin on the critical
    path. latin is preloaded in each page head; latin-ext loads on demand. Doto is
-   variable, so 400 and 700 share one file per subset — matching Google exactly. */
+   variable, so 400 and 700 share one file per subset - matching Google exactly. */
 @font-face {
     font-family: 'Doto';
     font-style: normal;
@@ -40,7 +40,7 @@
     unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
-/* Custom Properties — Light Theme (default) */
+/* Custom Properties - Light Theme (default) */
 :root {
     --bg-primary: #ffffff;
     --bg-secondary: #f8f8f8;
@@ -340,24 +340,6 @@ footer {
     background: rgba(255, 255, 255, 0.12);
 }
 
-.footer-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem 1.5rem;
-}
-
-.footer-row .footer-links,
-.footer-row .footer-badge,
-.footer-row .footer-visits {
-    margin: 0;
-}
-
-.footer-row--meta {
-    margin-top: 1.25rem;
-}
-
 .footer-text {
     margin: 1rem 0 0;
     font-size: 0.85rem;
@@ -575,7 +557,7 @@ html.js .clippy-bubble:not(.is-open) {
     }
 }
 
-/* Retro visitor hit counter — an amber-LED odometer rendered in Doto.
+/* Retro visitor hit counter - an amber-LED odometer rendered in Doto.
    Hidden by default; components.js reveals it only once a numeric count
    arrives from the backend, so it degrades to nothing when unconfigured. */
 .footer-visits {
@@ -586,7 +568,8 @@ html.js .clippy-bubble:not(.is-open) {
     gap: 0.5rem;
 }
 
-.footer-visits[hidden] {
+.footer-visits[hidden],
+html:not([data-geocities="true"]) .footer-visits {
     display: none;
 }
 
@@ -685,15 +668,17 @@ html.js .clippy-bubble:not(.is-open) {
 
 /* Heartbeat Animation */
 @keyframes heartbeat {
-    0%, 100% { transform: scale(1); }
-    10% { transform: scale(1.25); }
-    20% { transform: scale(1); }
-    30% { transform: scale(1.2); }
-    40% { transform: scale(1); }
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 1px rgba(255, 59, 92, 0.4)); }
+    10% { transform: scale(1.25); filter: drop-shadow(0 0 6px rgba(255, 59, 92, 0.95)); }
+    20% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(255, 59, 92, 0.5)); }
+    30% { transform: scale(1.2); filter: drop-shadow(0 0 7px rgba(255, 59, 92, 1)); }
+    40% { transform: scale(1); filter: drop-shadow(0 0 1px rgba(255, 59, 92, 0.4)); }
 }
 
 .heart-beat {
     display: inline-block;
+    color: #ff3b5c;
+    vertical-align: -0.1em;
     animation: heartbeat 1.5s ease-in-out infinite;
 }
 
@@ -1839,7 +1824,7 @@ footer {
     opacity: 1;
 }
 
-/* On the tinted active row, accent marks drop below AA — keep the match legible. */
+/* On the tinted active row, accent marks drop below AA - keep the match legible. */
 .cmdk__item.is-active .cmdk__label mark {
     color: var(--text-primary);
     text-decoration: underline;
@@ -2068,17 +2053,6 @@ html[data-theme="dark"] body {
 .page-hero .clippy-row {
     justify-content: center;
     margin-top: 1.25rem;
-}
-
-.footer-badge {
-    margin-top: 1rem;
-    text-align: center;
-}
-.footer-badge img {
-    display: inline-block;
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    vertical-align: middle;
 }
 
 .gb-layout {

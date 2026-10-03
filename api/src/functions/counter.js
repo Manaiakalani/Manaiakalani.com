@@ -1,7 +1,7 @@
 'use strict';
 
 /*
- * Visitor counter — Azure Static Web Apps managed function (Node v4 model).
+ * Visitor counter - Azure Static Web Apps managed function (Node v4 model).
  *
  * GET  /api/counter  -> { count }            (read only)
  * POST /api/counter  -> { count }            (increment, then read)

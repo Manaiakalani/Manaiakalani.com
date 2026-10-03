@@ -21,7 +21,7 @@ const allHashes = new Set();
 for (const file of htmlFiles) {
   const filePath = path.join(dir, file);
   if (!fs.existsSync(filePath)) {
-    log(`\n=== ${file} — NOT FOUND ===`);
+    log(`\n=== ${file} - NOT FOUND ===`);
     continue;
   }
   const html = fs.readFileSync(filePath, 'utf8');
@@ -82,5 +82,5 @@ if (checkMode) {
     console.error(`\nCSP hash check FAILED. Run \`node compute-hashes.js\` and sync staticwebapp.config.json.`);
     process.exit(1);
   }
-  console.log(`CSP hash check passed — ${allHashes.size} inline script hashes match script-src.`);
+  console.log(`CSP hash check passed - ${allHashes.size} inline script hashes match script-src.`);
 }

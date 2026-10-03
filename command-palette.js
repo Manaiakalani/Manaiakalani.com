@@ -3,7 +3,7 @@
  * Keyboard- and touch-driven launcher for pages and actions.
  * Self-contained: injects its own trigger button and <dialog>, reuses the
  * page's existing theme / retro toggles so behaviour stays in one place.
- * No inline scripts or styles (CSP-safe); progressive enhancement — if the
+ * No inline scripts or styles (CSP-safe); progressive enhancement - if the
  * native <dialog> API is unavailable the feature simply does nothing.
  */
 (function () {
@@ -47,7 +47,7 @@
         else go('/#about');
     } });
 
-    // Native share sheet — only offered where the browser supports it; elsewhere
+    // Native share sheet - only offered where the browser supports it; elsewhere
     // the copy-link command above covers the same need.
     if (typeof navigator.share === 'function') {
         add({ icon: ic('share'), title: 'Share this page\u2026', hint: 'Action', keys: 'share send native sheet url social', run: sharePage });
@@ -108,7 +108,7 @@
     // ---- Page content index (lazy) ----------------------------------------
     // Beyond command names, the palette searches real page text (thoughts,
     // uses, about) via a committed search.json. Fetched once on first open;
-    // any failure is non-fatal — command matching keeps working regardless.
+    // any failure is non-fatal - command matching keeps working regardless.
     var contentCmds = null;    // null = not loaded yet
     var contentLoading = false;
 

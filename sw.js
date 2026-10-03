@@ -1,18 +1,18 @@
 /*
- * Service worker — offline support for manaiakalani.com
+ * Service worker - offline support for manaiakalani.com
  * Strategy:
  *   - HTML documents (navigations AND prefetched pages): network-first, fall back
  *     to cache, then to the cached home page / 404 when fully offline. Routing by
  *     destination (not just req.mode) keeps prefetched documents off the cache-first
  *     path so they can never strand users on a stale page.
- *   - Versioned static assets (?v=…): cache-first (immutable — a new deploy requests
+ *   - Versioned static assets (?v=…): cache-first (immutable - a new deploy requests
  *     a new URL and never serves stale content).
  *   - Unversioned assets (favicon, manifest, og-image): network-first so they can't
  *     get locked to a stale copy until the cache name is bumped.
- *   - Same-origin API calls (/api/*): never intercepted — always go straight to the
+ *   - Same-origin API calls (/api/*): never intercepted - always go straight to the
  *     network so a live count / guestbook can never be served from a stale cache.
  *   - Cross-origin requests (fonts, CDN, analytics, GitHub API): left to the
- *     network — the worker never intercepts them.
+ *     network - the worker never intercepts them.
  * Bump CACHE on every deploy so the activate step purges the previous cache.
  */
 var CACHE = 'mnk-cache-v11';
@@ -87,7 +87,7 @@ self.addEventListener('fetch', function (event) {
     var url;
     try { url = new URL(req.url); } catch (e) { return; }
     if (url.origin !== self.location.origin) return; // never touch cross-origin
-    if (url.pathname.indexOf('/api/') === 0) return; // never cache API calls — always hit the network
+    if (url.pathname.indexOf('/api/') === 0) return; // never cache API calls - always hit the network
 
     // Treat HTML documents (real navigations AND prefetched documents, which are
     // NOT req.mode==='navigate') as network-first so a new deploy is picked up and

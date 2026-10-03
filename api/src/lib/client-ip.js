@@ -1,7 +1,7 @@
 'use strict';
 
 /*
- * Best-effort client-IP extraction for rate limiting — pure and unit-testable.
+ * Best-effort client-IP extraction for rate limiting - pure and unit-testable.
  *
  * Behind Cloudflare -> Azure Static Web Apps -> Functions, the real client IP
  * arrives in a header, not on the socket. Preference order:

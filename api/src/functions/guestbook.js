@@ -1,7 +1,7 @@
 'use strict';
 
 /*
- * Shared guestbook — Azure Static Web Apps managed function (Node v4 model).
+ * Shared guestbook - Azure Static Web Apps managed function (Node v4 model).
  *
  * GET  /api/guestbook  -> { entries: [{name, message, date}, ...] }  (newest first)
  * POST /api/guestbook  -> { entries: [...] }  after appending {name, message}
@@ -45,7 +45,7 @@ async function respond(request, context) {
       return {
         status: 429,
         headers: { 'Retry-After': String(limit.retryAfterSec) },
-        jsonBody: { error: 'Too many signatures — please wait a moment and try again.' }
+        jsonBody: { error: 'Too many signatures - please wait a moment and try again.' }
       };
     }
     let raw = {};

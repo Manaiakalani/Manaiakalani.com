@@ -5,7 +5,7 @@
  * counter). Backed by a Firestore collection so it never contends with the
  * guestbook documents.
  *
- * Privacy-first: the client IP is salted-hashed into an opaque document id —
+ * Privacy-first: the client IP is salted-hashed into an opaque document id -
  * raw visitor IPs are never written to storage.
  *
  * Fail-open by design: when Firebase is unconfigured, the client IP is unknown,
@@ -54,7 +54,7 @@ function hashIp(ip) {
   return crypto.createHash('sha256').update(salt + '|' + ip).digest('hex').slice(0, 32);
 }
 
-// Read the header accessor defensively — Functions v4 gives a Headers object
+// Read the header accessor defensively - Functions v4 gives a Headers object
 // (.get), but never assume; any failure just yields '' (-> fail open upstream).
 function headerGetter(request) {
   return function (name) {
@@ -85,7 +85,7 @@ async function readRecord(client, partition, row) {
  * counter.js. Returns { allowed, retryAfterSec }. Assumes the table exists.
  *
  * Two correctness properties the plain last-write-wins upsert lacked:
- *   1. Denied requests never write — the stored window/count is already right,
+ *   1. Denied requests never write - the stored window/count is already right,
  *      so a flood costs zero storage writes and can't keep resetting the row.
  *   2. Allowed writes are guarded by If-Match (updates) or create-if-absent, so
  *      concurrent requests can't both read count=N-1 and both commit N; the
@@ -123,7 +123,7 @@ async function commit(client, partition, row, policy, t) {
     }
   }
 
-  // Storage is healthy but this one key is under heavy write contention — i.e.
+  // Storage is healthy but this one key is under heavy write contention - i.e.
   // a burst/flood against a single IP, which a genuine visitor never generates.
   // Throttle rather than fail open, so contention can't be used to slip through.
   return { allowed: false, retryAfterSec: Math.ceil(policy.windowMs / 1000) };

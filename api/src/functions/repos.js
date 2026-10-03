@@ -1,7 +1,7 @@
 'use strict';
 
 /*
- * GitHub repos proxy — Azure Static Web Apps managed function.
+ * GitHub repos proxy - Azure Static Web Apps managed function.
  *
  * GET /api/repos -> { repos: [...], backend: 'github' }
  *

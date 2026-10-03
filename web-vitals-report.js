@@ -19,6 +19,6 @@
           }
         });
       })
-      .catch(function () { /* CDN unreachable — silent no-op */ });
-  } catch (e) { /* dynamic import unsupported — silent no-op */ }
+      .catch(function () { /* CDN unreachable - silent no-op */ });
+  } catch (e) { /* dynamic import unsupported - silent no-op */ }
 })();

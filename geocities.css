@@ -1,5 +1,5 @@
 /* =========================================================
-   GeoCities Mode — Welcome to 1997! 🚧🔥
+   GeoCities Mode: Welcome to 1997! 🚧🔥
    Scoped under [data-geocities="true"]
    ========================================================= */
 
@@ -288,7 +288,7 @@ html[data-geocities="true"] .geocities-toggle .gc-icon {
   line-height: 1;
 }
 
-/* When geocities active, style the toggle — leave position to style.css */
+/* When geocities active, style the toggle - leave position to style.css */
 html[data-geocities="true"] .geocities-toggle {
   background: var(--gc-accent);
   border: 2px solid var(--gc-border);

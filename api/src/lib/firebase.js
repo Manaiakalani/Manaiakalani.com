@@ -4,7 +4,7 @@
  * Lazy Firebase Admin / Firestore handle for the Azure Functions API.
  *
  * Credentials (first match wins):
- *   FIREBASE_SERVICE_ACCOUNT  — full service-account JSON (private_key may use \n)
+ *   FIREBASE_SERVICE_ACCOUNT  - full service-account JSON (private_key may use \n)
  *   FIREBASE_PROJECT_ID + FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY
  *
  * Returns null when nothing is configured so callers can degrade the same way

@@ -1,14 +1,14 @@
 'use strict';
 
 /*
- * Fixed-window rate-limit decision logic — pure, dependency-free, unit-testable.
+ * Fixed-window rate-limit decision logic - pure, dependency-free, unit-testable.
  *
  * No I/O and no clock of its own: the caller passes the current time and the
  * previously stored record, so the security-critical decision can be tested
  * without Firestore or the Functions runtime.
  *
  * A record is { windowStart: <epoch ms>, count: <n> }. evaluate() returns the
- * next record to persist, whether this request is allowed, and — when denied —
+ * next record to persist, whether this request is allowed, and - when denied -
  * how many seconds until the window resets.
  */
 
@@ -32,7 +32,7 @@ function evaluate(record, now, opts) {
   var count = record ? toInt(record.count, 0) : 0;
 
   // Fresh window when there is no record, the previous window has fully elapsed,
-  // or the stored window is (impossibly) in the future — never let a poisoned
+  // or the stored window is (impossibly) in the future - never let a poisoned
   // future timestamp lock a visitor out.
   if (!record || start > t || t - start >= windowMs) {
     return { allowed: true, record: { windowStart: t, count: 1 }, retryAfterSec: 0 };

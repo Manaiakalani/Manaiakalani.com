@@ -1,7 +1,7 @@
 'use strict';
 
 /*
- * Guestbook core logic — pure, dependency-free, and unit-testable.
+ * Guestbook core logic - pure, dependency-free, and unit-testable.
  * The Azure Function wrapper (../functions/guestbook.js) handles I/O and
  * delegates all validation, sanitization, and shaping to these helpers so the
  * security-critical code can be tested without the Functions runtime or Azure.
@@ -38,8 +38,8 @@ function today() {
 }
 
 // Project a raw Table entity down to the minimal stored shape toPublic consumes.
-// Kept here (pure + unit-tested) so the field set — crucially including the `id`
-// the client needs to reconcile its pending copy — can't silently drop a column
+// Kept here (pure + unit-tested) so the field set - crucially including the `id`
+// the client needs to reconcile its pending copy - can't silently drop a column
 // in the Function wrapper's read path. toPublic re-sanitizes the visible fields;
 // `seq` drives newest-first ordering.
 function projectRow(e) {
