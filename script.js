@@ -60,10 +60,14 @@ if (typingEl) {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         typingEl.textContent = typingText;
     } else {
+        typingEl.innerHTML = '<span class="visually-hidden"></span><span class="typing-ghost" aria-hidden="true"></span><span class="typing-live" aria-hidden="true"></span>';
+        typingEl.children[0].textContent = typingText;
+        typingEl.children[1].textContent = typingText;
+        var typingLive = typingEl.children[2];
         var index = 0;
         function type() {
             if (index < typingText.length) {
-                typingEl.textContent += typingText.charAt(index);
+                typingLive.textContent += typingText.charAt(index);
                 index++;
                 setTimeout(type, 100);
             }
@@ -292,14 +296,11 @@ if (typingEl) {
         var container = document.getElementById('all-projects');
         if (!container) return;
         var filtered = getVisibleProjects();
-        var note = document.getElementById('projects-sort-note');
         if (filtered.length) {
             container.innerHTML = filtered.map(buildCard).join('');
         } else {
             container.innerHTML = '<p class="projects-fallback" style="text-align:center;color:var(--text-secondary);padding:2rem;">No projects match your search.</p>';
         }
-        // The note describes the "impact" sort specifically, so only show it when that's active.
-        if (note) note.hidden = !(filtered.length && currentSort === 'impact');
         container.setAttribute('aria-busy', 'false');
         var hasQuery = searchInput && searchInput.value.trim();
         announceProjects(filtered.length

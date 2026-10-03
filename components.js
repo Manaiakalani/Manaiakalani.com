@@ -11,11 +11,14 @@
             ? '<h1>MANAIAKALANI</h1>'
             : '<span class="brand-text">MANAIAKALANI</span>';
         var typing = variant === 'home' ? '<p id="typing-effect"></p>' : '';
+        var hook = variant === 'home'
+            ? '<p class="header-hook"><button type="button" class="scorpius-trigger" aria-expanded="false" aria-controls="scorpius-sky"><em>Manaiakalani is Maui\'s fishhook \u2014 the Hawaiian name for Scorpius.</em></button></p>'
+            : '';
         header.innerHTML =
             '<div class="container">' +
                 brand +
                 '<p class="header-subtitle">Aloha, I\'m Maximilian (Manaiakalani) Stein</p>' +
-                '<p class="header-hook"><button type="button" class="scorpius-trigger" aria-expanded="false" aria-controls="scorpius-sky"><em>Manaiakalani is Maui\'s fishhook \u2014 the Hawaiian name for Scorpius.</em></button></p>' +
+                hook +
                 typing +
                 '<nav class="site-nav" aria-label="Main">' +
                     '<a href="/">About</a>' +
@@ -47,6 +50,7 @@
             '<div class="cube-wrapper" aria-hidden="true">' +
                 '<canvas id="ascii-cube"></canvas>' +
             '</div>' +
+            '<div class="footer-row">' +
             '<div class="social-icons">' +
                 '<a href="https://www.linkedin.com/in/manaiakalani/" target="_blank" rel="noopener noreferrer me" aria-label="LinkedIn">' + ic('linkedin') + '</a>' +
                 '<a href="https://x.com/manaiakalani" target="_blank" rel="noopener noreferrer me" aria-label="X (formerly Twitter)">' + ic('x') + '</a>' +
@@ -55,7 +59,6 @@
                 '<a href="https://www.youtube.com/kimaker213" target="_blank" rel="noopener noreferrer me" aria-label="YouTube">' + ic('youtube') + '</a>' +
                 '<a href="https://bsky.app/profile/did:plc:kurxpumma6piictgpr424wcj" target="_blank" rel="noopener noreferrer me" aria-label="Bluesky">' + ic('bluesky') + '</a>' +
             '</div>' +
-            '<p class="footer-text">Made with <span class="heart-beat" aria-hidden="true">' + ic('heart') + '</span> in Seattle, WA</p>' +
             '<p class="footer-links">' +
                 '<a href="/guestbook#sign" class="footer-text-btn" id="sign-the-book">' + ic('book') + ' Sign the book</a>' +
                 '<a href="/now">Now</a>' +
@@ -64,13 +67,17 @@
                 '<a href="mailto:webmaster@manaiakalani.com">Email</a>' +
                 '<a href="/feed.xml">RSS</a>' +
             '</p>' +
+            '</div>' +
+            '<div class="footer-row footer-row--meta">' +
             '<p class="footer-badge">' +
                 '<a href="/" title="manaiakalani.com 88x31"><img src="/badge-88x31.png" width="88" height="31" alt="manaiakalani.com"></a>' +
             '</p>' +
             '<p class="footer-visits" hidden>' +
                 '<span class="visits-odometer" aria-label="Visitor count"></span>' +
                 '<span class="visits-label">Visitors</span>' +
-            '</p>';
+            '</p>' +
+            '</div>' +
+            '<p class="footer-text">Made with <span class="heart-beat" aria-hidden="true">' + ic('heart') + '</span> in Seattle, WA</p>';
         footerContent.dataset.injected = 'true';
         ensureCubeLoader();
         initVisitorCounter();

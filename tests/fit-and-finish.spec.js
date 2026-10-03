@@ -269,19 +269,21 @@ test('projects: sort control reorders cards by impact, recency, and name', async
   await expect(page.locator('.project-card h2').first()).toHaveText('project-alpha');
 });
 
-test('projects: sort note only shows for the impact sort', async ({ page }) => {
+test('projects: search, sort, and random share one toolbar row', async ({ page }) => {
   await page.goto('/projects');
   await page.waitForSelector('.project-card', { timeout: 10000 });
-  const note = page.locator('#projects-sort-note');
-  await expect(note).toBeVisible();
-
-  await page.locator('#project-sort').selectOption('recent');
-  await page.waitForTimeout(200);
-  await expect(note).toBeHidden();
-
-  await page.locator('#project-sort').selectOption('impact');
-  await page.waitForTimeout(200);
-  await expect(note).toBeVisible();
+  const toolbar = page.locator('.page-toolbar');
+  await expect(toolbar.locator('#project-search')).toBeVisible();
+  await expect(toolbar.locator('#project-sort')).toBeVisible();
+  await expect(toolbar.locator('#random-project-btn')).toBeVisible();
+  const viewport = page.viewportSize();
+  if (viewport && viewport.width >= 1024) {
+    const tops = await Promise.all(['#project-search', '#project-sort', '#random-project-btn'].map(async sel => {
+      const box = await page.locator(sel).boundingBox();
+      return Math.round(box.y + box.height / 2);
+    }));
+    expect(Math.max(...tops) - Math.min(...tops)).toBeLessThanOrEqual(4);
+  }
 });
 
 // ── Thoughts page ──
@@ -1446,13 +1448,16 @@ test('guestbook wall signs without loading GeoCities', async ({ page }) => {
   await expect(page.locator('html')).not.toHaveAttribute('data-geocities', 'true');
 });
 
-test('uses: Clippy pops a page-aware line', async ({ page }) => {
+test('Clippy lives on the home page only, not on inner pages', async ({ page }) => {
+  for (const path of ['/projects', '/thoughts', '/uses', '/now', '/colophon', '/guestbook']) {
+    await page.goto(path);
+    await expect(page.locator('img.clippy')).toHaveCount(0);
+  }
+});
+
+test('chrome: the fishhook line is only in the home header', async ({ page }) => {
   await page.goto('/uses');
-  const bubble = page.locator('.clippy-bubble');
-  await expect(bubble).toBeHidden();
-  await page.locator('img.clippy').click();
-  await expect(bubble).toBeVisible();
-  await expect(bubble).toContainText('peek at the desk');
+  await expect(page.locator('#site-header .header-hook')).toHaveCount(0);
 });
 
 test('now page has Seattle and Hawaiʻi clocks', async ({ page }) => {

@@ -35,7 +35,7 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://api.github.com">
     <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="style.css?v=a6579466">
+    <link rel="stylesheet" href="style.css?v=a1594b8d">
 
     <!-- RSS Feed -->
     <link rel="alternate" type="application/atom+xml" title="Thoughts — Maximilian Stein" href="/feed.xml">
@@ -77,29 +77,22 @@
         <section class="page-hero">
             <h1>Projects</h1>
             <p>A selection of projects I've built — from gaming utilities and public health dashboards to creative experiments and homelab docs.</p>
-            <button type="button" id="random-project-btn" class="random-project-btn"><span data-icon="dice" aria-hidden="true"></span> Random project</button>
-            <div class="clippy-row clippy-row--hero">
-                <img class="clippy" src="/clippy.webp?v=1b255ca3" width="64" height="64" alt="Clippy" />
-                <div class="clippy-bubble" id="clippy-speech">
-                    <p class="clippy-bubble-line">It looks like you're trying to ship something. Need a repo?</p>
-                </div>
-            </div>
         </section>
 
-        <p class="sort-note" id="projects-sort-note" hidden>Sorted by community impact — most-starred first, then most recent.</p>
-        <div class="page-toolbar page-toolbar--stack">
+        <div class="page-toolbar">
             <div class="search-wrapper">
                 <label for="project-search" class="visually-hidden">Search projects</label>
                 <input type="search" id="project-search" class="search-input" placeholder="Search projects…" autocomplete="off" aria-controls="all-projects">
             </div>
             <div class="select-wrapper">
-                <label for="project-sort" class="toolbar-label">Sort projects</label>
+                <label for="project-sort" class="visually-hidden">Sort projects</label>
                 <select id="project-sort" class="select-input" aria-controls="all-projects">
                     <option value="impact" selected>Most stars</option>
                     <option value="recent">Recently updated</option>
                     <option value="name">Name (A–Z)</option>
                 </select>
             </div>
+            <button type="button" id="random-project-btn" class="random-project-btn" aria-label="Random project"><span data-icon="dice" aria-hidden="true"></span> Random</button>
         </div>
         <div id="projects-status" class="visually-hidden" role="status" aria-live="polite"></div>
         <div class="projects-grid" id="all-projects" aria-busy="true">
@@ -127,9 +120,9 @@
     </footer>
 
     <script defer src="icons.js?v=269f2e81"></script>
-    <script defer src="components.js?v=f1febc1d"></script>
+    <script defer src="components.js?v=a64672bd"></script>
     <script defer src="guestbook.js?v=f0cbcf04"></script>
-    <script defer src="script.js?v=9f4687a5"></script>
+    <script defer src="script.js?v=6a48e1ef"></script>
     <script type="importmap">
     {
         "imports": {

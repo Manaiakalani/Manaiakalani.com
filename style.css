@@ -60,6 +60,8 @@
     --header-control-gap: 0.75rem;
     --header-inset: 1.5rem;
     --touch: 44px;
+    --font-display: 'Doto', sans-serif;
+    --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* Dark Theme */
@@ -108,7 +110,7 @@
 
 /* General Styles */
 body {
-    font-family: 'Doto', sans-serif;
+    font-family: var(--font-body);
     margin: 0;
     padding: 0;
     line-height: 1.6;
@@ -144,8 +146,14 @@ button:focus-visible {
 
 /* Headings */
 h1, h2 {
-    font-family: 'Doto', sans-serif;
+    font-family: var(--font-display);
     font-weight: 700;
+}
+
+h3,
+header p,
+.site-nav {
+    font-family: var(--font-display);
 }
 
 h1 {
@@ -155,7 +163,7 @@ h1 {
 }
 
 .brand-text {
-    font-family: 'Doto', sans-serif;
+    font-family: var(--font-display);
     font-weight: 700;
     font-size: 3rem;
     margin-bottom: 0.5rem;
@@ -176,7 +184,6 @@ h2 {
 
 /* Paragraphs and Other Text */
 p {
-    font-family: 'Doto', sans-serif;
     font-weight: 400;
     margin-bottom: 1.5rem;
 }
@@ -333,9 +340,27 @@ footer {
     background: rgba(255, 255, 255, 0.12);
 }
 
+.footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem 1.5rem;
+}
+
+.footer-row .footer-links,
+.footer-row .footer-badge,
+.footer-row .footer-visits {
+    margin: 0;
+}
+
+.footer-row--meta {
+    margin-top: 1.25rem;
+}
+
 .footer-text {
-    margin-top: 1rem;
-    font-size: 1rem;
+    margin: 1rem 0 0;
+    font-size: 0.85rem;
     color: var(--text-footer-muted);
 }
 
@@ -346,7 +371,7 @@ footer {
     justify-content: center;
     align-items: center;
     margin-top: 0.85rem;
-    font-family: 'Doto', sans-serif;
+    font-family: var(--font-body);
     font-size: 0.9rem;
     font-weight: 700;
 }
@@ -421,7 +446,7 @@ html.js .clippy-bubble:not(.is-open) {
     color: #1a1a1a;
     border: 1px solid #1a1a1a;
     border-radius: 16px;
-    font-family: 'Doto', sans-serif;
+    font-family: var(--font-body);
     font-size: 0.95rem;
     font-style: italic;
     line-height: 1.45;
@@ -768,12 +793,24 @@ html.js .clippy-bubble:not(.is-open) {
 }
 
 #typing-effect {
+    display: grid;
     min-height: 1.6em;
+    margin-top: 0.75rem;
+    font-size: 1.15rem;
+}
+
+.typing-ghost,
+.typing-live {
+    grid-area: 1 / 1;
+}
+
+.typing-ghost {
+    visibility: hidden;
 }
 
 /* Currently Building Teaser (homepage, dynamic from GitHub) */
 .currently-building-teaser {
-    padding: 2.5rem 0;
+    padding: 2.5rem 0 0;
 }
 
 .building-card {
@@ -893,6 +930,25 @@ a.building-card:focus-visible {
     line-height: 1.5;
 }
 
+.projects-grid .project-card:nth-child(n+10) {
+    padding: 1rem 1.25rem;
+}
+
+.projects-grid .project-card:nth-child(n+10) h2 {
+    font-size: 1rem;
+    margin-bottom: 0.35rem;
+}
+
+.projects-grid .project-card:nth-child(n+10) p {
+    font-size: 0.85rem;
+    margin-bottom: 0.6rem;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+}
+
 .project-meta {
     display: flex;
     align-items: center;
@@ -955,10 +1011,11 @@ a.building-card:focus-visible {
 
 /* View All Link */
 .view-all {
-    display: inline-flex;
+    display: flex;
+    width: fit-content;
     align-items: center;
     gap: 0.4rem;
-    margin-top: 2rem;
+    margin: 2rem auto 0;
     min-height: var(--touch);
     color: var(--accent);
     text-decoration: none;
@@ -991,7 +1048,7 @@ a.building-card:focus-visible {
     margin-left: auto;
     margin-right: auto;
     color: var(--text-primary);
-    font-weight: 500;
+    font-weight: 400;
 }
 
 .random-thought-btn,
@@ -1008,7 +1065,7 @@ a.building-card:focus-visible {
     border-radius: 6px;
     background: var(--bg-secondary);
     color: var(--text-primary);
-    font-family: 'Doto', sans-serif;
+    font-family: var(--font-body);
     font-size: 0.9rem;
     font-weight: 700;
     cursor: pointer;
@@ -1160,13 +1217,6 @@ a.building-card:focus-visible {
 }
 
 /* Projects Full Page Grid */
-.sort-note {
-    margin: 0.75rem 0 0;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    text-align: center;
-}
-
 .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
@@ -1287,55 +1337,30 @@ a.building-card:focus-visible {
 .page-toolbar {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    align-items: center;
+    gap: 0.75rem;
     justify-content: center;
-    margin: 1rem 0 0;
+    max-width: 52rem;
+    margin: 1rem auto 0;
 }
 
-.search-wrapper,
+.search-wrapper {
+    flex: 2 1 240px;
+}
+
 .select-wrapper {
-    flex: 1 1 240px;
-    max-width: 320px;
+    flex: 1 1 180px;
 }
 
-.page-toolbar--stack {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.85rem;
-}
-
-.page-toolbar--stack .search-wrapper {
+.page-toolbar .random-thought-btn,
+.page-toolbar .random-project-btn {
     flex: none;
-    width: min(100%, 22rem);
-    max-width: none;
-}
-
-.page-toolbar--stack .select-wrapper {
-    flex: none;
-    width: min(100%, 16rem);
-    max-width: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-.toolbar-label {
-    font-family: 'Doto', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    text-align: center;
-}
-
-.page-toolbar--stack .select-input {
-    text-align: center;
-    text-align-last: center;
+    margin: 0;
 }
 
 .search-input,
 .select-input {
-    font-family: 'Doto', sans-serif;
+    font-family: var(--font-body);
     font-size: 0.95rem;
     min-height: var(--touch);
     padding: 0.6rem 1rem;
@@ -1391,7 +1416,7 @@ footer {
     margin: 0 0 1rem;
     max-width: 40rem;
     color: var(--text-secondary);
-    font-family: 'Doto', sans-serif;
+    font-family: var(--font-body);
     font-size: 0.95rem;
     line-height: 1.5;
 }
@@ -1413,7 +1438,7 @@ footer {
     border-radius: 10px;
     background: var(--bg-secondary);
     color: var(--text-secondary);
-    font-family: 'Doto', sans-serif;
+    font-family: var(--font-body);
     font-size: 0.95rem;
     line-height: 1.45;
 }
@@ -1560,7 +1585,7 @@ footer {
 }
 
 #random-use-btn {
-    font-family: 'Doto', sans-serif;
+    font-family: var(--font-body);
     font-weight: 700;
     font-size: 0.9rem;
     color: var(--accent);
@@ -1651,7 +1676,7 @@ footer {
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
-    font-family: 'Doto', sans-serif;
+    font-family: var(--font-body);
     font-size: 0.82rem;
     font-weight: 700;
     letter-spacing: 0.02em;
@@ -1734,7 +1759,7 @@ footer {
     border: none;
     background: transparent;
     color: var(--text-primary);
-    font-family: 'Doto', sans-serif;
+    font-family: var(--font-body);
     font-size: 1.05rem;
     outline: none;
 }
@@ -1754,7 +1779,7 @@ footer {
 /* Section header dividing content matches from command matches. */
 .cmdk__group {
     padding: 0.55rem 0.7rem 0.3rem;
-    font-family: 'Doto', sans-serif;
+    font-family: var(--font-body);
     font-size: 0.68rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -1774,7 +1799,7 @@ footer {
     padding: 0.6rem 0.7rem;
     border-radius: 8px;
     cursor: pointer;
-    font-family: 'Doto', sans-serif;
+    font-family: var(--font-body);
 }
 
 .cmdk__icon {

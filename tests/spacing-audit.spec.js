@@ -124,13 +124,11 @@ test('search and sort controls meet 44px touch height', async ({ page }) => {
   expect(sort.h).toBeGreaterThanOrEqual(TOUCH);
 });
 
-test('projects: sort dropdown is centered under Sort projects', async ({ page }) => {
+test('projects: toolbar is centered and the sort control keeps an accessible name', async ({ page }) => {
   await page.goto('/projects');
-  await expect(page.locator('label[for="project-sort"]')).toHaveText('Sort projects');
+  await expect(page.getByLabel('Sort projects')).toBeVisible();
+  const main = await box(page.locator('#main'));
   const toolbar = await box(page.locator('.page-toolbar'));
-  const sort = await box(page.locator('#project-sort'));
-  const label = await box(page.locator('label[for="project-sort"]'));
   const mid = (el) => el.x + el.w / 2;
-  expect(Math.abs(mid(sort) - mid(toolbar))).toBeLessThan(8);
-  expect(Math.abs(mid(label) - mid(toolbar))).toBeLessThan(8);
+  expect(Math.abs(mid(toolbar) - mid(main))).toBeLessThan(8);
 });
