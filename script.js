@@ -127,7 +127,7 @@ if (typingEl) {
         return {
             name: raw.name,
             html_url: raw.html_url,
-            description: typeof raw.description === 'string' ? raw.description : null,
+            description: typeof raw.description === 'string' ? raw.description.replace(/\s*\u2014\s*|\s+(?:\u2013|--)\s+/g, ': ') : null,
             language: typeof raw.language === 'string' ? raw.language : null,
             fork: raw.fork === true,
             stargazers_count: (typeof raw.stargazers_count === 'number' && raw.stargazers_count >= 0) ? raw.stargazers_count : 0,

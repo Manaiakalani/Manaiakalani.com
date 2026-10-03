@@ -795,7 +795,11 @@ html:not([data-geocities="true"]) .footer-visits {
 
 /* Currently Building Teaser (homepage, dynamic from GitHub) */
 .currently-building-teaser {
-    padding: 2.5rem 0 0;
+    padding: 2.5rem 0;
+}
+
+.currently-building-teaser + .featured-teaser {
+    padding-top: 0;
 }
 
 .building-card {
@@ -899,6 +903,7 @@ a.building-card:focus-visible {
 }
 
 .project-card h2 {
+    text-align: left;
     font-size: 1.2rem;
     font-weight: 700;
     margin: 0 0 0.5rem;
@@ -1289,6 +1294,7 @@ a.building-card:focus-visible {
     .site-nav { gap: 0.25rem 0.35rem; }
     .site-nav a { font-size: 0.85rem; padding: 0 0.5rem; }
     .header-subtitle { font-size: 0.95rem; }
+    #typing-effect { font-size: 0.95rem; }
     .featured-grid { grid-template-columns: 1fr; }
     .projects-grid { grid-template-columns: 1fr; }
     .github-link { font-size: 0.8rem; padding: 0.5rem 0.85rem; width: 100%; }
@@ -2148,6 +2154,21 @@ html[data-theme="dark"] body {
 .now-desk {
     max-width: 36rem;
     margin: 0 auto 2rem;
+}
+
+.now-clocks + noscript + .currently-building-teaser {
+    max-width: 36rem;
+    margin: 0 auto;
+    padding: 0 0 2rem;
+}
+
+main a:not([class]) {
+    color: var(--accent);
+    text-underline-offset: 0.15em;
+}
+
+main a:not([class]):hover {
+    color: var(--text-primary);
 }
 
 .webring-modern {
