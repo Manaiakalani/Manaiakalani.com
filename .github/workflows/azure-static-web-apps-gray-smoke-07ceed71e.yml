@@ -18,16 +18,28 @@ jobs:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Test Job
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           submodules: true
           lfs: false
+          # Dependabot PRs: check out the branch so a lockfile resync can be pushed back.
+          ref: ${{ github.actor == 'dependabot[bot]' && github.head_ref || github.ref }}
       - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: 22
           cache: npm
+      - name: Pin npm 10
+        run: npm install -g npm@10
+      - name: Resync lockfiles for Dependabot
+        if: github.actor == 'dependabot[bot]'
+        run: |
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          npm install --prefix api --package-lock-only --ignore-scripts --no-audit --no-fund
       - name: Install dependencies
         run: npm ci
       - name: Verify CSP script hashes match inline scripts
@@ -48,6 +60,18 @@ jobs:
           BASE_URL: http://localhost:4173
       - name: Run Lighthouse CI
         run: npx lhci autorun
+      - name: Push lockfile resync on Dependabot PRs
+        if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json api/package-lock.json
+          if git diff --cached --quiet; then
+            echo "lockfiles already in sync with npm 10"
+            exit 0
+          fi
+          git commit -m "chore: resync package-lock.json so npm ci passes"
+          git push
 
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
