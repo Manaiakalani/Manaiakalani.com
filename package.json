@@ -37,6 +37,7 @@
     "uuid": "^11.1.1",
     "js-yaml": "^3.15.2",
     "qs": "^6.16.0",
-    "lighthouse": "^13.4.1"
+    "lighthouse": "^13.4.1",
+    "compression": "1.8.2"
   }
 }
