@@ -4,6 +4,8 @@ Personal website for **Maximilian Stein** - Product Manager for **Microsoft Intu
 
 🌐 **Live:** [manaiakalani.com](https://manaiakalani.com)
 
+![manaiakalani.com home](docs/screenshot.png)
+
 ## Overview
 
 A lightweight, static personal site built with vanilla HTML, CSS, and JavaScript. Home/about, Thoughts, Projects (GitHub API), Uses, Now, a guestbook wall, a colophon, ⌘K, and a GeoCities mode behind the globe (or Konami, or typing `clippy`). Hosted on **Azure Static Web Apps** and deployed via GitHub Actions on every push to `main`. Pretty URLs (`/thoughts`, `/now`, …) rewrite to the `.html` files.
