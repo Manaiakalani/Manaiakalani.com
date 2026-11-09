@@ -28,8 +28,8 @@
   },
   "homepage": "https://github.com/Manaiakalani/Manaiakalani.com#readme",
   "devDependencies": {
-    "@lhci/cli": "^0.15.1",
-    "@playwright/test": "^1.64.1",
+    "@lhci/cli": "^0.16.0",
+    "@playwright/test": "^1.65.0",
     "serve": "^14.2.6"
   },
   "overrides": {
