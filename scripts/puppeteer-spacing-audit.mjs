@@ -21,8 +21,11 @@ const PAGES = ['/', '/projects.html', '/thoughts.html', '/uses.html', '/404.html
 const VIEWPORTS = [
   { name: 'iphone-se', width: 320, height: 568 },
   { name: 'iphone', width: 375, height: 812 },
+  { name: 'iphone-pro-max', width: 440, height: 956 },
+  { name: 'duo-single', width: 540, height: 720 },
   { name: 'tablet', width: 768, height: 1024 },
   { name: 'laptop', width: 1024, height: 768 },
+  { name: 'duo-spanned-width', width: 1114, height: 720 },
   { name: 'desktop', width: 1280, height: 800 },
   { name: 'wide', width: 1440, height: 900 },
 ];

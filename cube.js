@@ -3,17 +3,20 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass }     from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass }     from 'three/addons/postprocessing/ShaderPass.js';
 
-const CHARACTERS      = ' ..<>#';
+// Light-to-dense ramp. Ten steps give the faces real shading instead of 3 tones.
+const CHARACTERS      = ' .:-=+*#%@';
 const DAMPING_FACTOR  = 0.25;
 const AUTO_SPIN_SPEED = 0.003;
 const DRAG_SENSITIVITY = 85;
-const MAX_DPR         = 2;
+// 3 so iPhone Pro Max (3x) gets a native buffer instead of an upscaled 2x one.
+const MAX_DPR         = 3;
 const ENTER_DURATION  = 1800;
 
+// Glyph cell in CSS px. At 3-4px the characters blurred into dots; 5-6px keeps
+// each glyph legible while the cube still resolves as a shape.
 function getCellSize(w) {
-  if (w < 200) return 3;
-  if (w < 400) return 4;
-  return 5;
+  if (w < 220) return 5;
+  return 6;
 }
 
 function createCharactersTexture(width, height, characters) {
@@ -27,7 +30,7 @@ function createCharactersTexture(width, height, characters) {
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.scale(dpr, dpr);
-  ctx.font = `${CELL}px monospace`;
+  ctx.font = `700 ${CELL}px ui-monospace, Menlo, Consolas, monospace`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#fff';
@@ -45,8 +48,11 @@ function createCharactersTexture(width, height, characters) {
     canvas, undefined,
     THREE.RepeatWrapping, THREE.RepeatWrapping,
     THREE.LinearFilter, THREE.LinearFilter,
-    THREE.RGBAFormat, THREE.FloatType
+    // UnsignedByte, not Float: float textures are not linearly filterable on
+    // iOS WebGL, which smeared or blanked the glyphs on iPhone.
+    THREE.RGBAFormat, THREE.UnsignedByteType
   );
+  tex.generateMipmaps = false;
   tex.needsUpdate = true;
   return tex;
 }
@@ -94,7 +100,10 @@ const ASCIIShader = {
       vec3 a = vec3(0.5), b = vec3(0.5), c = vec3(1.0), d = vec3(0.0, 0.33, 0.67);
       float uvF = dot(uv - 0.5, uv - 0.5);
       vec3 grad = a + b * cos(6.28318 * (c * (t + uvF * 2.0) + d));
-      return mix(grad, vec3(1.0 - length(uv - 0.5) * 2.0), 0.5);
+      // Light radial falloff only: at 0.5 the corners went near-black and the
+      // cube's silhouette disappeared into the footer.
+      vec3 c2 = mix(grad, vec3(1.0 - length(uv - 0.5) * 2.0), 0.2);
+      return max(c2, vec3(0.38));
     }
 
     float sharpen(sampler2D tex, vec2 uv, vec2 ts) {

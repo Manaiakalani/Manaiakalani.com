@@ -1,6 +1,16 @@
 const canvas = document.getElementById("ascii-cube");
 
-if (canvas) {
+// Data saver: the cube pulls hundreds of KB of three.js from a CDN purely for decoration. Skip
+// it (and its empty box) when the visitor has asked to save data.
+const saveData =
+  (navigator.connection && navigator.connection.saveData === true) ||
+  (window.matchMedia && window.matchMedia("(prefers-reduced-data: reduce)").matches);
+
+if (canvas && saveData) {
+  canvas.parentElement.hidden = true;
+}
+
+if (canvas && !saveData) {
   // Concurrent callers share one in-flight promise. On failure it is cleared so a
   // later intersection can retry: the cube pulls three.js from a CDN via the import
   // map, so a blocked or offline CDN (or a WebGL-less context) must degrade quietly
@@ -9,7 +19,7 @@ if (canvas) {
   let cubePromise = null;
   const loadCube = () => {
     if (!cubePromise) {
-      cubePromise = import("/cube.js?v=1a1846a1")
+      cubePromise = import("/cube.js?v=69919b6c")
         .then(({ initCube }) => {
           initCube(canvas, "/cube-texture.webp");
           return true;

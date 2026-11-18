@@ -31,7 +31,7 @@
 // Active Nav Link - /thoughts and /thoughts.html both count
 (function() {
     var path = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
-    var links = document.querySelectorAll('.site-nav a');
+    var links = document.querySelectorAll('.site-nav a, .mini-nav a:not(.mini-nav__top)');
     links.forEach(function(link) {
         link.classList.remove('active');
         link.removeAttribute('aria-current');
@@ -51,6 +51,66 @@
             link.setAttribute('aria-current', 'page');
         }
     });
+})();
+
+// Header visibility: pause the animated gradient off-screen, and slide in the
+// mini nav when the reader scrolls back up on a long page.
+(function () {
+    var header = document.getElementById('site-header');
+    if (!header || !('IntersectionObserver' in window)) return;
+    var mini = header.querySelector('.mini-nav');
+    var headerVisible = true;
+    var shown = false;
+    var lastY = window.scrollY;
+    var ticking = false;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function setShown(next) {
+        if (!mini || next === shown) return;
+        // Keep the bar up while keyboard focus is inside it.
+        if (!next && mini.contains(document.activeElement)) return;
+        shown = next;
+        mini.classList.toggle('is-shown', next);
+        if (next) {
+            mini.removeAttribute('inert');
+            mini.removeAttribute('aria-hidden');
+        } else {
+            mini.setAttribute('inert', '');
+            mini.setAttribute('aria-hidden', 'true');
+        }
+    }
+
+    new IntersectionObserver(function (entries) {
+        headerVisible = entries[0].isIntersecting;
+        header.classList.toggle('is-offscreen', !headerVisible);
+        if (headerVisible) setShown(false);
+    }).observe(header);
+
+    if (!mini) return;
+
+    function onScroll() {
+        ticking = false;
+        var y = window.scrollY;
+        var dy = y - lastY;
+        lastY = y;
+        if (headerVisible) return setShown(false);
+        if (dy < -6) setShown(true);
+        else if (dy > 6) setShown(false);
+    }
+    window.addEventListener('scroll', function () {
+        if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
+    }, { passive: true });
+
+    var top = mini.querySelector('.mini-nav__top');
+    if (top) {
+        top.addEventListener('click', function (e) {
+            e.preventDefault();
+            var main = document.getElementById('main');
+            if (main) main.focus({ preventScroll: true });
+            setShown(false);
+            window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+        });
+    }
 })();
 
 // Typing Effect (respects prefers-reduced-motion)
@@ -146,7 +206,10 @@ if (typingEl) {
         return out;
     }
 
-    function buildCard(repo) {
+    // Heading level is contextual: h3 under the home page's "Featured Projects" h2,
+    // h2 directly under the Projects page h1.
+    function buildCard(repo, level) {
+        var h = level === 3 ? 'h3' : 'h2';
         if (!repo || typeof repo.name !== 'string' || typeof repo.html_url !== 'string') return '';
         var name = escapeHtml(repo.name);
         var desc = repo.description ? escapeHtml(repo.description) : 'No description provided.';
@@ -167,7 +230,7 @@ if (typingEl) {
             : '';
 
         return '<a href="' + escapeHtml(repo.html_url) + '" target="_blank" rel="noopener noreferrer" class="project-card">' +
-            '<h2>' + name + '</h2>' +
+            '<' + h + '>' + name + '</' + h + '>' +
             '<p>' + desc + '</p>' +
             meta +
             '</a>';
@@ -201,7 +264,7 @@ if (typingEl) {
             .filter(function (r) { return !r.fork && EXCLUDE.indexOf(r.name) === -1 && r.description; })
             .sort(byImpact)
             .slice(0, 3);
-        container.innerHTML = featured.map(buildCard).join('');
+        container.innerHTML = featured.map(function (r) { return buildCard(r, 3); }).join('');
         container.setAttribute('aria-busy', 'false');
         // On the homepage there's no #all-projects grid, so renderAll() bails and never
         // announces. Announce the featured count here so the #projects-status live region
@@ -297,7 +360,7 @@ if (typingEl) {
         if (!container) return;
         var filtered = getVisibleProjects();
         if (filtered.length) {
-            container.innerHTML = filtered.map(buildCard).join('');
+            container.innerHTML = filtered.map(function (r) { return buildCard(r, 2); }).join('');
         } else {
             container.innerHTML = '<p class="projects-fallback" style="text-align:center;color:var(--text-secondary);padding:2rem;">No projects match your search.</p>';
         }
