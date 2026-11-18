@@ -111,6 +111,15 @@ test.describe('single screen', () => {
     }
   });
 
+  test('footer text links and the fishhook line meet the 44px touch target', async ({ page }) => {
+    await page.goto('/');
+    const sizes = await page.locator('.footer-links a, .scorpius-trigger').evaluateAll(els =>
+      els.map(el => ({ t: el.textContent.trim().slice(0, 20), h: el.getBoundingClientRect().height }))
+    );
+    expect(sizes.length).toBeGreaterThanOrEqual(7);
+    for (const s of sizes) expect(s.h, s.t).toBeGreaterThanOrEqual(44);
+  });
+
   test('header controls clear the wordmark', async ({ page }) => {
     await page.goto('/');
     const h1 = await page.locator('header h1').boundingBox();
