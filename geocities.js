@@ -211,9 +211,7 @@
     var sites = [
       { name: 'This homepage', href: 'https://manaiakalani.com/' },
       { name: 'Space Jam 1996', href: 'https://www.spacejam.com/1996/' },
-      { name: "Cameron's World", href: 'https://www.cameronsworld.net/' },
       { name: 'The Restart Page', href: 'https://therestartpage.com/' },
-      { name: 'Zombo.com', href: 'https://zombo.com/' },
       { name: 'Hamster Dance', href: 'https://www.hamsterdance.org/hamsterdance/' },
       { name: 'Arngren', href: 'https://www.arngren.net/' },
       { name: "Ling's Cars", href: 'https://www.lingscars.com/' }

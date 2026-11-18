@@ -3,10 +3,12 @@
         return (typeof mnkIcon === 'function') ? mnkIcon(name) : '';
     }
 
-    function injectHeader() {
-        var header = document.getElementById('site-header') || document.querySelector('header');
-        if (!header || header.dataset.injected === 'true') return;
-        var variant = header.getAttribute('data-variant') || 'page';
+    // Header/footer markup lives here once. build-chrome.js runs these same
+    // functions at build time and writes the result into every page, so the
+    // chrome paints with the HTML (no layout shift, works without JS). At runtime
+    // the inject* functions only fill an empty placeholder (fallback) and bind
+    // behaviour.
+    function headerHTML(variant) {
         var brand = variant === 'home'
             ? '<h1>MANAIAKALANI</h1>'
             : '<span class="brand-text">MANAIAKALANI</span>';
@@ -14,7 +16,7 @@
         var hook = variant === 'home'
             ? '<p class="header-hook"><button type="button" class="scorpius-trigger" aria-expanded="false" aria-controls="scorpius-sky"><em>Manaiakalani is Maui\'s fishhook, the Hawaiian name for Scorpius.</em></button></p>'
             : '';
-        header.innerHTML =
+        return (
             '<div class="container">' +
                 brand +
                 '<p class="header-subtitle">Aloha, I\'m Maximilian (Manaiakalani) Stein</p>' +
@@ -27,13 +29,27 @@
                     '<a href="/uses">Uses</a>' +
                 '</nav>' +
             '</div>' +
+            // Slim bar shown on scroll-up once the header is out of view (script.js).
+            '<nav class="mini-nav" aria-label="Quick" aria-hidden="true" inert>' +
+                '<a href="#main" class="mini-nav__top"><span class="mini-nav__arrow" aria-hidden="true">\u2191</span><span class="mini-nav__top-label">Top</span></a>' +
+                '<a href="/">About</a>' +
+                '<a href="/thoughts">Thoughts</a>' +
+                '<a href="/projects">Projects</a>' +
+                '<a href="/uses">Uses</a>' +
+            '</nav>' +
             '<button class="theme-toggle" aria-label="Toggle dark mode">' +
                 '<span class="theme-icon theme-icon--moon" data-icon="moon"></span>' +
                 '<span class="theme-icon theme-icon--sun" data-icon="sun"></span>' +
             '</button>' +
             '<button class="geocities-toggle" aria-label="Toggle GeoCities mode" title="Welcome to 1997!">' +
                 '<span class="gc-icon" data-icon="geocities"></span>' +
-            '</button>';
+            '</button>');
+    }
+
+    function injectHeader() {
+        var header = document.getElementById('site-header') || document.querySelector('header');
+        if (!header || header.dataset.injected === 'true') return;
+        header.innerHTML = headerHTML(header.getAttribute('data-variant') || 'page');
         header.dataset.injected = 'true';
         if (typeof mnkIconsHydrate === 'function') mnkIconsHydrate(header);
     }
@@ -42,11 +58,8 @@
         window.location.href = focusForm ? '/guestbook#sign' : '/guestbook';
     }
 
-    function injectFooter() {
-        var footerContent = document.getElementById('footer-content');
-        if (!footerContent || footerContent.dataset.injected === 'true') return;
-
-        footerContent.innerHTML =
+    function footerHTML() {
+        return (
             '<div class="cube-wrapper" aria-hidden="true">' +
                 '<canvas id="ascii-cube"></canvas>' +
             '</div>' +
@@ -70,13 +83,23 @@
             '<p class="footer-visits" hidden>' +
                 '<span class="visits-odometer" aria-label="Visitor count"></span>' +
                 '<span class="visits-label">Visitors</span>' +
-            '</p>';
-        footerContent.dataset.injected = 'true';
+            '</p>');
+    }
+
+    function injectFooter() {
+        var footerContent = document.getElementById('footer-content');
+        if (!footerContent) return;
+        if (footerContent.dataset.injected !== 'true') {
+            footerContent.innerHTML = footerHTML();
+            footerContent.dataset.injected = 'true';
+        }
+        // Pre-rendered or injected, bind behaviour exactly once.
+        if (footerContent.dataset.bound === 'true') return;
+        footerContent.dataset.bound = 'true';
         ensureCubeLoader();
         initVisitorCounter();
         bindScorpius();
         bindOdometer();
-        fillHandmadeHomepages();
     }
 
     function ensureCubeLoader() {
@@ -85,7 +108,7 @@
         var moduleScript = document.createElement('script');
         moduleScript.type = 'module';
         moduleScript.dataset.cubeLoader = 'true';
-        moduleScript.src = '/cube-loader.js?v=a1adcf71';
+        moduleScript.src = '/cube-loader.js?v=1c18cb58';
         document.body.appendChild(moduleScript);
     }
 
@@ -282,30 +305,6 @@
         return { name: MAHINA[i], phase: phase };
     }
 
-    var HANDMADE = [
-        { name: 'This homepage', href: 'https://manaiakalani.com/' },
-        { name: "Cameron's World", href: 'https://www.cameronsworld.net/' },
-        { name: 'Space Jam 1996', href: 'https://www.spacejam.com/1996/' },
-        { name: 'The Restart Page', href: 'https://therestartpage.com/' },
-        { name: 'Zombo.com', href: 'https://zombo.com/' }
-    ];
-
-    function fillHandmadeHomepages() {
-        var navs = document.querySelectorAll('.site-webring');
-        if (!navs.length) return;
-        var here = 0;
-        var host = (window.location.hostname || '').replace(/^www\./, '');
-        for (var i = 0; i < HANDMADE.length; i++) {
-            if (HANDMADE[i].href.indexOf(host) !== -1) { here = i; break; }
-        }
-        var prev = HANDMADE[(here - 1 + HANDMADE.length) % HANDMADE.length];
-        var next = HANDMADE[(here + 1) % HANDMADE.length];
-        var html = '<a href="' + prev.href + '" rel="noopener noreferrer">' + prev.name + '</a>' +
-            '<span>handmade homepages</span>' +
-            '<a href="' + next.href + '" rel="noopener noreferrer">' + next.name + '</a>';
-        for (var n = 0; n < navs.length; n++) navs[n].innerHTML = html;
-    }
-
     function bindOdometer() {
         var odo = document.querySelector('.visits-odometer');
         if (!odo || odo.dataset.tick === 'true') return;
@@ -329,6 +328,7 @@
         injectFooter();
     }
 
+    window.mnkChrome = { header: headerHTML, footer: footerHTML };
     window.injectFooter = injectFooter;
     window.injectHeader = injectHeader;
     window.openGuestbookFromChrome = openGuestbookFromChrome;

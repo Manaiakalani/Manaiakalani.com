@@ -60,6 +60,17 @@
     --header-control-gap: 0.75rem;
     --header-inset: 1.5rem;
     --touch: 44px;
+    /* Spacing scale: one rhythm for sections, stacks and gaps. */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
+    --space-8: 4rem;
+    --section-pad: clamp(2.5rem, 6vw, 4rem);
+    --gutter: clamp(12px, 4vw, 32px);
     --font-display: 'Doto', sans-serif;
     --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
@@ -140,7 +151,9 @@ button:focus-visible {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 clamp(12px, 4vw, 32px);
+    padding-block: 0;
+    /* Landscape iPhone: keep content out from under the Dynamic Island / rounded corners. */
+    padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px)) max(var(--gutter), env(safe-area-inset-right, 0px));
     box-sizing: border-box;
 }
 
@@ -157,7 +170,7 @@ header p,
 }
 
 h1 {
-    font-size: 3rem;
+    font-size: clamp(1.75rem, 1rem + 4vw, 3rem);
     margin-bottom: 0.5rem;
     text-align: center;
 }
@@ -165,19 +178,19 @@ h1 {
 .brand-text {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 3rem;
+    font-size: clamp(1.75rem, 1rem + 4vw, 3rem);
     margin-bottom: 0.5rem;
     text-align: center;
     display: block;
 }
 
 .page-hero h1 {
-    font-size: 2.5rem;
+    font-size: clamp(1.8rem, 1.2rem + 3vw, 2.5rem);
     margin-bottom: 1rem;
 }
 
 h2 {
-    font-size: 2.5rem;
+    font-size: clamp(1.6rem, 1.1rem + 2.5vw, 2.5rem);
     margin-bottom: 1rem;
     text-align: center;
 }
@@ -185,7 +198,7 @@ h2 {
 /* Paragraphs and Other Text */
 p {
     font-weight: 400;
-    margin-bottom: 1.5rem;
+    margin-block: 0 var(--space-5);
 }
 
 /* Header */
@@ -201,12 +214,19 @@ header {
     animation: gradient 15s ease infinite;
     color: var(--header-text);
     text-align: center;
-    padding: 4rem 0 3.25rem;
+    /* The corner controls drop by the safe-area inset (~60px in an installed,
+       standalone iPhone app), so the content drops with them. 0 in a browser tab. */
+    padding: calc(4rem + env(safe-area-inset-top, 0px)) 0 3.25rem;
     position: relative;
 }
 
+/* Item 18: no point animating a 400% gradient nobody can see. */
+header.is-offscreen {
+    animation-play-state: paused;
+}
+
 header p {
-    font-size: 1.5rem;
+    font-size: clamp(1.1rem, 0.9rem + 1vw, 1.5rem);
     margin: 0 auto;
     max-width: 40rem;
     text-align: center;
@@ -259,7 +279,7 @@ header p {
 
 /* About Section */
 #about {
-    padding: 2.5rem 0 3.5rem;
+    padding-block: var(--section-pad);
     background-color: var(--bg-secondary);
     transition: background-color var(--transition-speed) ease;
 }
@@ -269,6 +289,7 @@ header p {
 }
 
 .about-text p {
+    max-width: 65ch;
     color: var(--text-primary);
     transition: color var(--transition-speed) ease;
 }
@@ -284,8 +305,8 @@ footer {
 
 /* ASCII Cube */
 .cube-wrapper {
-    width: 220px;
-    height: 220px;
+    width: 240px;
+    height: 240px;
     margin: 0 auto 1.5rem;
     position: relative;
 }
@@ -667,18 +688,19 @@ html:not([data-geocities="true"]) .footer-visits {
 }
 
 /* Heartbeat Animation */
+/* Transform-only keyframes stay on the compositor; animating filter repainted
+   the glow every frame, forever. The glow is now a static drop-shadow. */
 @keyframes heartbeat {
-    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 1px rgba(255, 59, 92, 0.4)); }
-    10% { transform: scale(1.25); filter: drop-shadow(0 0 6px rgba(255, 59, 92, 0.95)); }
-    20% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(255, 59, 92, 0.5)); }
-    30% { transform: scale(1.2); filter: drop-shadow(0 0 7px rgba(255, 59, 92, 1)); }
-    40% { transform: scale(1); filter: drop-shadow(0 0 1px rgba(255, 59, 92, 0.4)); }
+    0%, 20%, 40%, 100% { transform: scale(1); }
+    10% { transform: scale(1.25); }
+    30% { transform: scale(1.2); }
 }
 
 .heart-beat {
     display: inline-block;
     color: #ff3b5c;
     vertical-align: -0.1em;
+    filter: drop-shadow(0 0 4px rgba(255, 59, 92, 0.7));
     animation: heartbeat 1.5s ease-in-out infinite;
 }
 
@@ -759,7 +781,7 @@ html:not([data-geocities="true"]) .footer-visits {
 
 /* Header Subtitle */
 .header-subtitle {
-    font-size: 1.1rem;
+    font-size: clamp(0.9rem, 0.8rem + 0.6vw, 1.1rem);
     margin-top: 0.5rem;
     font-weight: 400;
     max-width: 28rem;
@@ -781,7 +803,7 @@ html:not([data-geocities="true"]) .footer-visits {
     display: grid;
     min-height: 1.6em;
     margin-top: 0.75rem;
-    font-size: 1.15rem;
+    font-size: clamp(0.95rem, 0.85rem + 0.5vw, 1.15rem);
 }
 
 .typing-ghost,
@@ -795,11 +817,11 @@ html:not([data-geocities="true"]) .footer-visits {
 
 /* Currently Building Teaser (homepage, dynamic from GitHub) */
 .currently-building-teaser {
-    padding: 2.5rem 0;
+    padding-block: var(--section-pad) 0;
 }
 
 .currently-building-teaser + .featured-teaser {
-    padding-top: 0;
+    padding-top: var(--space-4);
 }
 
 .building-card {
@@ -856,13 +878,14 @@ a.building-card:focus-visible {
 
 /* Featured Projects Teaser */
 .featured-teaser {
-    padding: 2.5rem 0 4rem;
+    /* The h2's own top margin supplies the rest of the section rhythm. */
+    padding-block: calc(var(--section-pad) - var(--space-6)) var(--section-pad);
     background-color: var(--bg-primary);
     transition: background-color var(--transition-speed) ease;
 }
 
 .featured-teaser h2 {
-    margin-bottom: 2rem;
+    margin: var(--space-6) 0 var(--space-5);
 }
 
 .featured-grid {
@@ -871,6 +894,16 @@ a.building-card:focus-visible {
     gap: 1.5rem;
     justify-content: center;
     margin-top: 0;
+}
+
+.featured-grid:has(> .project-card:only-child) {
+    max-width: 24rem;
+    margin-inline: auto;
+}
+
+.featured-grid:has(> .project-card:nth-child(2):last-child) {
+    max-width: 48rem;
+    margin-inline: auto;
 }
 
 /* Project Cards */
@@ -902,7 +935,8 @@ a.building-card:focus-visible {
     box-shadow: 0 0 0 4px var(--focus-ring-shadow), 0 8px 18px rgba(0, 0, 0, 0.35);
 }
 
-.project-card h2 {
+.project-card h2,
+.project-card h3 {
     text-align: left;
     font-size: 1.2rem;
     font-weight: 700;
@@ -980,6 +1014,24 @@ a.building-card:focus-visible {
     min-height: 140px;
 }
 
+/* Skeletons reserve the height of the real cards so the page does not jump
+   when the GitHub data lands. Measured: featured cards ~190-212px on phones,
+   ~168px at 768px (one wide column), ~212-233px in the 3-up grid; building
+   card ~150-195px. Values are content-box (padding + border add ~50px). */
+.featured-grid .skeleton-card {
+    min-height: clamp(7.25rem, calc(193px - 9.8vw), 9.5rem);
+}
+
+#currently-building .skeleton-card {
+    min-height: clamp(6.4rem, calc(164px - 4.9vw), 9rem);
+}
+
+@media (min-width: 769px) {
+    .featured-grid .skeleton-card {
+        min-height: clamp(10rem, calc(258px - 7.4vw), 11.5rem);
+    }
+}
+
 .skeleton-line {
     height: 1rem;
     border-radius: 4px;
@@ -1020,7 +1072,7 @@ a.building-card:focus-visible {
 
 /* Page Heading Section */
 .page-hero {
-    padding: 2.25rem 0 1rem;
+    padding-block: clamp(2rem, 4vw, 2.75rem) var(--space-4);
     background-color: var(--bg-primary);
     transition: background-color var(--transition-speed) ease;
 }
@@ -1092,7 +1144,8 @@ a.building-card:focus-visible {
 .thoughts-list {
     list-style: none;
     padding: 0;
-    margin: 2rem 0 0;
+    max-width: 46rem;
+    margin: var(--space-6) auto 0;
 }
 
 .thoughts-no-results {
@@ -1280,35 +1333,24 @@ a.building-card:focus-visible {
 /* Responsive */
 @media (max-width: 768px) {
     :root { --header-inset: 0.8rem; }
-    h1 { font-size: 2rem; }
-    .brand-text { font-size: 2rem; }
-    h2 { font-size: 1.75rem; }
-    header { padding: 3.25rem 0 2.25rem; }
-    header p { font-size: 1.1rem; }
+    header { padding: calc(3.25rem + env(safe-area-inset-top, 0px)) 0 2.25rem; }
     .social-icons a { font-size: 1.5rem; }
     .theme-toggle,
     .geocities-toggle { font-size: 1rem; }
     .cmdk-launcher { font-size: 0.78rem; padding: 0 0.55rem 0 0.5rem; }
     .cmdk-launcher-key { display: none; }
-    .cube-wrapper { width: 160px; height: 160px; margin-bottom: 1rem; }
+    .cube-wrapper { width: 200px; height: 200px; margin-bottom: 1rem; }
     .site-nav { gap: 0.25rem 0.35rem; }
     .site-nav a { font-size: 0.85rem; padding: 0 0.5rem; }
-    .header-subtitle { font-size: 0.95rem; }
-    #typing-effect { font-size: 0.95rem; }
     .featured-grid { grid-template-columns: 1fr; }
     .projects-grid { grid-template-columns: 1fr; }
     .github-link { font-size: 0.8rem; padding: 0.5rem 0.85rem; width: 100%; }
 }
 
 @media (max-width: 375px) {
-    h1 { font-size: 1.6rem; }
-    .brand-text { font-size: 1.7rem; }
-    header p { font-size: 0.9rem; }
-    .header-subtitle { font-size: 0.8rem; }
     .site-nav a { font-size: 0.78rem; padding: 0 0.4rem; }
     .cmdk-launcher-label { display: none; }
     .cmdk-launcher { padding: 0; width: var(--header-control); font-size: 1.05rem; }
-    .page-hero h1 { font-size: 1.8rem; }
 }
 
 /* Visually Hidden (accessible label helper) */
@@ -1352,7 +1394,7 @@ a.building-card:focus-visible {
 .search-input,
 .select-input {
     font-family: var(--font-body);
-    font-size: 0.95rem;
+    font-size: 1rem; /* <16px makes iOS Safari zoom the page on focus */
     min-height: var(--touch);
     padding: 0.6rem 1rem;
     width: 100%;
@@ -1730,6 +1772,7 @@ footer {
     display: flex;
     flex-direction: column;
     max-height: 70vh;
+    max-height: 70dvh;
 }
 
 .cmdk__search {
@@ -2184,14 +2227,6 @@ main a:not([class]):hover {
     word-break: break-all;
 }
 
-.site-webring {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.75rem 1rem;
-    align-items: center;
-    font-weight: 700;
-}
 
 .about-grid {
     display: grid;
@@ -2201,6 +2236,11 @@ main a:not([class]):hover {
 @media (min-width: 720px) {
     .about-grid {
         grid-template-columns: 11.5rem minmax(0, 1fr);
+    }
+    /* Photo + a 65ch column, centred, instead of a left-heavy row with an
+       empty right third on wide screens. */
+    .container.about-grid {
+        max-width: 58rem;
     }
 }
 .about-figure {
@@ -2263,6 +2303,7 @@ main a:not([class]):hover {
     .theme-toggle,
     .geocities-toggle,
     .cmdk-launcher,
+    .mini-nav,
     .clippy-row,
     footer,
     .page-toolbar,
@@ -2273,4 +2314,205 @@ main a:not([class]):hover {
     a { color: inherit; text-decoration: underline; }
     .thought-entry { break-inside: avoid; }
     body { background: #fff; color: #111; }
+}
+/* ------------------------------------------------------------------ */
+/* Phones (iPhone Pro Max is ~440px): a shorter header so About Me     */
+/* starts above the fold.                                              */
+/* ------------------------------------------------------------------ */
+@media (max-width: 480px) {
+    header {
+        padding: calc(3.25rem + env(safe-area-inset-top, 0px)) 0 1.75rem;
+    }
+    /* h1 top lands ~7px under the 44px controls (12.8px inset + 44px). */
+    header h1,
+    header .brand-text { margin: 0.75rem 0 0.25rem; }
+    .header-subtitle { margin-top: 0.25rem; }
+    .header-hook { margin-top: 0.3rem; }
+    #typing-effect { margin-top: 0.4rem; }
+    .site-nav { margin-top: 0.6rem; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Touch screens: no sticky hover. On iPhone a tap leaves :hover set, */
+/* so lifted cards and scaled icons stayed stuck until the next tap.   */
+/* ------------------------------------------------------------------ */
+@media (hover: none) {
+    .theme-toggle:hover,
+    .geocities-toggle:hover,
+    .social-icons a:hover,
+    a.building-card:hover,
+    .project-card:hover,
+    .clippy-row .clippy:hover,
+    .uses-list li:hover .uses-icon {
+        transform: none;
+        box-shadow: none;
+    }
+    .uses-list li:hover .uses-icon {
+        background: color-mix(in srgb, var(--accent) 16%, var(--bg-primary));
+    }
+    .uses-list li:hover .icon {
+        animation: none;
+    }
+    .social-icons a:hover {
+        color: var(--text-footer);
+    }
+    .view-all:hover {
+        gap: 0.4rem;
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* Mini nav: slim bar that slides in on scroll-up once the header is   */
+/* out of view (long Thoughts/Projects pages). script.js toggles it.   */
+/* ------------------------------------------------------------------ */
+.mini-nav {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem 0.4rem;
+    padding: env(safe-area-inset-top, 0px) max(var(--gutter), env(safe-area-inset-right, 0px)) 0 max(var(--gutter), env(safe-area-inset-left, 0px));
+    background: color-mix(in srgb, var(--bg-primary) 88%, transparent);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+    -webkit-backdrop-filter: saturate(1.4) blur(12px);
+    backdrop-filter: saturate(1.4) blur(12px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    transform: translateY(-110%);
+    visibility: hidden;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.25s;
+    font-family: var(--font-display);
+}
+
+.mini-nav.is-shown {
+    transform: none;
+    visibility: visible;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s;
+}
+
+.mini-nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    min-height: var(--touch);
+    padding: 0 0.6rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-radius: 4px;
+}
+
+.mini-nav a:hover {
+    color: var(--accent);
+}
+
+.mini-nav a.active {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.35em;
+}
+
+.mini-nav .mini-nav__top {
+    margin-right: auto;
+}
+
+.mini-nav__arrow {
+    font-family: var(--font-body);
+    font-size: 1.1em;
+    line-height: 1;
+}
+
+@media (max-width: 480px) {
+    .mini-nav { gap: 0; }
+    .mini-nav a { font-size: 0.72rem; padding: 0 0.45rem; }
+    .mini-nav .mini-nav__top-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+    .mini-nav .mini-nav__top { min-width: var(--touch); justify-content: center; padding: 0; }
+}
+
+html[data-geocities="true"] .mini-nav {
+    display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mini-nav,
+    .mini-nav.is-shown { transition: none; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Dual-screen (Surface Duo spanned, foldables): keep text and cards   */
+/* off the hinge. Each half gets one screen; the gap is the hinge.     */
+/* ------------------------------------------------------------------ */
+@media (horizontal-viewport-segments: 2) {
+    :root {
+        --seg-left: env(viewport-segment-width 0 0, 50vw);
+        --seg-right: env(viewport-segment-width 1 0, 50vw);
+        --hinge: calc(env(viewport-segment-left 1 0, 50vw) - env(viewport-segment-right 0 0, 50vw));
+    }
+
+    /* Two-column content: columns land exactly on the two screens. */
+    .about-grid,
+    .featured-grid,
+    .projects-grid {
+        max-width: none;
+        grid-template-columns: var(--seg-left) var(--seg-right);
+        column-gap: var(--hinge);
+        margin-inline: calc(-1 * max(var(--gutter), env(safe-area-inset-left, 0px)));
+    }
+    .about-grid > *,
+    .featured-grid > *,
+    .projects-grid > * {
+        margin-inline: var(--gutter);
+    }
+    .about-grid { align-items: start; }
+    .about-figure { max-width: 16rem; position: sticky; top: var(--space-6); }
+    .about-text h2 { text-align: left; }
+
+    /* Centred, single-column blocks would straddle the hinge: give them the
+       left screen, and the footer the right screen. */
+    header .container,
+    .page-hero > .container,
+    .currently-building-teaser > .container {
+        max-width: var(--seg-left);
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .page-toolbar,
+    .featured-teaser h2,
+    .uses-section h2,
+    .uses-lead,
+    main.container > :not(.projects-grid):not(.uses-section) {
+        max-width: calc(var(--seg-left) - 2 * var(--gutter));
+        margin-left: 0;
+        margin-right: auto;
+    }
+    .featured-teaser h2 { text-align: left; }
+    .view-all { margin-left: 0; }
+    .skip-link { left: calc(var(--seg-left) / 2); }
+    footer .container {
+        max-width: var(--seg-right);
+        margin-left: calc(var(--seg-left) + var(--hinge));
+        margin-right: 0;
+    }
+
+    /* Thoughts read as two newspaper columns, one per screen. */
+    .thoughts-list {
+        max-width: none;
+        columns: 2;
+        column-gap: calc(var(--hinge) + 2 * var(--gutter));
+    }
+    .thoughts-list > li {
+        break-inside: avoid;
+    }
+
+    .uses-list,
+    .uses-section--studio .uses-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: calc(var(--hinge) + 2 * var(--gutter));
+    }
 }

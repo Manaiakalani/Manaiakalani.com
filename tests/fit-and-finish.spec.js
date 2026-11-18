@@ -50,7 +50,7 @@ for (const pg of PAGES) {
 test('nav links are present and correct on all pages', async ({ page }) => {
   for (const pg of PAGES) {
     await page.goto(pg.path);
-    const nav = page.locator('nav');
+    const nav = page.locator('nav.site-nav');
     await expect(nav).toBeVisible();
     await expect(nav.locator('a[href="/"]')).toBeVisible();
     await expect(nav.locator('a[href="/projects"], a[href="/projects.html"]')).toBeVisible();
@@ -141,7 +141,7 @@ test('index: currently building widget shows most recently active project', asyn
   await expect(page.locator('#currently-building .building-card h3')).toHaveText('Manaiakalani.com');
   await expect(page.locator('#currently-building time.building-updated')).toHaveAttribute('datetime', /20/);
   await expect(page.locator('#currently-building .skeleton-card')).toHaveCount(0);
-  await expect(page.locator('.featured-teaser .project-card h2', { hasText: 'Manaiakalani.com' })).toHaveCount(0);
+  await expect(page.locator('.featured-teaser .project-card h3', { hasText: 'Manaiakalani.com' })).toHaveCount(0);
 });
 
 test('index: currently building widget hides when GitHub API fails', async ({ page }) => {
@@ -538,8 +538,8 @@ test('404: table flip easter egg works', async ({ page }) => {
 
 test('404: nav links present', async ({ page }) => {
   await page.goto('/nope-404');
-  await expect(page.locator('nav')).toBeVisible();
-  await expect(page.locator('nav a[href="/"]')).toBeVisible();
+  await expect(page.locator('nav.site-nav')).toBeVisible();
+  await expect(page.locator('nav.site-nav a[href="/"]')).toBeVisible();
 });
 
 test('404: shows attempted path', async ({ page }) => {
@@ -560,7 +560,7 @@ test('index: Doto font is loaded', async ({ page }) => {
 // ── Accessibility: aria-current on active nav ──
 test('active nav link has aria-current="page"', async ({ page }) => {
   await page.goto('/');
-  const activeLink = page.locator('nav a.active');
+  const activeLink = page.locator('nav.site-nav a.active');
   await expect(activeLink).toHaveAttribute('aria-current', 'page');
 });
 
