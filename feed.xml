@@ -5,10 +5,24 @@
   <link href="https://manaiakalani.com/feed.xml" rel="self" />
   <link href="https://manaiakalani.com/thoughts" />
   <id>https://manaiakalani.com/feed.xml</id>
-  <updated>2026-10-03T09:00:00Z</updated>
+  <updated>2026-11-17T09:00:00Z</updated>
   <author>
     <name>Maximilian Stein</name>
   </author>
+  <entry>
+    <title>Old Art, New Doors</title>
+    <link href="https://manaiakalani.com/thoughts#old-art-new-doors" />
+    <id>https://manaiakalani.com/thoughts.html#old-art-new-doors</id>
+    <updated>2026-11-17T09:00:00Z</updated>
+    <summary>In 1996, Microsoft Comic Chat turned chat rooms into comic strips, with characters drawn by Jim Woodring. When Microsoft released the source under the MIT License, those characters became something you could build on again. Sans Comic is my take: type a line, get a panel. LOL laughs, CAPS shout, parentheses think. No build step, no account, and the strip lives in your browser until you save it. The idea still works thirty years later. Some of the most fun product work is finding a good idea that got left behind and giving people a door back in.</summary>
+  </entry>
+  <entry>
+    <title>Build the Thing You Couldn't Find</title>
+    <link href="https://manaiakalani.com/thoughts#build-the-thing-you-couldnt-find" />
+    <id>https://manaiakalani.com/thoughts.html#build-the-thing-you-couldnt-find</id>
+    <updated>2026-11-14T09:00:00Z</updated>
+    <summary>My garage has a shelf of 3D printer filament, and I kept buying colors I already owned. Every tracker I found came with ads, an account, or a data policy longer than the spool. So I spent a weekend on Filament Shelf: one folder on a computer I control, a page my phone installs, and nothing that phones home. Then I spent another evening drawing glitter spools as sparkles and rainbow spools as bands, because if it's mine, it gets to be delightful. The best side projects start with a small annoyance and the stubbornness not to rent a fix for it.</summary>
+  </entry>
   <entry>
     <title>Hide Something for the Curious</title>
     <link href="https://manaiakalani.com/thoughts#hide-something-for-the-curious" />
