@@ -12,11 +12,20 @@ const DRAG_SENSITIVITY = 85;
 const MAX_DPR         = 3;
 const ENTER_DURATION  = 1800;
 
-// Glyph cell in CSS px. At 3-4px the characters blurred into dots; 5-6px keeps
-// each glyph legible while the cube still resolves as a shape.
+// Glyph cell in CSS px. ~60 columns across the canvas: enough to resolve the
+// face on the texture, while each glyph still renders at 8-15 device px.
 function getCellSize(w) {
-  if (w < 220) return 5;
-  return 6;
+  if (w < 260) return 4;
+  return 4.5;
+}
+
+// Ink colour follows the footer text so the cube reads as part of the page,
+// not a rainbow sticker. GeoCities mode still blends to the gradient.
+function footerInk(el) {
+  const c = getComputedStyle(el.closest('footer') || document.body).color;
+  const m = c.match(/[\d.]+/g);
+  if (!m) return new THREE.Color(0xe8e6e1);
+  return new THREE.Color(+m[0] / 255, +m[1] / 255, +m[2] / 255);
 }
 
 function createCharactersTexture(width, height, characters) {
@@ -66,7 +75,7 @@ const ASCIIShader = {
     uColor:           { value: new THREE.Color('#ffffff') },
     uInvert:          { value: true },
     uTime:            { value: 0 },
-    uGradientMix:     { value: 1 },
+    uGradientMix:     { value: 0 },
     uOpacity:         { value: 0 },
     resolution:       { value: new THREE.Vector2() },
   },
@@ -106,6 +115,10 @@ const ASCIIShader = {
       return max(c2, vec3(0.38));
     }
 
+    float vignette(vec2 uv) {
+      return 1.0 - 0.35 * smoothstep(0.25, 0.7, length(uv - 0.5));
+    }
+
     float sharpen(sampler2D tex, vec2 uv, vec2 ts) {
       float center = texture2D(tex, uv).r;
       float top    = texture2D(tex, uv + vec2(0, ts.y)).r;
@@ -122,9 +135,12 @@ const ASCIIShader = {
       vec4 px   = texture2D(tDiffuse, pUV);
       float gs  = greyscale(px.rgb);
 
+      // Contrast curve: skin and paper fall to blank, ink lines stay dense,
+      // so the face reads instead of a wall of mid-tone glyphs.
+      gs = smoothstep(0.18, 0.92, gs);
       if (uInvert) gs = 1.0 - gs;
 
-      vec3 animC = mix(uColor, rotatingGradient(uTime, vUv), uGradientMix);
+      vec3 animC = mix(uColor * vignette(vUv), rotatingGradient(uTime, vUv), uGradientMix);
 
       float ci  = floor((uCharactersCount - 1.0) * gs);
       vec2  cp  = vec2(mod(ci, SIZE.x), floor(ci / SIZE.y));
@@ -164,11 +180,15 @@ export function initCube(canvasEl, textureUrl) {
   let resizeTimer = 0;
   let loopId = null;
   let visible = true;
+  let destroyed = false;
+  const cleanups = [];
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function setup(texture) {
+    if (destroyed) { texture.dispose(); return; }
+    texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
     const geo = new THREE.BoxGeometry(50, 50, 50, 8, 8, 8);
-    cubeMaterial = new THREE.MeshStandardMaterial({ map: texture });
+    cubeMaterial = new THREE.MeshStandardMaterial({ map: texture, roughness: 1, metalness: 0 });
     cube = new THREE.Mesh(geo, cubeMaterial);
 
     const initRot = new THREE.Euler(0.5, 0.75, 0, 'XYZ');
@@ -177,13 +197,18 @@ export function initCube(canvasEl, textureUrl) {
     targetQ.setFromEuler(initRot);
     cube.position.set(0, 1.0, 0);
     scene.add(cube);
-    scene.add(new THREE.AmbientLight(0xffffff, 1.95));
+    // Mostly ambient so the face stays readable, plus a soft key light so the
+    // three visible faces get distinct densities and the cube reads as 3D.
+    scene.add(new THREE.AmbientLight(0xffffff, 2.1));
+    const key = new THREE.DirectionalLight(0xffffff, 0.7);
+    key.position.set(-0.6, 0.8, 1);
+    scene.add(key);
 
     composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
     asciiPass = new ShaderPass(ASCIIShader);
     asciiPass.uniforms.uCharactersCount.value = CHARACTERS.length;
-    asciiPass.uniforms.uColor.value = new THREE.Color(0xffffff);
+    asciiPass.uniforms.uColor.value = footerInk(canvasEl);
     asciiPass.uniforms.uInvert.value = true;
     composer.addPass(asciiPass);
 
@@ -211,7 +236,7 @@ export function initCube(canvasEl, textureUrl) {
     })();
   }
 
-  // GeoCities mode: rainbow cube with faster spin
+  // GeoCities mode: rainbow cube with faster spin. Elsewhere the cube is mono.
   let gcTarget = 0;
   let gcCurrent = 0;
   const GC_LERP = 0.04;
@@ -222,11 +247,14 @@ export function initCube(canvasEl, textureUrl) {
 
   const gcObserver = new MutationObserver(() => {
     gcTarget = isGeoCitiesActive() ? 1 : 0;
+    // Theme toggles change the footer text colour too.
+    if (asciiPass) asciiPass.uniforms.uColor.value = footerInk(canvasEl);
   });
   gcObserver.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ['data-geocities']
+    attributeFilter: ['data-geocities', 'data-theme', 'class']
   });
+  cleanups.push(() => gcObserver.disconnect());
   gcTarget = isGeoCitiesActive() ? 1 : 0;
   gcCurrent = gcTarget;
 
@@ -237,10 +265,10 @@ export function initCube(canvasEl, textureUrl) {
     gcCurrent += (gcTarget - gcCurrent) * GC_LERP;
     const gc = gcCurrent;
 
-    // Rainbow always on; GeoCities cranks the speed (frozen under reduced motion)
-    if (!prefersReducedMotion) {
-      const timeSpeed = 0.003 + gc * 0.007;
-      asciiPass.material.uniforms.uTime.value += timeSpeed;
+    asciiPass.uniforms.uGradientMix.value = gc;
+    // Gradient only animates in GeoCities mode (frozen under reduced motion)
+    if (!prefersReducedMotion && gc > 0.001) {
+      asciiPass.material.uniforms.uTime.value += 0.003 + gc * 0.007;
     }
 
     // Skip auto-rotation under reduced motion; drag still works
@@ -279,10 +307,12 @@ export function initCube(canvasEl, textureUrl) {
     }
   }
 
-  window.addEventListener('resize', () => {
+  const onWinResize = () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(onResize, 100);
-  });
+  };
+  window.addEventListener('resize', onWinResize);
+  cleanups.push(() => { window.removeEventListener('resize', onWinResize); clearTimeout(resizeTimer); });
 
   // Pause when off-screen
   const observer = new IntersectionObserver(([entry]) => {
@@ -295,6 +325,7 @@ export function initCube(canvasEl, textureUrl) {
     }
   }, { threshold: 0.1 });
   observer.observe(canvasEl);
+  cleanups.push(() => observer.disconnect());
 
   // Drag interaction
   canvasEl.addEventListener('pointerdown', e => {
@@ -341,4 +372,17 @@ export function initCube(canvasEl, textureUrl) {
     tex.needsUpdate = true;
     setup(tex);
   });
+
+  return {
+    destroy() {
+      destroyed = true;
+      cleanups.forEach(fn => fn());
+      renderer.setAnimationLoop(null);
+      if (asciiPass) asciiPass.uniforms.uCharacters.value?.dispose();
+      if (cube) { cube.geometry.dispose(); cubeMaterial.map?.dispose(); cubeMaterial.dispose(); }
+      composer?.dispose?.();
+      renderer.dispose();
+      renderer.forceContextLoss();
+    }
+  };
 }
