@@ -22,10 +22,11 @@ const VIEWPORTS = [
   { name: 'iphone-se', width: 320, height: 568 },
   { name: 'iphone', width: 375, height: 812 },
   { name: 'iphone-pro-max', width: 440, height: 956 },
-  { name: 'duo-single', width: 540, height: 720 },
+  { name: 'iphone-duo-outer', width: 466, height: 678 },
+  { name: 'iphone-duo-inner', width: 626, height: 890 },
   { name: 'tablet', width: 768, height: 1024 },
   { name: 'laptop', width: 1024, height: 768 },
-  { name: 'duo-spanned-width', width: 1114, height: 720 },
+  { name: 'iphone-duo-inner-landscape', width: 890, height: 626 },
   { name: 'desktop', width: 1280, height: 800 },
   { name: 'wide', width: 1440, height: 900 },
 ];
