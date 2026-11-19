@@ -48,6 +48,8 @@ jobs:
         run: node build-search-index.js --check
       - name: Verify pre-rendered header/footer match components.js
         run: node build-chrome.js --check
+      - name: Verify thoughts outputs (pages, feed, sitemap, routes) are current
+        run: node build-thoughts.js --check
       - name: Verify asset query strings match file hashes
         run: node stamp-assets.js --check
       - name: Install API dependencies

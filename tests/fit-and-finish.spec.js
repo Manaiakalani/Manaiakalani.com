@@ -30,7 +30,7 @@ test.beforeEach(async ({ page }) => {
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_REPOS) })
   );
   // Block web-vitals CDN to avoid external dependency in tests
-  await page.route('**/cdn.jsdelivr.net/npm/web-vitals**', route => route.abort());
+  await page.route('**/vendor/web-vitals@*/**', route => route.abort());
   // Clear localStorage cache to ensure mock data is used
   await page.addInitScript(() => {
     try { localStorage.removeItem('mnk:gh_repos_cache'); } catch (e) {}
@@ -148,7 +148,7 @@ test('index: currently building widget hides when GitHub API fails', async ({ pa
   await page.unrouteAll({ behavior: 'ignoreErrors' });
   await page.route('**/analytics.manaiakalani.info/**', route => route.abort());
   await page.route('**/api.github.com/**', route => route.abort());
-  await page.route('**/cdn.jsdelivr.net/npm/web-vitals**', route => route.abort());
+  await page.route('**/vendor/web-vitals@*/**', route => route.abort());
   await page.addInitScript(() => {
     try { localStorage.removeItem('mnk:gh_repos_cache'); } catch (e) {}
   });
@@ -364,7 +364,8 @@ test('thoughts: copy-link button copies the entry URL to the clipboard', async (
     catch (e) { return { ok: false, message: String(e && e.message) }; }
   });
   if (read.ok) {
-    expect(read.text).toContain('#' + entryId);
+    // Copies the thought's own page, not a #fragment of the list.
+    expect(read.text).toMatch(new RegExp('/thoughts/' + entryId + '$'));
   } else {
     expect(read.message).toMatch(/permissions policy/i);
   }
@@ -596,7 +597,7 @@ test('projects: shows fallback when GitHub API fails', async ({ page }) => {
   await page.unrouteAll({ behavior: 'ignoreErrors' });
   await page.route('**/analytics.manaiakalani.info/**', route => route.abort());
   await page.route('**/api.github.com/**', route => route.abort());
-  await page.route('**/cdn.jsdelivr.net/npm/web-vitals**', route => route.abort());
+  await page.route('**/vendor/web-vitals@*/**', route => route.abort());
   await page.addInitScript(() => {
     try { localStorage.removeItem('mnk:gh_repos_cache'); } catch (e) {}
   });
@@ -690,7 +691,7 @@ test('index: projects status live region is announced after featured load', asyn
 test('projects: empty GitHub response shows a consistent empty state (not a loading/error message)', async ({ page }) => {
   await page.unrouteAll({ behavior: 'ignoreErrors' });
   await page.route('**/analytics.manaiakalani.info/**', route => route.abort());
-  await page.route('**/cdn.jsdelivr.net/npm/web-vitals**', route => route.abort());
+  await page.route('**/vendor/web-vitals@*/**', route => route.abort());
   await page.route('**/api.github.com/users/*/repos*', route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' })
   );
@@ -1215,7 +1216,7 @@ test('search index: search.json is served with thoughts, uses, and about entries
   expect(kinds.has('Uses')).toBe(true);
   expect(kinds.has('About')).toBe(true);
   // Content deep-links to permalinks / section anchors.
-  expect(data.items.find(i => i.s === 'Thought').u).toMatch(/\/thoughts#/);
+  expect(data.items.find(i => i.s === 'Thought').u).toMatch(/^\/thoughts\/[a-z0-9-]+$/);
   expect(data.items.find(i => i.s === 'Uses').u).toMatch(/\/uses#/);
 });
 
@@ -1238,7 +1239,7 @@ test('command palette: content search surfaces page text under a group and navig
   const contentItem = dlg.locator('.cmdk__item', { hasText: 'GeoCities Mode Exists' });
   await expect(contentItem).toBeVisible();
   await contentItem.click();
-  await expect(page).toHaveURL(/thoughts(\.html)?#/);
+  await expect(page).toHaveURL(/\/thoughts\/[a-z0-9-]+$/);
 });
 
 test('command palette: content results are gated to queries of 2+ characters', async ({ page }) => {

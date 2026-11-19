@@ -15,7 +15,7 @@
  *     network - the worker never intercepts them.
  * Bump CACHE on every deploy so the activate step purges the previous cache.
  */
-var CACHE = 'mnk-cache-v11';
+var CACHE = 'mnk-cache-v12';
 var PRETTY = {
     '/thoughts': '/thoughts.html',
     '/projects': '/projects.html',
@@ -24,12 +24,15 @@ var PRETTY = {
     '/guestbook': '/guestbook.html',
     '/now': '/now.html'
 };
+var THOUGHT_PAGE = /^\/thoughts\/[a-z0-9-]+$/;
 function isDocPath(pathname) {
     if (pathname === '/') return true;
+    if (THOUGHT_PAGE.test(pathname)) return true;
     if (/\.html$/.test(pathname)) return true;
     return Object.prototype.hasOwnProperty.call(PRETTY, pathname);
 }
 function htmlTwin(pathname) {
+    if (THOUGHT_PAGE.test(pathname)) return pathname + '.html';
     return PRETTY[pathname] || pathname;
 }
 // The offline shell (home + 404) MUST land before activate purges the old cache;

@@ -40,7 +40,7 @@ read('thoughts.html').split('<div class="thought-entry"').slice(1).forEach(funct
   const date = clean((chunk.match(/class="thought-date">([\s\S]*?)<\/div>/) || [])[1] || '');
   const body = clean((chunk.match(/class="thought-excerpt">([\s\S]*?)<\/p>/) || [])[1] || '');
   if (!title) return;
-  items.push({ t: title, u: '/thoughts#' + id, s: 'Thought', d: date, b: cap(body, 400) });
+  items.push({ t: title, u: '/thoughts/' + id, s: 'Thought', d: date, b: cap(body, 400) });
 });
 
 // ---- Uses: one entry per .uses-section, linked to its anchor ----

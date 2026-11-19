@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://manaiakalani.com/</loc>
-    <lastmod>2026-09-16</lastmod>
+    <lastmod>2026-11-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -14,38 +14,134 @@
   </url>
   <url>
     <loc>https://manaiakalani.com/projects</loc>
-    <lastmod>2026-09-16</lastmod>
+    <lastmod>2026-11-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://manaiakalani.com/uses</loc>
-    <lastmod>2026-09-16</lastmod>
+    <lastmod>2026-11-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://manaiakalani.com/colophon</loc>
-    <lastmod>2026-09-16</lastmod>
+    <lastmod>2026-11-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://manaiakalani.com/now</loc>
-    <lastmod>2026-09-16</lastmod>
+    <lastmod>2026-11-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://manaiakalani.com/guestbook</loc>
-    <lastmod>2026-09-16</lastmod>
+    <lastmod>2026-11-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://manaiakalani.com/feed.xml</loc>
-    <lastmod>2026-09-15</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/old-art-new-doors</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/build-the-thing-you-couldnt-find</loc>
+    <lastmod>2026-11-14</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/hide-something-for-the-curious</loc>
+    <lastmod>2026-10-03</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/fit-and-finish-is-respect</loc>
+    <lastmod>2026-09-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/your-personal-site-has-a-supply-chain</loc>
+    <lastmod>2026-08-14</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/a-homepage-can-still-be-a-place</loc>
+    <lastmod>2026-07-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/ship-it-where-someone-can-use-it</loc>
+    <lastmod>2026-06-03</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/let-the-api-be-the-cms</loc>
+    <lastmod>2026-05-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/side-projects-are-career-development</loc>
+    <lastmod>2026-05-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/the-tools-changed-the-job-didnt</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/why-geocities-mode-exists</loc>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/on-community-strategy</loc>
+    <lastmod>2026-03-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/building-in-public</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/from-racking-servers-to-deploying-endpoints</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/the-clippy-philosophy</loc>
+    <lastmod>2025-01-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://manaiakalani.com/thoughts/every-site-needs-dark-mode</loc>
+    <lastmod>2024-11-03</lastmod>
+    <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 </urlset>
