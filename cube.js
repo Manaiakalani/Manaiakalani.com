@@ -12,11 +12,11 @@ const DRAG_SENSITIVITY = 85;
 const MAX_DPR         = 3;
 const ENTER_DURATION  = 1800;
 
-// Glyph cell in CSS px. ~60 columns across the canvas: enough to resolve the
-// face on the texture, while each glyph still renders at 8-15 device px.
+// Glyph cell in CSS px. ~75 columns across the canvas so the face resolves;
+// at 2-3x DPR each glyph still renders at 7-11 device px.
 function getCellSize(w) {
-  if (w < 260) return 4;
-  return 4.5;
+  if (w < 260) return 3.25;
+  return 3.75;
 }
 
 
@@ -194,7 +194,9 @@ export function initCube(canvasEl, textureUrl) {
     asciiPass = new ShaderPass(ASCIIShader);
     asciiPass.uniforms.uCharactersCount.value = CHARACTERS.length;
     asciiPass.uniforms.uColor.value = new THREE.Color(0xffffff);
-    asciiPass.uniforms.uInvert.value = true;
+    // Positive image: bright skin = dense glyphs, dark lines = gaps. The face
+    // reads at a glance instead of as a negative.
+    asciiPass.uniforms.uInvert.value = false;
     composer.addPass(asciiPass);
 
     onResize();

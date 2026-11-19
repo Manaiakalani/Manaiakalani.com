@@ -85,12 +85,13 @@ void main() {
   vec3 L = normalize(vec3(-0.5, 0.7, 0.9));
   float diffuse = max(dot(n, L), 0.0);
   float glint = pow(max(dot(n, normalize(L + vec3(0.0, 0.0, 1.0))), 0.0), 22.0);
-  float depthFade = 0.75 + 0.25 * clamp(vDepth + 0.5, 0.0, 1.0);
+  float depthFade = mix(0.75 + 0.25 * clamp(vDepth + 0.5, 0.0, 1.0), 1.0, vBlend * 0.7);
   // In flight the beads run through the site's rainbow; they settle into the
   // portrait's own colours as they land. GeoCities keeps them rainbow.
   vec3 flight = hue(vHue + uTime * 0.06) * 0.85;
   vec3 base = mix(mix(flight, vColor, vBlend), hue(vHue + uTime * 0.1), uRainbow);
-  vec3 col = base * (0.55 + 0.6 * diffuse) * depthFade + glint * 0.18;
+  // Mostly flat shading once landed so the portrait's own tones carry the image.
+  vec3 col = base * mix(0.55 + 0.6 * diffuse, 0.88 + 0.2 * diffuse, vBlend) * depthFade + glint * 0.12 * (1.0 - 0.6 * vBlend);
   float a = smoothstep(1.0, 0.72, r2);
   gl_FragColor = vec4(col * a, a);
 }`;
@@ -106,7 +107,7 @@ function rng(seed) {
 
 // Returns { pos: Float32Array(n*4), color: Float32Array(n*3) }.
 function sampleBeads(img, n) {
-  const S = 256;
+  const S = 320;
   const c = document.createElement('canvas');
   c.width = c.height = S;
   const ctx = c.getContext('2d', { willReadFrequently: true });
@@ -127,7 +128,7 @@ function sampleBeads(img, n) {
     const l = lum(i);
     const nb = ix > 0 && ix < S - 1 && iy > 0 && iy < S - 1
       ? Math.abs(lum(i - 1) - lum(i + 1)) + Math.abs(lum(i - S) - lum(i + S)) : 0;
-    const w = Math.min(1, 0.5 + nb * 2.5 + (1 - l) * 0.3);
+    const w = Math.min(1, 0.6 + nb * 2.5 + (1 - l) * 0.3);
     if (rand() > w) continue;
     const x = (fx / S) * 2 - 1, y = 1 - (fy / S) * 2;
     const r = Math.hypot(x * 1.1, y);
@@ -168,7 +169,7 @@ export async function initParticles(canvas, { imageUrl = '/portrait-beads.webp' 
 
   const img = await loadImage(imageUrl);
   const small = canvas.parentElement.getBoundingClientRect().width < 260;
-  const N = small ? 13000 : 17000;
+  const N = small ? 18000 : 24000;
   const { pos, color } = sampleBeads(img, N);
 
   const prog = gl.createProgram();
@@ -260,8 +261,8 @@ export async function initParticles(canvas, { imageUrl = '/portrait-beads.webp' 
     gl.uniform2f(U.uTilt, tiltNow[0], tiltNow[1]);
     gl.uniform3f(U.uPointer, pointer.x, pointer.y, pointer.s);
     gl.uniform1f(U.uScale, SCALE);
-    // ~1.6 CSS px beads on the 280px canvas; scales with the box.
-    gl.uniform1f(U.uPointSize, Math.max(1.25, (cssW / 175) * dpr));
+    // ~1.4 CSS px beads on the 280px canvas; scales with the box.
+    gl.uniform1f(U.uPointSize, Math.max(1.25, (cssW / 205) * dpr));
     gl.uniform1f(U.uRainbow, rainbow);
     gl.uniform1f(U.uTime, time);
     gl.drawArrays(gl.POINTS, 0, N);
