@@ -551,7 +551,7 @@ if (typingEl) {
     }
 })();
 
-// --- Thoughts page: reading time, copy-link, search/filter, jump nav, random (thoughts.html only) ---
+// --- Thoughts page: reading time, search/filter, jump nav, random (thoughts.html only) ---
 (function () {
     var thoughtsList = document.querySelector('.thoughts-list');
     if (!thoughtsList) return;
@@ -566,43 +566,6 @@ if (typingEl) {
         var words = excerpt.textContent.trim().split(/\s+/).filter(Boolean).length;
         var minutes = Math.max(1, Math.round(words / 200));
         dateEl.appendChild(document.createTextNode(' \u00B7 ' + minutes + ' min read'));
-    });
-
-    // Copy-link button per entry.
-    entries.forEach(function (entry) {
-        var titleEl = entry.querySelector('.thought-title');
-        if (!titleEl || !entry.id) return;
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'copy-link-btn';
-        btn.setAttribute('aria-label', 'Copy link to this entry');
-        btn.innerHTML = (typeof mnkIcon === 'function') ? mnkIcon('link') : 'Link';
-        btn.addEventListener('click', function () {
-            var url = window.location.origin + (entry.dataset.permalink || (window.location.pathname + '#' + entry.id));
-            var reset = function () {
-                btn.classList.remove('copied');
-                btn.setAttribute('aria-label', 'Copy link to this entry');
-            };
-            var confirmCopy = function () {
-                btn.classList.add('copied');
-                btn.setAttribute('aria-label', 'Link copied!');
-                setTimeout(reset, 1500);
-            };
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(url).then(confirmCopy).catch(function () {});
-            } else {
-                // Fallback for browsers without the async Clipboard API
-                var ta = document.createElement('textarea');
-                ta.value = url;
-                ta.style.position = 'fixed';
-                ta.style.opacity = '0';
-                document.body.appendChild(ta);
-                ta.select();
-                try { document.execCommand('copy'); confirmCopy(); } catch (e) { /* ignore */ }
-                document.body.removeChild(ta);
-            }
-        });
-        titleEl.appendChild(btn);
     });
 
     // Search/filter over existing entries (no re-fetch - content is static).
@@ -683,19 +646,6 @@ if (typingEl) {
         if (window.location.hash === '#random') randomBtn.click();
     }
 
-    // When arriving via a shared permalink (#entry-id), briefly highlight the
-    // target so the reader can see where the link landed them.
-    function highlightFromHash() {
-        var id = window.location.hash.slice(1);
-        if (!id || id === 'random') return;
-        var target = document.getElementById(id);
-        if (!target || entries.indexOf(target) === -1) return;
-        entries.forEach(function (e) { e.classList.remove('thought-entry--highlight'); });
-        void target.offsetWidth; // restart the animation on repeat visits
-        target.classList.add('thought-entry--highlight');
-    }
-    window.addEventListener('hashchange', highlightFromHash);
-    highlightFromHash();
 })();
 
 // --- 404 page: show attempted path + table-flip easter egg ---

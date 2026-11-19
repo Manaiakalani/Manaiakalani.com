@@ -747,7 +747,6 @@ html:not([data-geocities="true"]) .footer-visits {
 
 .random-thought-btn .icon,
 .random-project-btn .icon,
-.copy-link-btn .icon,
 .heart-beat .icon,
 .building-label .icon {
     width: 1em;
@@ -1238,11 +1237,6 @@ a.building-card:focus-visible {
     scroll-margin-top: 1.5rem;
 }
 
-.thought-entry:target {
-    background-color: var(--bg-secondary);
-    box-shadow: inset 3px 0 0 0 var(--accent);
-}
-
 .thought-anchor {
     color: inherit;
     text-decoration: none;
@@ -1275,53 +1269,6 @@ a.building-card:focus-visible {
     text-align: left;
     margin-top: 0.2rem;
     margin-bottom: 0.45rem;
-}
-
-.copy-link-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 0.15rem;
-    min-width: var(--touch);
-    min-height: var(--touch);
-    padding: 0.25rem;
-    vertical-align: middle;
-    background: none;
-    border: none;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    line-height: 1;
-    cursor: pointer;
-    position: relative;
-    vertical-align: middle;
-    transition: background-color 0.2s ease;
-}
-
-.copy-link-btn:hover,
-.copy-link-btn:focus-visible {
-    background-color: var(--bg-secondary);
-}
-
-.copy-link-btn:focus-visible {
-    outline: 2px solid var(--focus-ring);
-    outline-offset: 2px;
-}
-
-.copy-link-btn.copied::after {
-    content: 'Copied!';
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-bottom: 0.3rem;
-    background: var(--text-primary);
-    color: var(--bg-primary);
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    white-space: nowrap;
-    pointer-events: none;
 }
 
 .thought-excerpt {
@@ -1875,26 +1822,9 @@ footer {
     }
 }
 
-/* Shared permalink arrival: briefly highlight the targeted thought entry */
-@keyframes thought-highlight {
-    from { background-color: var(--focus-ring-shadow); }
-    to   { background-color: transparent; }
-}
-
-.thought-entry--highlight {
-    animation: thought-highlight 1.8s ease-out;
-    border-radius: 8px;
-}
-
 /* The global reduce block above doesn't reach view-transition pseudo-elements,
    so opt them out explicitly for users who prefer reduced motion. */
 @media (prefers-reduced-motion: reduce) {
-    /* No fade for reduced-motion users, but still mark the arrived-at entry. */
-    .thought-entry--highlight {
-        animation: none;
-        background-color: var(--focus-ring-shadow);
-    }
-
     ::view-transition-group(*),
     ::view-transition-old(*),
     ::view-transition-new(*) {

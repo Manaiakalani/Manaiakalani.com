@@ -345,32 +345,6 @@ test('thoughts: random thought button jumps to a valid entry', async ({ page }) 
   await expect(page.locator('.thought-entry#' + hash)).toBeFocused();
 });
 
-test('thoughts: copy-link button copies the entry URL to the clipboard', async ({ page, context }) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.goto('/thoughts');
-  const firstEntry = page.locator('.thought-entry').first();
-  const entryId = await firstEntry.getAttribute('id');
-  const copyBtn = firstEntry.locator('.copy-link-btn');
-  await expect(copyBtn).toBeVisible();
-  await copyBtn.click();
-  // `copied` is added only from the writeText() success path, so this on its own
-  // proves the copy happened.
-  await expect(copyBtn).toHaveClass(/copied/);
-  // Reading it back needs clipboard-read, which the deployed Permissions-Policy
-  // denies on purpose. Assert the contents wherever the read is allowed, and
-  // tolerate only a policy block so a genuine clipboard regression still fails.
-  const read = await page.evaluate(async () => {
-    try { return { ok: true, text: await navigator.clipboard.readText() }; }
-    catch (e) { return { ok: false, message: String(e && e.message) }; }
-  });
-  if (read.ok) {
-    // Copies the thought's own page, not a #fragment of the list.
-    expect(read.text).toMatch(new RegExp('/thoughts/' + entryId + '$'));
-  } else {
-    expect(read.message).toMatch(/permissions policy/i);
-  }
-});
-
 // ── Uses page ──
 test('uses: hero heading is visible', async ({ page }) => {
   await page.goto('/uses');
@@ -1188,21 +1162,17 @@ test('view transitions: cross-document navigation opt-in is present', async ({ p
   expect(css).toMatch(/@view-transition\s*\{\s*navigation:\s*auto/);
 });
 
-// ── Per-thought permalink arrival highlight ──
-test('thoughts: arriving via a permalink highlights the target entry', async ({ page }) => {
-  await page.goto('/thoughts');
-  const id = await page.locator('.thought-entry[id]').first().getAttribute('id');
-  expect(id).toBeTruthy();
-  await page.goto('/thoughts#' + id);
-  await expect(page.locator('#' + id)).toHaveClass(/thought-entry--highlight/);
-});
-
-test('thoughts: every entry has a copy-link button', async ({ page }) => {
+// Each entry links to its own page; no copy-link button and no selection bar.
+test('thoughts: entries offer a permalink, not a copy button or a highlight bar', async ({ page }) => {
   await page.goto('/thoughts');
   const entries = await page.locator('.thought-entry[id]').count();
-  const buttons = await page.locator('.thought-entry .copy-link-btn').count();
   expect(entries).toBeGreaterThan(0);
-  expect(buttons).toBe(entries);
+  await expect(page.locator('.thought-entry .thought-permalink a')).toHaveCount(entries);
+  await expect(page.locator('.copy-link-btn')).toHaveCount(0);
+  const id = await page.locator('.thought-entry').nth(2).getAttribute('id');
+  await page.goto('/thoughts#' + id);
+  const shadow = await page.locator('#' + id).evaluate(el => getComputedStyle(el).boxShadow);
+  expect(shadow).toBe('none');
 });
 
 // ── Round 5: palette content search (search.json) ──
