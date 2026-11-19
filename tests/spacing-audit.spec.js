@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
   await page.route('**/api.github.com/**', route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' })
   );
-  await page.route('**/cdn.jsdelivr.net/npm/web-vitals**', route => route.abort());
+  await page.route('**/vendor/web-vitals@*/**', route => route.abort());
 });
 
 function box(locator) {

@@ -1313,6 +1313,144 @@ a.building-card:focus-visible {
     margin: 0;
 }
 
+/* Now: last-updated stamp and this month's list */
+.now-updated {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.now-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.now-list li {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.15);
+    line-height: 1.55;
+}
+
+.now-list li:last-child {
+    border-bottom: 0;
+}
+
+.now-list a {
+    color: var(--text-primary);
+    text-underline-offset: 3px;
+}
+
+/* Related projects + permalink under each thought */
+.thought-related,
+.thought-permalink {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0.35rem 0 0;
+    text-align: left;
+}
+
+.thought-related__label {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.7rem;
+    margin-right: 0.35rem;
+}
+
+.thought-related a,
+.thought-permalink a,
+.thought-back a,
+.thought-pager a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    min-height: var(--touch);
+    color: var(--text-primary);
+    text-underline-offset: 3px;
+}
+
+.thought-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0 1rem;
+    margin-top: 0.25rem;
+}
+
+.thought-meta .thought-related,
+.thought-meta .thought-permalink {
+    margin: 0;
+}
+
+.thought-meta .thought-permalink {
+    margin-left: auto;
+}
+
+/* A thought on its own page (/thoughts/<slug>) */
+.thought-single {
+    max-width: 46rem;
+    margin-inline: auto;
+    padding-block: var(--section-pad);
+    text-align: left;
+}
+
+.thought-single .thought-date {
+    margin-top: var(--space-2);
+}
+
+.thought-single__title {
+    text-align: left;
+    margin: 0.25rem 0 var(--space-4);
+}
+
+.thought-single__body {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    max-width: 65ch;
+    color: var(--text-primary);
+}
+
+.thought-single .thought-related {
+    font-size: 0.9rem;
+}
+
+.thought-pager {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.thought-pager a {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    text-decoration: none;
+    background: var(--bg-secondary);
+}
+
+.thought-pager__older {
+    text-align: right;
+    align-items: flex-end !important;
+}
+
+.thought-pager__label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+}
+
+@media (hover: hover) {
+    .thought-pager a:hover { text-decoration: underline; }
+}
+
 /* Projects Full Page Grid */
 .projects-grid {
     display: grid;
@@ -2249,7 +2387,8 @@ html[data-theme="dark"] body {
     font-variant-numeric: tabular-nums;
     color: var(--text-secondary);
 }
-.now-desk {
+.now-desk,
+.now-month {
     max-width: 36rem;
     margin: 0 auto 2rem;
 }
@@ -2540,6 +2679,7 @@ html[data-geocities="true"] .mini-nav {
     .featured-teaser h2,
     .uses-section h2,
     .uses-lead,
+    .now-month,
     main.container > :not(.projects-grid):not(.uses-section) {
         max-width: calc(var(--seg-left) - 2 * var(--gutter));
         margin-left: 0;
@@ -2548,6 +2688,12 @@ html[data-geocities="true"] .mini-nav {
     .featured-teaser h2 { text-align: left; }
     .view-all { margin-left: 0; }
     .skip-link { left: calc(var(--seg-left) / 2); }
+    .thought-single {
+        max-width: var(--seg-left);
+        margin-left: 0;
+        padding-inline: var(--gutter);
+        box-sizing: border-box;
+    }
     footer .container {
         max-width: var(--seg-right);
         margin-left: calc(var(--seg-left) + var(--hinge));

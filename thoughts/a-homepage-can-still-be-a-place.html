@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<!--
+  Aloha, view-source friend.
+  This page is a product: vanilla HTML, a CSP, a guestbook, and a globe that goes to 1997.
+  manaiakalani.com
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>A Homepage Can Still Be a Place | Maximilian Stein</title>
+    <meta name="description" content="I wired a shared sign-in book and a visitor counter onto this site this summer. If the backend is not there, they vanish.">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-07-22">
+    <meta property="og:site_name" content="Maximilian Stein">
+    <meta property="og:url" content="https://manaiakalani.com/thoughts/a-homepage-can-still-be-a-place">
+    <meta property="og:title" content="A Homepage Can Still Be a Place">
+    <meta property="og:description" content="I wired a shared sign-in book and a visitor counter onto this site this summer. If the backend is not there, they vanish.">
+    <meta property="og:image" content="https://manaiakalani.com/og/thoughts/a-homepage-can-still-be-a-place.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="A Homepage Can Still Be a Place, a thought by Maximilian Stein">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="A Homepage Can Still Be a Place">
+    <meta property="twitter:description" content="I wired a shared sign-in book and a visitor counter onto this site this summer. If the backend is not there, they vanish.">
+    <meta property="twitter:image" content="https://manaiakalani.com/og/thoughts/a-homepage-can-still-be-a-place.jpg">
+    <meta property="twitter:image:alt" content="A Homepage Can Still Be a Place, a thought by Maximilian Stein">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#c84534">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121218">
+    <meta name="author" content="Maximilian Stein">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://manaiakalani.com/thoughts/a-homepage-can-still-be-a-place">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
+    
+    <!-- Preconnect -->
+    
+    <!-- Self-hosted Doto: preload the latin subset used above the fold -->
+    <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/style.css?v=2890f42e">
+
+    <!-- RSS Feed -->
+    <link rel="alternate" type="application/atom+xml" title="Thoughts | Maximilian Stein" href="/feed.xml">
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Prevent flash: apply saved theme/geocities before paint -->
+    <script src="/boot.js?v=66ae0b80"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "A Homepage Can Still Be a Place",
+      "description": "I wired a shared sign-in book and a visitor counter onto this site this summer. If the backend is not there, they vanish.",
+      "datePublished": "2026-07-22",
+      "url": "https://manaiakalani.com/thoughts/a-homepage-can-still-be-a-place",
+      "image": "https://manaiakalani.com/og/thoughts/a-homepage-can-still-be-a-place.jpg",
+      "mainEntityOfPage": "https://manaiakalani.com/thoughts/a-homepage-can-still-be-a-place",
+      "isPartOf": {
+        "@type": "Blog",
+        "name": "Thoughts | Maximilian Stein",
+        "url": "https://manaiakalani.com/thoughts"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Maximilian Stein",
+        "url": "https://manaiakalani.com"
+      }
+    }
+    </script>
+
+    <!-- Analytics - self-hosted Rybbit on our own subdomain. Deliberately no
+         SRI: /api/script.js is a rolling endpoint that changes whenever the
+         instance is upgraded, so a pinned hash would silently break analytics
+         on every upgrade. The endpoint does send Access-Control-Allow-Origin
+         when a request carries an Origin header, so a crossorigin pair would in
+         fact work - the reason is update cadence, not CORS. CSP script-src pins
+         the origin instead. -->
+    <script
+      src="https://analytics.manaiakalani.info/api/script.js"
+      data-site-id="c24b6c864956"
+      defer
+    ></script>
+
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <!-- Header Section -->
+    <header id="site-header" data-variant="page" data-injected="true"><div class="container"><span class="brand-text">MANAIAKALANI</span><p class="header-subtitle">Aloha, I'm Maximilian (Manaiakalani) Stein</p><nav class="site-nav" aria-label="Main"><a href="/">About</a><a href="/thoughts">Thoughts</a><a href="/projects">Projects</a><a href="/uses">Uses</a></nav></div><nav class="mini-nav" aria-label="Quick" aria-hidden="true" inert><a href="#main" class="mini-nav__top"><span class="mini-nav__arrow" aria-hidden="true">↑</span><span class="mini-nav__top-label">Top</span></a><a href="/">About</a><a href="/thoughts">Thoughts</a><a href="/projects">Projects</a><a href="/uses">Uses</a></nav><button class="theme-toggle" aria-label="Toggle dark mode"><span class="theme-icon theme-icon--moon" data-icon="moon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M14.6 2.4A9.8 9.8 0 1 0 21.6 15.2 7.9 7.9 0 0 1 14.6 2.4Z"/></svg></span><span class="theme-icon theme-icon--sun" data-icon="sun"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11 1.2h2v3.6h-2zM11 19.2h2v3.6h-2zM1.2 11h3.6v2H1.2zm17.99 0H22.8v2h-3.61zM4.22 3.16 5.64 1.75l2.55 2.55-1.42 1.41zM15.81 16.29l2.55 2.55-1.41 1.42-2.55-2.55zM3.16 19.78l1.41 1.41 2.55-2.55-1.41-1.41zM16.29 8.19l2.55-2.55 1.42 1.41-2.55 2.55z"/><circle fill="currentColor" cx="12" cy="12" r="4.7"/></svg></span></button><button class="geocities-toggle" aria-label="Toggle GeoCities mode" title="Welcome to 1997!"><span class="gc-icon" data-icon="geocities"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" d="M12 2.1a9.9 9.9 0 1 1 0 19.8 9.9 9.9 0 0 1 0-19.8Zm0 1.8a8.1 8.1 0 1 0 0 16.2 8.1 8.1 0 0 0 0-16.2Zm-6.4 7.3h12.8v1.6H5.6Zm6.4-5.4c1.5 1.9 2.4 4.2 2.4 6.6s-.9 4.7-2.4 6.6C10.5 15.7 9.6 13.4 9.6 11s.9-4.7 2.4-6.6Z"/></svg></span></button></header>
+
+    <main id="main" tabindex="-1">
+        <article class="container thought-single" aria-labelledby="thought-title">
+            <p class="thought-back"><a href="/thoughts"><span aria-hidden="true">←</span> All thoughts</a></p>
+            <div class="thought-date"><time datetime="2026-07-22">2026.07.22</time> · 1 min read</div>
+            <h1 class="thought-single__title" id="thought-title">A Homepage Can Still Be a Place</h1>
+            <p class="thought-single__body">I wired a shared sign-in book and a visitor counter onto this site this summer. If the backend is not there, they vanish. No fake numbers, no spinner that never ends. That is the point. Community strategy at work is sitting between engineers and the people who use what they ship. The same instinct belongs on a personal homepage: leave a place someone can actually sign, count the visits only when the count is real, and let the rest of the page keep working when the lights in the back are off.</p>
+            <nav class="thought-pager" aria-label="More thoughts">
+                <a class="thought-pager__newer" href="/thoughts/your-personal-site-has-a-supply-chain" rel="prev"><span class="thought-pager__label">Newer</span> Your Personal Site Has a Supply Chain</a>
+                <a class="thought-pager__older" href="/thoughts/ship-it-where-someone-can-use-it" rel="next"><span class="thought-pager__label">Older</span> Ship It Where Someone Can Use It</a>
+            </nav>
+        </article>
+    </main>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="container" id="footer-content" data-injected="true"><div class="cube-wrapper" aria-hidden="true"><canvas id="ascii-cube"></canvas></div><div class="viz-switch" role="group" aria-label="Footer animation" hidden><button type="button" data-viz="cube" aria-pressed="true">Cube</button><button type="button" data-viz="swarm" aria-pressed="false">Swarm</button></div><div class="social-icons"><a href="https://www.linkedin.com/in/manaiakalani/" target="_blank" rel="noopener noreferrer me" aria-label="LinkedIn"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M4.4 3.2A2.2 2.2 0 1 0 4.4 7.6 2.2 2.2 0 0 0 4.4 3.2ZM3.2 9.2h2.5V20.8H3.2V9.2Zm5.3 0h2.4v1.6h.1c.3-.6 1.2-1.8 3.2-1.8 3.4 0 4 2.2 4 5.1v6.7h-2.5v-6c0-1.4 0-3.2-2-3.2s-2.3 1.5-2.3 3.1v6.1H8.5V9.2Z"/></svg></a><a href="https://x.com/manaiakalani" target="_blank" rel="noopener noreferrer me" aria-label="X (formerly Twitter)"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M3.2 3.2h5.1l4.1 5.8L17.3 3.2H21l-7.1 8.4L21.2 20.8h-5.1l-4.5-6.4-5.2 6.4H3.2l7.6-8.9L3.2 3.2z"/></svg></a><a href="https://github.com/manaiakalani" target="_blank" rel="noopener noreferrer me" aria-label="GitHub"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.2-3.4-1.2-.4-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 3 .8.1-.6.4-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c2-.1.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7 1 .7 2v2.3c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg></a><a href="https://instagram.com/manaiakalani" target="_blank" rel="noopener noreferrer me" aria-label="Instagram"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" d="M8 3h8a5 5 0 0 1 5 5v8a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5V8a5 5 0 0 1 5-5Zm8 2.2H8A2.8 2.8 0 0 0 5.2 8v8A2.8 2.8 0 0 0 8 18.8h8A2.8 2.8 0 0 0 18.8 16V8A2.8 2.8 0 0 0 16 5.2ZM12 8.2A3.8 3.8 0 1 1 8.2 12 3.8 3.8 0 0 1 12 8.2Zm0 2a1.8 1.8 0 1 0 0 3.6 1.8 1.8 0 0 0 0-3.6ZM17.1 6.4a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z"/></svg></a><a href="https://www.youtube.com/kimaker213" target="_blank" rel="noopener noreferrer me" aria-label="YouTube"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" d="M21.6 7.4c-.2-1.2-1.1-2.1-2.3-2.3C17.4 4.8 12 4.8 12 4.8s-5.4 0-7.3.3C3.5 5.3 2.6 6.2 2.4 7.4 2.1 9.3 2.1 12 2.1 12s0 2.7.3 4.6c.2 1.2 1.1 2 2.3 2.3 1.9.3 7.3.3 7.3.3s5.4 0 7.3-.3c1.2-.3 2.1-1.1 2.3-2.3.3-1.9.3-4.6.3-4.6s0-2.7-.3-4.6ZM10.2 15.2V8.8l5.6 3.2-5.6 3.2Z"/></svg></a><a href="https://bsky.app/profile/did:plc:kurxpumma6piictgpr424wcj" target="_blank" rel="noopener noreferrer me" aria-label="Bluesky"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6.2 4.2c2.4 1.8 5 5.3 5.8 7.4.8-2.1 3.4-5.6 5.8-7.4C20.2 2.8 21 3.1 21.5 3.4c.6.3.7 1.3.7 1.9 0 .6-.3 4.9-.5 5.6-.7 2.3-3.2 3.1-5.5 2.8 3.3.5 6.3 1.7 2.4 6-4.3 4.4-5.9-.9-6.6-3.6-.8 2.7-1.8 8-6.6 3.6-3.7-3.7-1-5.5 2.4-6-2.3.3-4.8-.5-5.5-2.8C1.6 10.2 1.3 5.9 1.3 5.3c0-.6.1-1.6.7-1.9.5-.3 1.3-.6 4.2.8Z"/></svg></a></div><p class="footer-links"><a href="/guestbook#sign" class="footer-text-btn" id="sign-the-book"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M4 3.2h6.2c1.4 0 2.6.6 3.4 1.6.8-1 2-1.6 3.4-1.6H23V19h-6.2c-1 0-1.9.3-2.6.9V6.4A2.4 2.4 0 0 0 11.8 4H5.6v16.4h6.6V22H4V3.2z"/></svg> Sign the book</a><a href="/now">Now</a><a href="/colophon">Colophon</a><a href="https://github.com/Manaiakalani/Manaiakalani.com">Source</a><a href="mailto:webmaster@manaiakalani.com">Email</a><a href="/feed.xml">RSS</a></p><p class="footer-text">Made with <span class="heart-beat" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 21S3 14.4 3 8.8A5.1 5.1 0 0 1 8.4 3.6 5.4 5.4 0 0 1 12 5.4a5.4 5.4 0 0 1 3.6-1.8A5.1 5.1 0 0 1 21 8.8C21 14.4 12 21 12 21z"/></svg></span> in Seattle, WA</p><p class="footer-visits" hidden><span class="visits-odometer" aria-label="Visitor count"></span><span class="visits-label">Visitors</span></p></div>
+    </footer>
+
+    <!-- External JavaScript -->
+    <script defer src="/icons.js?v=8e859fc3"></script>
+    <script defer src="/components.js?v=c7a57b88"></script>
+    <script defer src="/guestbook.js?v=97c19949"></script>
+    <script defer src="/script.js?v=61676c78"></script>
+
+    <!-- ASCII Cube -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "/vendor/three@0.170.0/build/three.module.min.js",
+            "three/addons/": "/vendor/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="speculationrules">
+    {
+        "prefetch": [{
+            "where": { "and": [
+                { "href_matches": "/*" },
+                { "not": { "href_matches": "/api/*" } },
+                { "not": { "href_matches": "/*.xml" } },
+                { "not": { "href_matches": "/*.json" } }
+            ] },
+            "eagerness": "moderate"
+        }]
+    }
+    </script>
+    <script defer src="/command-palette.js?v=cba3ac8f"></script>
+    <script type="module" src="/web-vitals-report.js?v=f5a0338b"></script>
+</body>
+</html>

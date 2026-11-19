@@ -1,0 +1,164 @@
+[
+  {
+    "slug": "old-art-new-doors",
+    "date": "2026-11-17",
+    "published": "2026-11-17T09:00:00Z",
+    "title": "Old Art, New Doors",
+    "body": "In 1996, Microsoft Comic Chat turned chat rooms into comic strips, with characters drawn by Jim Woodring. When Microsoft released the source under the MIT License, those characters became something you could build on again. Sans Comic is my take: type a line, get a panel. LOL laughs, CAPS shout, parentheses think. No build step, no account, and the strip lives in your browser until you save it. The idea still works thirty years later. Some of the most fun product work is finding a good idea that got left behind and giving people a door back in.",
+    "related": [
+      {
+        "name": "Sans Comic",
+        "url": "https://github.com/Manaiakalani/sans-comic"
+      }
+    ]
+  },
+  {
+    "slug": "build-the-thing-you-couldnt-find",
+    "date": "2026-11-14",
+    "published": "2026-11-14T09:00:00Z",
+    "title": "Build the Thing You Couldn't Find",
+    "body": "My garage has a shelf of 3D printer filament, and I kept buying colors I already owned. Every tracker I found came with ads, an account, or a data policy longer than the spool. So I spent a weekend on Filament Shelf: one folder on a computer I control, a page my phone installs, and nothing that phones home. Then I spent another evening drawing glitter spools as sparkles and rainbow spools as bands, because if it's mine, it gets to be delightful. The best side projects start with a small annoyance and the stubbornness not to rent a fix for it.",
+    "related": [
+      {
+        "name": "Filament Shelf",
+        "url": "https://github.com/Manaiakalani/filament-shelf"
+      }
+    ]
+  },
+  {
+    "slug": "hide-something-for-the-curious",
+    "date": "2026-10-03",
+    "published": "2026-10-03T09:00:00Z",
+    "title": "Hide Something for the Curious",
+    "body": "This site has a few secrets. Enter the Konami code and you land in 1997. Type \"clippy\" and the same thing happens, because of course it does. Click the fishhook line in the header and you get Scorpius over a starfield, plus tonight's Hawaiian moon. None of it moves a metric. That is the point. An easter egg is a note to the one visitor who pokes around, and it says: I hoped you would. Ship the boring parts well, then hide something for the curious."
+  },
+  {
+    "slug": "fit-and-finish-is-respect",
+    "date": "2026-09-15",
+    "published": "2026-09-15T20:00:00Z",
+    "title": "Fit and Finish Is Respect",
+    "body": "I spent a night measuring this site the way a visitor actually uses it: thumb on a 320px phone, six viewports, nav links that looked fine and were 27 pixels tall. Thought titles had inherited a centered heading style so the list read like a poster instead of writing. The command palette sat 6px from the theme toggle. Nobody files a ticket for that. They just bounce. Fit and finish is not polish for its own sake. It is the difference between \"I built this\" and \"I meant for you to use this.\""
+  },
+  {
+    "slug": "your-personal-site-has-a-supply-chain",
+    "date": "2026-08-14",
+    "published": "2026-08-14T00:00:00Z",
+    "title": "Your Personal Site Has a Supply Chain",
+    "body": "This site is static HTML. I still ended up with a high-severity parser in a Lighthouse tool I never imported on purpose, a lockfile that could not clean-install, and a week of Dependabot PRs that could not merge because of it. A homepage is a product. It has a lockfile, a content-security policy, and a queue of unglamorous patches. If you only ship the fun pages, the boring ones are what eventually take the site down. Keep the supply chain as honest as the About page.",
+    "related": [
+      {
+        "name": "This site's source",
+        "url": "https://github.com/Manaiakalani/Manaiakalani.com"
+      }
+    ]
+  },
+  {
+    "slug": "a-homepage-can-still-be-a-place",
+    "date": "2026-07-22",
+    "published": "2026-07-22T00:00:00Z",
+    "title": "A Homepage Can Still Be a Place",
+    "body": "I wired a shared sign-in book and a visitor counter onto this site this summer. If the backend is not there, they vanish. No fake numbers, no spinner that never ends. That is the point. Community strategy at work is sitting between engineers and the people who use what they ship. The same instinct belongs on a personal homepage: leave a place someone can actually sign, count the visits only when the count is real, and let the rest of the page keep working when the lights in the back are off."
+  },
+  {
+    "slug": "ship-it-where-someone-can-use-it",
+    "date": "2026-06-03",
+    "published": "2026-06-04T02:02:00Z",
+    "title": "Ship It Where Someone Can Use It",
+    "body": "The most fun I've had lately is open-sourcing things other people can actually run. A self-hosted Dune: Awakening server you spin up with one Docker command. An open web app for those little round LED smart badges. A party game you can host yourself. None of it is groundbreaking, but every repo is something a stranger can clone, star, and make their own. That's the whole reward. Not the build, but the moment someone you've never met spins it up and it just works. Make the useful thing, then give it away.",
+    "related": [
+      {
+        "name": "Arrakis Command Nexus",
+        "url": "https://github.com/Manaiakalani/arrakis-command-nexus"
+      },
+      {
+        "name": "Cards Against AI",
+        "url": "https://github.com/Manaiakalani/cards-against-ai"
+      }
+    ]
+  },
+  {
+    "slug": "let-the-api-be-the-cms",
+    "date": "2026-05-23",
+    "published": "2026-05-23T00:00:00Z",
+    "title": "Let the API Be the CMS",
+    "body": "I just made my projects page dynamic: it pulls straight from the GitHub API now. No more editing HTML every time I ship a new repo. The site reflects what I'm actually working on, not what I remembered to update three weeks ago. If your portfolio doesn't match your commit history, it's fiction. Let the API be the CMS.",
+    "related": [
+      {
+        "name": "Projects",
+        "url": "/projects"
+      }
+    ]
+  },
+  {
+    "slug": "side-projects-are-career-development",
+    "date": "2026-05-15",
+    "published": "2026-05-15T00:00:00Z",
+    "title": "Side Projects Are Career Development",
+    "body": "People ask why I build so many random things: a step tracker for an offsite, an LED badge controller, a party card game. None of these are on my performance review. But every one of them taught me something I used at work within a month. Side projects are the fastest way to learn because the stakes are low and the feedback is instant. Your manager doesn't need to approve a PR for your weekend project.",
+    "related": [
+      {
+        "name": "CxE Americas Step Tracker",
+        "url": "https://github.com/Manaiakalani/CxEAmericasStepTracker"
+      },
+      {
+        "name": "Cards Against AI",
+        "url": "https://github.com/Manaiakalani/cards-against-ai"
+      }
+    ]
+  },
+  {
+    "slug": "the-tools-changed-the-job-didnt",
+    "date": "2026-04-28",
+    "published": "2026-04-28T00:00:00Z",
+    "title": "The Tools Changed, the Job Didn't",
+    "body": "Ten years ago I was racking servers in Hawaiʻi. Now I'm shaping social media strategy for enterprise security products at Microsoft. The tools are completely different but the job is exactly the same: figure out what someone needs and help them get it. Whether it's a cable run or a blog post about Zero Trust, the skill is empathy. Everything else is just execution."
+  },
+  {
+    "slug": "why-geocities-mode-exists",
+    "date": "2026-03-08",
+    "published": "2026-03-08T00:00:00Z",
+    "title": "Why GeoCities Mode Exists",
+    "body": "Every website today looks the same. Clean sans-serif fonts, muted colors, generous whitespace. There's nothing wrong with that; this site does it too. But the early web had a raw, unpolished energy that we've lost. GeoCities mode is my love letter to that era. Hit the 🚧 button and you'll get Comic Sans, construction banners, visitor counters, and rainbow text. It's not ironic. It's genuine nostalgia for a time when every homepage was a personal statement, not a template."
+  },
+  {
+    "slug": "on-community-strategy",
+    "date": "2026-03-02",
+    "published": "2026-03-02T00:00:00Z",
+    "title": "On Community Strategy",
+    "body": "Community strategy isn't marketing. It's not social media management. It's the work of sitting between engineering teams and the people who use what they build, making sure the conversation flows both ways. At Microsoft, I spend my days translating customer frustration into actionable engineering feedback, and translating engineering decisions into content that helps people get their work done. The best community work is invisible: when it's working, people just feel heard."
+  },
+  {
+    "slug": "building-in-public",
+    "date": "2026-02-25",
+    "published": "2026-02-25T00:00:00Z",
+    "title": "Building in Public",
+    "body": "I have 50+ repositories on GitHub. Most of them are small experiments: a Tamagotchi on an e-ink display, a party card game, a turtle facts app. None of them are going to change the world. But each one taught me something, and putting them out there means someone else might learn from them too. Building in public isn't about showing off polished work. It's about showing the process, the rough edges, the weird ideas that might not work.",
+    "related": [
+      {
+        "name": "GitHub",
+        "url": "https://github.com/Manaiakalani"
+      }
+    ]
+  },
+  {
+    "slug": "from-racking-servers-to-deploying-endpoints",
+    "date": "2026-01-06",
+    "published": "2026-01-06T00:00:00Z",
+    "title": "From Racking Servers to Deploying Endpoints",
+    "body": "My career started in Hawaiʻi, racking servers and running cable. Desktop support, service technician: the kind of work where you learn that technology isn't about the technology. It's about the person on the other end who just wants their thing to work. That perspective followed me to Microsoft, where I now work at the intersection of product engineering and the global IT community. The tools changed, but the job is the same: help people get their work done."
+  },
+  {
+    "slug": "the-clippy-philosophy",
+    "date": "2025-01-22",
+    "published": "2025-01-22T00:00:00Z",
+    "title": "The Clippy Philosophy",
+    "body": "\"It looks like you're trying to build something useful. Need help with that?\" That line in my bio isn't just a joke. Clippy was annoying because he interrupted you. But the instinct was right: proactive help, offered at the right moment, is the best kind of support. That's what community strategy is. You don't wait for people to file a ticket. You watch the conversations, spot the patterns, and show up with the answer before they have to ask."
+  },
+  {
+    "slug": "every-site-needs-dark-mode",
+    "date": "2024-11-03",
+    "published": "2024-11-03T00:00:00Z",
+    "title": "Every Site Needs Dark Mode",
+    "body": "I don't have strong opinions about most things in web development. But I will die on the hill that every website needs a dark mode toggle. Not just because some people prefer it, but because your site is someone's companion at 2am when they're debugging a production issue. Blinding them with a white background at that moment is a small act of cruelty. Respect the night owls."
+  }
+]

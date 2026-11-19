@@ -31,10 +31,9 @@
     <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <link rel="dns-prefetch" href="https://api.github.com">
     <link rel="preload" href="/fonts/doto-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/style.css?v=87e423c2">
+    <link rel="stylesheet" href="/style.css?v=2890f42e">
     <link rel="alternate" type="application/atom+xml" title="Thoughts | Maximilian Stein" href="/feed.xml">
     <link rel="manifest" href="/manifest.json">
     <script src="/boot.js?v=66ae0b80"></script>
@@ -56,6 +55,7 @@
         <section class="page-hero">
             <h1>Now</h1>
             <p>Seattle most days. Hawaiʻi is still the other clock. This page is the desk, not a feed.</p>
+            <p class="now-updated">Updated <time datetime="2026-11-18">2026.11.18</time></p>
         </section>
         <dl class="now-clocks">
             <div>
@@ -76,6 +76,15 @@
             <div id="currently-building" aria-busy="true">
                 <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line full"></div></div>
             </div>
+        </section>
+        <section class="uses-section now-month" id="this-month">
+            <h2>This month</h2>
+            <ul class="now-list">
+                <li><a href="https://github.com/Manaiakalani/sans-comic" target="_blank" rel="noopener noreferrer"><strong>Sans Comic</strong></a>: type a line, get a comic panel, with the Microsoft Comic Chat characters. <a href="/thoughts/old-art-new-doors">Why</a></li>
+                <li><a href="https://github.com/Manaiakalani/filament-shelf" target="_blank" rel="noopener noreferrer"><strong>Filament Shelf</strong></a>: a self-hosted tracker for the filament spools in the garage. <a href="/thoughts/build-the-thing-you-couldnt-find">Why</a></li>
+                <li><a href="https://github.com/Manaiakalani/rainier-bandit" target="_blank" rel="noopener noreferrer"><strong>Jimothy</strong></a>: the Seattle desktop raccoon moved to Electron 45.</li>
+                <li><strong>This site</strong>: a sharper rainbow cube, a Swarm portrait in the footer, and a page for every <a href="/thoughts">thought</a>.</li>
+            </ul>
         </section>
         <section class="uses-section now-desk" id="desk">
             <h2>On the desk</h2>
@@ -102,16 +111,29 @@
     <script defer src="/icons.js?v=8e859fc3"></script>
     <script defer src="/components.js?v=c7a57b88"></script>
     <script defer src="/guestbook.js?v=97c19949"></script>
-    <script defer src="/script.js?v=3a3123b8"></script>
+    <script defer src="/script.js?v=61676c78"></script>
     <script type="importmap">
     {
         "imports": {
-            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+            "three": "/vendor/three@0.170.0/build/three.module.min.js",
+            "three/addons/": "/vendor/three@0.170.0/examples/jsm/"
         }
     }
     </script>
+    <script type="speculationrules">
+    {
+        "prefetch": [{
+            "where": { "and": [
+                { "href_matches": "/*" },
+                { "not": { "href_matches": "/api/*" } },
+                { "not": { "href_matches": "/*.xml" } },
+                { "not": { "href_matches": "/*.json" } }
+            ] },
+            "eagerness": "moderate"
+        }]
+    }
+    </script>
     <script defer src="/command-palette.js?v=cba3ac8f"></script>
-    <script type="module" src="/web-vitals-report.js?v=561b18e9"></script>
+    <script type="module" src="/web-vitals-report.js?v=f5a0338b"></script>
 </body>
 </html>

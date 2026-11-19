@@ -13,7 +13,12 @@
     "check:chrome": "node build-chrome.js --check",
     "build:search": "node build-search-index.js",
     "build:chrome": "node build-chrome.js",
-    "stamp": "node stamp-assets.js"
+    "stamp": "node stamp-assets.js",
+    "check:thoughts": "node build-thoughts.js --check",
+    "build:thoughts": "node build-thoughts.js",
+    "build:og": "node scripts/build-og-thoughts.mjs",
+    "build": "node build-thoughts.js && node build-chrome.js && node stamp-assets.js && node build-thoughts.js && node compute-hashes.js --write && node build-search-index.js",
+    "check": "node compute-hashes.js --check && node build-search-index.js --check && node build-chrome.js --check && node stamp-assets.js --check && node build-thoughts.js --check"
   },
   "engines": {
     "node": ">=22.19"

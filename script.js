@@ -28,7 +28,7 @@
     }
 })();
 
-// Active Nav Link - /thoughts and /thoughts.html both count
+// Active Nav Link - /thoughts, /thoughts.html and /thoughts/<slug> all count
 (function() {
     var path = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
     var links = document.querySelectorAll('.site-nav a, .mini-nav a:not(.mini-nav__top)');
@@ -44,7 +44,8 @@
         } else {
             var bare = file.replace(/\.html$/, '');
             match = path === '/' + file || path === '/' + bare ||
-                path.endsWith('/' + file) || path.endsWith('/' + bare);
+                path.endsWith('/' + file) || path.endsWith('/' + bare) ||
+                path.indexOf('/' + bare + '/') === 0;
         }
         if (match) {
             link.classList.add('active');
@@ -577,7 +578,7 @@ if (typingEl) {
         btn.setAttribute('aria-label', 'Copy link to this entry');
         btn.innerHTML = (typeof mnkIcon === 'function') ? mnkIcon('link') : 'Link';
         btn.addEventListener('click', function () {
-            var url = window.location.origin + window.location.pathname + '#' + entry.id;
+            var url = window.location.origin + (entry.dataset.permalink || (window.location.pathname + '#' + entry.id));
             var reset = function () {
                 btn.classList.remove('copied');
                 btn.setAttribute('aria-label', 'Copy link to this entry');

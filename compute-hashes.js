@@ -1,12 +1,22 @@
-// Compute SHA-256 hashes for all inline <script> blocks across all HTML pages
+// Compute SHA-256 hashes for all executable inline <script> blocks across all HTML pages
+// (classic scripts and import maps). JSON-LD data blocks are never executed, so CSP does
+// not govern them and they are not hashed.
 // This script normalizes CRLF → LF before hashing (HTML spec behavior)
+//
+//   node compute-hashes.js           # print hashes per page
+//   node compute-hashes.js --write   # sync script-src hashes in staticwebapp.config.json
+//   node compute-hashes.js --check   # CI: fail if script-src is out of sync
 const fs = require('fs');
 const crypto = require('crypto');
 const path = require('path');
 
-const htmlFiles = ['index.html', 'thoughts.html', 'projects.html', '404.html', 'uses.html', 'colophon.html', 'guestbook.html', 'now.html'];
 const dir = __dirname;
+const thoughtPages = fs.existsSync(path.join(dir, 'thoughts'))
+  ? fs.readdirSync(path.join(dir, 'thoughts')).filter((f) => f.endsWith('.html')).sort().map((f) => 'thoughts/' + f)
+  : [];
+const htmlFiles = ['index.html', 'thoughts.html', 'projects.html', '404.html', 'uses.html', 'colophon.html', 'guestbook.html', 'now.html', ...thoughtPages];
 const checkMode = process.argv.includes('--check');
+const writeMode = process.argv.includes('--write');
 const log = checkMode ? () => {} : console.log;
 
 function hashContent(content) {
@@ -45,6 +55,7 @@ for (const file of htmlFiles) {
     if (!content.trim()) continue;
     
     const type = (attrs.match(/type\s*=\s*"([^"]+)"/i) || [])[1] || 'text/javascript';
+    if (/^application\/ld\+json$/i.test(type)) continue;
     const hash = hashContent(content);
     allHashes.add(hash);
     
@@ -58,6 +69,21 @@ for (const h of allHashes) {
   log(h);
 }
 log(`\nTotal unique: ${allHashes.size}`);
+
+if (writeMode) {
+  const configPath = path.join(dir, 'staticwebapp.config.json');
+  const raw = fs.readFileSync(configPath, 'utf8');
+  const next = raw.replace(/(script-src )([^;"]*)/, (m, head, body) => {
+    const kept = body.split(/\s+/).filter((t) => t && !/^'sha256-/.test(t));
+    return head + [...kept, ...allHashes].join(' ');
+  });
+  if (next !== raw) {
+    fs.writeFileSync(configPath, next);
+    console.log(`Synced ${allHashes.size} script-src hashes into staticwebapp.config.json.`);
+  } else {
+    console.log('script-src hashes already in sync.');
+  }
+}
 
 if (checkMode) {
   const configPath = path.join(dir, 'staticwebapp.config.json');
@@ -79,7 +105,7 @@ if (checkMode) {
   for (const h of stale) console.error(`STALE in CSP script-src (no inline script matches): ${h}`);
 
   if (missing.length || stale.length) {
-    console.error(`\nCSP hash check FAILED. Run \`node compute-hashes.js\` and sync staticwebapp.config.json.`);
+    console.error(`\nCSP hash check FAILED. Run \`node compute-hashes.js --write\`.`);
     process.exit(1);
   }
   console.log(`CSP hash check passed - ${allHashes.size} inline script hashes match script-src.`);

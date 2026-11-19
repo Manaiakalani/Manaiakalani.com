@@ -14,7 +14,7 @@ test.beforeEach(async ({ page }) => {
   await page.route('**/api.github.com/users/*/repos*', route =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_REPOS) })
   );
-  await page.route('**/cdn.jsdelivr.net/npm/web-vitals**', route => route.abort());
+  await page.route('**/vendor/web-vitals@*/**', route => route.abort());
   await page.addInitScript(() => {
     try { localStorage.removeItem('mnk:gh_repos_cache'); } catch (e) {}
   });
@@ -170,7 +170,7 @@ test.describe('Duo spanned', () => {
     });
   });
 
-  for (const path of ['/', '/thoughts', '/projects', '/uses', '/now', '/colophon', '/guestbook']) {
+  for (const path of ['/', '/thoughts', '/thoughts/old-art-new-doors', '/projects', '/uses', '/now', '/colophon', '/guestbook']) {
     test(`${path}: no visible text straddles the hinge`, async ({ page }) => {
       await page.goto(path);
       await page.waitForLoadState('networkidle');
