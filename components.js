@@ -113,7 +113,7 @@
         var moduleScript = document.createElement('script');
         moduleScript.type = 'module';
         moduleScript.dataset.cubeLoader = 'true';
-        moduleScript.src = '/cube-loader.js?v=6566738d';
+        moduleScript.src = '/cube-loader.js?v=7610efe0';
         document.body.appendChild(moduleScript);
     }
 
