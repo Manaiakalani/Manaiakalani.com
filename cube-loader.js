@@ -38,8 +38,8 @@ if (canvas && !saveData) {
   // The canvas is decorative and simply stays blank if three.js (CDN) or WebGL is
   // unavailable; failures clear `pending` so a later intersection can retry.
   const engines = {
-    cube: () => import("/cube.js?v=62376f87").then(({ initCube }) => initCube(canvas, "/cube-texture.webp?v=c61215e5")),
-    swarm: () => import("/particles.js?v=e8f223b4").then(({ initParticles }) => initParticles(canvas, { imageUrl: "/portrait-beads.webp?v=edb3c469" }))
+    cube: () => import("/cube.js?v=62376f87").then(({ initCube }) => initCube(canvas, "/cube-texture.webp?v=08e6fdeb")),
+    swarm: () => import("/particles.js?v=176d0c9b").then(({ initParticles }) => initParticles(canvas, { imageUrl: "/portrait-beads.webp?v=edb3c469" }))
   };
 
   const start = () => {
