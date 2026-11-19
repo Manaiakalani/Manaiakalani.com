@@ -12,12 +12,13 @@ const DRAG_SENSITIVITY = 85;
 const MAX_DPR         = 3;
 const ENTER_DURATION  = 1800;
 
-// Glyph cell in CSS px. At 3-4px the characters blurred into dots; 5-6px keeps
-// each glyph legible while the cube still resolves as a shape.
+// Glyph cell in CSS px. ~75 columns across the canvas so the face resolves;
+// at 2-3x DPR each glyph still renders at 7-11 device px.
 function getCellSize(w) {
-  if (w < 220) return 5;
-  return 6;
+  if (w < 260) return 3.25;
+  return 3.75;
 }
+
 
 function createCharactersTexture(width, height, characters) {
   const canvas = document.createElement('canvas');
@@ -100,10 +101,7 @@ const ASCIIShader = {
       vec3 a = vec3(0.5), b = vec3(0.5), c = vec3(1.0), d = vec3(0.0, 0.33, 0.67);
       float uvF = dot(uv - 0.5, uv - 0.5);
       vec3 grad = a + b * cos(6.28318 * (c * (t + uvF * 2.0) + d));
-      // Light radial falloff only: at 0.5 the corners went near-black and the
-      // cube's silhouette disappeared into the footer.
-      vec3 c2 = mix(grad, vec3(1.0 - length(uv - 0.5) * 2.0), 0.2);
-      return max(c2, vec3(0.38));
+      return mix(grad, vec3(1.0 - length(uv - 0.5) * 2.0), 0.5);
     }
 
     float sharpen(sampler2D tex, vec2 uv, vec2 ts) {
@@ -122,6 +120,9 @@ const ASCIIShader = {
       vec4 px   = texture2D(tDiffuse, pUV);
       float gs  = greyscale(px.rgb);
 
+      // Contrast curve: skin and paper fall to blank, ink lines stay dense,
+      // so the face reads instead of a wall of mid-tone glyphs.
+      gs = smoothstep(0.18, 0.92, gs);
       if (uInvert) gs = 1.0 - gs;
 
       vec3 animC = mix(uColor, rotatingGradient(uTime, vUv), uGradientMix);
@@ -164,11 +165,15 @@ export function initCube(canvasEl, textureUrl) {
   let resizeTimer = 0;
   let loopId = null;
   let visible = true;
+  let destroyed = false;
+  const cleanups = [];
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function setup(texture) {
+    if (destroyed) { texture.dispose(); return; }
+    texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
     const geo = new THREE.BoxGeometry(50, 50, 50, 8, 8, 8);
-    cubeMaterial = new THREE.MeshStandardMaterial({ map: texture });
+    cubeMaterial = new THREE.MeshStandardMaterial({ map: texture, roughness: 1, metalness: 0 });
     cube = new THREE.Mesh(geo, cubeMaterial);
 
     const initRot = new THREE.Euler(0.5, 0.75, 0, 'XYZ');
@@ -177,14 +182,21 @@ export function initCube(canvasEl, textureUrl) {
     targetQ.setFromEuler(initRot);
     cube.position.set(0, 1.0, 0);
     scene.add(cube);
-    scene.add(new THREE.AmbientLight(0xffffff, 1.95));
+    // Mostly ambient so the face stays readable, plus a soft key light so the
+    // three visible faces get distinct densities and the cube reads as 3D.
+    scene.add(new THREE.AmbientLight(0xffffff, 2.1));
+    const key = new THREE.DirectionalLight(0xffffff, 0.7);
+    key.position.set(-0.6, 0.8, 1);
+    scene.add(key);
 
     composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
     asciiPass = new ShaderPass(ASCIIShader);
     asciiPass.uniforms.uCharactersCount.value = CHARACTERS.length;
     asciiPass.uniforms.uColor.value = new THREE.Color(0xffffff);
-    asciiPass.uniforms.uInvert.value = true;
+    // Positive image: bright skin = dense glyphs, dark lines = gaps. The face
+    // reads at a glance instead of as a negative.
+    asciiPass.uniforms.uInvert.value = false;
     composer.addPass(asciiPass);
 
     onResize();
@@ -227,6 +239,7 @@ export function initCube(canvasEl, textureUrl) {
     attributes: true,
     attributeFilter: ['data-geocities']
   });
+  cleanups.push(() => gcObserver.disconnect());
   gcTarget = isGeoCitiesActive() ? 1 : 0;
   gcCurrent = gcTarget;
 
@@ -279,10 +292,12 @@ export function initCube(canvasEl, textureUrl) {
     }
   }
 
-  window.addEventListener('resize', () => {
+  const onWinResize = () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(onResize, 100);
-  });
+  };
+  window.addEventListener('resize', onWinResize);
+  cleanups.push(() => { window.removeEventListener('resize', onWinResize); clearTimeout(resizeTimer); });
 
   // Pause when off-screen
   const observer = new IntersectionObserver(([entry]) => {
@@ -295,6 +310,7 @@ export function initCube(canvasEl, textureUrl) {
     }
   }, { threshold: 0.1 });
   observer.observe(canvasEl);
+  cleanups.push(() => observer.disconnect());
 
   // Drag interaction
   canvasEl.addEventListener('pointerdown', e => {
@@ -341,4 +357,17 @@ export function initCube(canvasEl, textureUrl) {
     tex.needsUpdate = true;
     setup(tex);
   });
+
+  return {
+    destroy() {
+      destroyed = true;
+      cleanups.forEach(fn => fn());
+      renderer.setAnimationLoop(null);
+      if (asciiPass) asciiPass.uniforms.uCharacters.value?.dispose();
+      if (cube) { cube.geometry.dispose(); cubeMaterial.map?.dispose(); cubeMaterial.dispose(); }
+      composer?.dispose?.();
+      renderer.dispose();
+      renderer.forceContextLoss();
+    }
+  };
 }

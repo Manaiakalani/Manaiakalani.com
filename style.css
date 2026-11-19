@@ -305,10 +305,59 @@ footer {
 
 /* ASCII Cube */
 .cube-wrapper {
-    width: 240px;
-    height: 240px;
-    margin: 0 auto 1.5rem;
+    width: 280px;
+    height: 280px;
+    max-width: calc(100vw - 2 * var(--gutter, 16px));
+    margin: 0 auto 0.5rem;
     position: relative;
+}
+
+.cube-wrapper:has(+ .viz-switch[hidden]) {
+    margin-bottom: 1.5rem;
+}
+
+/* Cube / Swarm: a quiet segmented control under the footer animation. */
+.viz-switch {
+    display: inline-flex;
+    gap: 2px;
+    padding: 2px;
+    margin: 0 auto 1.25rem;
+    border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+    border-radius: 999px;
+}
+
+.viz-switch[hidden] {
+    display: none;
+}
+
+.viz-switch button {
+    min-height: var(--touch, 44px);
+    min-width: var(--touch, 44px);
+    padding: 0 0.9rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    opacity: 0.7;
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.viz-switch button[aria-pressed="true"] {
+    background: color-mix(in srgb, currentColor 16%, transparent);
+    opacity: 1;
+}
+
+.viz-switch button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+@media (hover: hover) {
+    .viz-switch button:hover { opacity: 1; }
 }
 
 .cube-wrapper canvas {
@@ -1344,7 +1393,7 @@ a.building-card:focus-visible {
     .geocities-toggle { font-size: 1rem; }
     .cmdk-launcher { font-size: 0.78rem; padding: 0 0.55rem 0 0.5rem; }
     .cmdk-launcher-key { display: none; }
-    .cube-wrapper { width: 200px; height: 200px; margin-bottom: 1rem; }
+    .cube-wrapper { width: 240px; height: 240px; }
     .site-nav { gap: 0.25rem 0.35rem; }
     .site-nav a { font-size: 0.85rem; padding: 0 0.5rem; }
     .featured-grid { grid-template-columns: 1fr; }

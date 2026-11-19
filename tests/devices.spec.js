@@ -120,6 +120,32 @@ test.describe('single screen', () => {
     for (const s of sizes) expect(s.h, s.t).toBeGreaterThanOrEqual(44);
   });
 
+  test('footer animation toggle: Cube / Swarm switch, persist, and meet 44px', async ({ page }) => {
+    await page.goto('/');
+    const sw = page.locator('.viz-switch');
+    await sw.scrollIntoViewIfNeeded();
+    await expect(sw).toBeVisible();
+    await expect(sw.locator('[aria-pressed="true"]')).toHaveText('Cube');
+    for (const b of await sw.locator('button').all()) {
+      const box = await b.boundingBox();
+      expect(box.height).toBeGreaterThanOrEqual(44);
+    }
+    await sw.getByRole('button', { name: 'Swarm' }).click();
+    await expect(sw.locator('[aria-pressed="true"]')).toHaveText('Swarm');
+    await expect(page.locator('#ascii-cube')).toHaveCount(1);
+    expect(await page.evaluate(() => localStorage.getItem('mnk:footer-viz'))).toBe('swarm');
+    await page.reload();
+    await expect(page.locator('.viz-switch [aria-pressed="true"]')).toHaveText('Swarm');
+  });
+
+  test('footer animation toggle stays hidden without JavaScript', async ({ browser }) => {
+    const ctx = await browser.newContext({ javaScriptEnabled: false });
+    const page = await ctx.newPage();
+    await page.goto('/');
+    await expect(page.locator('.viz-switch')).toBeHidden();
+    await ctx.close();
+  });
+
   test('header controls clear the wordmark', async ({ page }) => {
     await page.goto('/');
     const h1 = await page.locator('header h1').boundingBox();

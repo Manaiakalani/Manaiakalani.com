@@ -29,6 +29,9 @@ const ASSETS = [
   'guestbook.js',
   'cube-loader.js',
   'cube.js',
+  'particles.js',
+  'cube-texture.webp',
+  'portrait-beads.webp',
   'web-vitals-report.js',
   'clippy.webp'
 ];
