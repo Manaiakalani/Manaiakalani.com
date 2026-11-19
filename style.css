@@ -316,7 +316,7 @@ footer {
     margin-bottom: 1.5rem;
 }
 
-/* Cube / Swarm / Morph: a quiet segmented control under the footer animation. */
+/* Cube / Swarm: a quiet segmented control under the footer animation. */
 .viz-switch {
     display: inline-flex;
     gap: 2px;

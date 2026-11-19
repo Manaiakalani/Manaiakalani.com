@@ -1,4 +1,4 @@
-const MODES = ["cube", "swarm", "morph"];
+const MODES = ["cube", "swarm"];
 const STORE_KEY = "mnk:footer-viz";
 
 let canvas = document.getElementById("ascii-cube");
@@ -38,9 +38,8 @@ if (canvas && !saveData) {
   // The canvas is decorative and simply stays blank if three.js (CDN) or WebGL is
   // unavailable; failures clear `pending` so a later intersection can retry.
   const engines = {
-    cube: () => import("/cube.js?v=0ea35c6f").then(({ initCube }) => initCube(canvas, "/cube-texture.webp?v=eceef5af")),
-    swarm: () => import("/particles.js?v=a89cc912").then(({ initParticles }) => initParticles(canvas, { mode: "swarm", textureUrl: "/cube-texture.webp?v=eceef5af" })),
-    morph: () => import("/particles.js?v=a89cc912").then(({ initParticles }) => initParticles(canvas, { mode: "morph", textureUrl: "/cube-texture.webp?v=eceef5af" }))
+    cube: () => import("/cube.js?v=d310ef1a").then(({ initCube }) => initCube(canvas, "/cube-texture.webp?v=0fbe3269")),
+    swarm: () => import("/particles.js?v=b03f7c3c").then(({ initParticles }) => initParticles(canvas, { imageUrl: "/portrait-beads.webp?v=49d075cf" }))
   };
 
   const start = () => {

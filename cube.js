@@ -19,14 +19,6 @@ function getCellSize(w) {
   return 4.5;
 }
 
-// Ink colour follows the footer text so the cube reads as part of the page,
-// not a rainbow sticker. GeoCities mode still blends to the gradient.
-function footerInk(el) {
-  const c = getComputedStyle(el.closest('footer') || document.body).color;
-  const m = c.match(/[\d.]+/g);
-  if (!m) return new THREE.Color(0xe8e6e1);
-  return new THREE.Color(+m[0] / 255, +m[1] / 255, +m[2] / 255);
-}
 
 function createCharactersTexture(width, height, characters) {
   const canvas = document.createElement('canvas');
@@ -75,7 +67,7 @@ const ASCIIShader = {
     uColor:           { value: new THREE.Color('#ffffff') },
     uInvert:          { value: true },
     uTime:            { value: 0 },
-    uGradientMix:     { value: 0 },
+    uGradientMix:     { value: 1 },
     uOpacity:         { value: 0 },
     resolution:       { value: new THREE.Vector2() },
   },
@@ -109,14 +101,7 @@ const ASCIIShader = {
       vec3 a = vec3(0.5), b = vec3(0.5), c = vec3(1.0), d = vec3(0.0, 0.33, 0.67);
       float uvF = dot(uv - 0.5, uv - 0.5);
       vec3 grad = a + b * cos(6.28318 * (c * (t + uvF * 2.0) + d));
-      // Light radial falloff only: at 0.5 the corners went near-black and the
-      // cube's silhouette disappeared into the footer.
-      vec3 c2 = mix(grad, vec3(1.0 - length(uv - 0.5) * 2.0), 0.2);
-      return max(c2, vec3(0.38));
-    }
-
-    float vignette(vec2 uv) {
-      return 1.0 - 0.35 * smoothstep(0.25, 0.7, length(uv - 0.5));
+      return mix(grad, vec3(1.0 - length(uv - 0.5) * 2.0), 0.5);
     }
 
     float sharpen(sampler2D tex, vec2 uv, vec2 ts) {
@@ -140,7 +125,7 @@ const ASCIIShader = {
       gs = smoothstep(0.18, 0.92, gs);
       if (uInvert) gs = 1.0 - gs;
 
-      vec3 animC = mix(uColor * vignette(vUv), rotatingGradient(uTime, vUv), uGradientMix);
+      vec3 animC = mix(uColor, rotatingGradient(uTime, vUv), uGradientMix);
 
       float ci  = floor((uCharactersCount - 1.0) * gs);
       vec2  cp  = vec2(mod(ci, SIZE.x), floor(ci / SIZE.y));
@@ -208,7 +193,7 @@ export function initCube(canvasEl, textureUrl) {
     composer.addPass(new RenderPass(scene, camera));
     asciiPass = new ShaderPass(ASCIIShader);
     asciiPass.uniforms.uCharactersCount.value = CHARACTERS.length;
-    asciiPass.uniforms.uColor.value = footerInk(canvasEl);
+    asciiPass.uniforms.uColor.value = new THREE.Color(0xffffff);
     asciiPass.uniforms.uInvert.value = true;
     composer.addPass(asciiPass);
 
@@ -236,7 +221,7 @@ export function initCube(canvasEl, textureUrl) {
     })();
   }
 
-  // GeoCities mode: rainbow cube with faster spin. Elsewhere the cube is mono.
+  // GeoCities mode: rainbow cube with faster spin
   let gcTarget = 0;
   let gcCurrent = 0;
   const GC_LERP = 0.04;
@@ -247,12 +232,10 @@ export function initCube(canvasEl, textureUrl) {
 
   const gcObserver = new MutationObserver(() => {
     gcTarget = isGeoCitiesActive() ? 1 : 0;
-    // Theme toggles change the footer text colour too.
-    if (asciiPass) asciiPass.uniforms.uColor.value = footerInk(canvasEl);
   });
   gcObserver.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ['data-geocities', 'data-theme', 'class']
+    attributeFilter: ['data-geocities']
   });
   cleanups.push(() => gcObserver.disconnect());
   gcTarget = isGeoCitiesActive() ? 1 : 0;
@@ -265,10 +248,10 @@ export function initCube(canvasEl, textureUrl) {
     gcCurrent += (gcTarget - gcCurrent) * GC_LERP;
     const gc = gcCurrent;
 
-    asciiPass.uniforms.uGradientMix.value = gc;
-    // Gradient only animates in GeoCities mode (frozen under reduced motion)
-    if (!prefersReducedMotion && gc > 0.001) {
-      asciiPass.material.uniforms.uTime.value += 0.003 + gc * 0.007;
+    // Rainbow always on; GeoCities cranks the speed (frozen under reduced motion)
+    if (!prefersReducedMotion) {
+      const timeSpeed = 0.003 + gc * 0.007;
+      asciiPass.material.uniforms.uTime.value += timeSpeed;
     }
 
     // Skip auto-rotation under reduced motion; drag still works

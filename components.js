@@ -67,7 +67,6 @@
             '<div class="viz-switch" role="group" aria-label="Footer animation" hidden>' +
                 '<button type="button" data-viz="cube" aria-pressed="true">Cube</button>' +
                 '<button type="button" data-viz="swarm" aria-pressed="false">Swarm</button>' +
-                '<button type="button" data-viz="morph" aria-pressed="false">Morph</button>' +
             '</div>' +
             '<div class="social-icons">' +
                 '<a href="https://www.linkedin.com/in/manaiakalani/" target="_blank" rel="noopener noreferrer me" aria-label="LinkedIn">' + ic('linkedin') + '</a>' +
@@ -114,7 +113,7 @@
         var moduleScript = document.createElement('script');
         moduleScript.type = 'module';
         moduleScript.dataset.cubeLoader = 'true';
-        moduleScript.src = '/cube-loader.js?v=c509ede1';
+        moduleScript.src = '/cube-loader.js?v=13e2bab2';
         document.body.appendChild(moduleScript);
     }
 

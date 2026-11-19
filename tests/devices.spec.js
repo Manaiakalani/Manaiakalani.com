@@ -120,7 +120,7 @@ test.describe('single screen', () => {
     for (const s of sizes) expect(s.h, s.t).toBeGreaterThanOrEqual(44);
   });
 
-  test('footer animation toggle: Cube / Swarm / Morph switch, persist, and meet 44px', async ({ page }) => {
+  test('footer animation toggle: Cube / Swarm switch, persist, and meet 44px', async ({ page }) => {
     await page.goto('/');
     const sw = page.locator('.viz-switch');
     await sw.scrollIntoViewIfNeeded();

@@ -31,6 +31,7 @@ const ASSETS = [
   'cube.js',
   'particles.js',
   'cube-texture.webp',
+  'portrait-beads.webp',
   'web-vitals-report.js',
   'clippy.webp'
 ];
