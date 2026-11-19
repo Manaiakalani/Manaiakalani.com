@@ -91,15 +91,6 @@ test('thought titles are left-aligned, not centered via h2 inheritance', async (
   expect(align).toBe('left');
 });
 
-test('copy-link buttons meet 44px touch target', async ({ page }) => {
-  await page.goto('/thoughts');
-  const first = page.locator('.copy-link-btn').first();
-  await expect(first).toBeVisible();
-  const r = await box(first);
-  expect(r.w).toBeGreaterThanOrEqual(TOUCH);
-  expect(r.h).toBeGreaterThanOrEqual(TOUCH);
-});
-
 test('footer social icons meet 44px touch target', async ({ page }) => {
   await page.goto('/');
   await page.locator('.social-icons a').first().waitFor();

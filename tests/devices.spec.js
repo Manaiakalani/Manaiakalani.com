@@ -1,6 +1,6 @@
-// Device fit: iPhone Pro Max, Surface Duo (single + spanned), desktop.
+// Device fit: iPhone Pro Max, iPhone Duo (outer, inner, inner landscape), desktop.
 // Guards the UX/spacing pass: iOS input zoom, pre-rendered chrome, the scroll-up
-// mini nav, readable measure, and keeping text off the Duo hinge.
+// mini nav, readable measure, and a header that fits short landscape screens.
 const { test, expect } = require('@playwright/test');
 
 const MOCK_REPOS = [
@@ -20,11 +20,7 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-const isSpanned = (info) => info.project.name === 'duo-spanned';
-
 test.describe('single screen', () => {
-  test.beforeEach(({}, info) => test.skip(isSpanned(info), 'covered by the spanned suite'));
-
   for (const [path, sel] of [['/thoughts', '#thought-search'], ['/thoughts', '#thoughts-jump-nav'], ['/projects', '.search-input']]) {
     test(`${path} ${sel}: font-size is >=16px so iOS Safari does not zoom on focus`, async ({ page }) => {
       await page.goto(path);
@@ -146,60 +142,32 @@ test.describe('single screen', () => {
     await ctx.close();
   });
 
+  test('short landscape screens keep the header compact so About starts above the fold', async ({ page }, info) => {
+    const vp = page.viewportSize();
+    test.skip(!(vp.width > vp.height && vp.height <= 700), 'short landscape only');
+    await page.goto('/');
+    const h = await page.locator('#site-header').evaluate(el => el.getBoundingClientRect().height);
+    expect(h, 'header height').toBeLessThanOrEqual(vp.height * 0.6);
+    const about = await page.locator('#about h2').boundingBox();
+    expect(about.y).toBeLessThan(vp.height);
+  });
+
   test('header controls clear the wordmark', async ({ page }) => {
     await page.goto('/');
-    const h1 = await page.locator('header h1').boundingBox();
     await expect(page.locator('.cmdk-launcher')).toBeVisible();
+    // Measure the glyphs, not the full-width block: on wide, short screens the
+    // corner controls sit beside the wordmark rather than above it.
+    const word = await page.locator('header h1').evaluate(el => {
+      const r = document.createRange();
+      r.selectNodeContents(el);
+      const b = r.getBoundingClientRect();
+      return { x: b.left, y: b.top, width: b.width, height: b.height };
+    });
     for (const sel of ['.theme-toggle', '.geocities-toggle', '.cmdk-launcher']) {
       const b = await page.locator(sel).boundingBox();
-      expect(b.y + b.height, `${sel} bottom vs h1 top`).toBeLessThanOrEqual(h1.y + 1);
+      const overlaps = b.x < word.x + word.width - 1 && b.x + b.width > word.x + 1 &&
+        b.y < word.y + word.height - 1 && b.y + b.height > word.y + 1;
+      expect(overlaps, `${sel} overlaps the wordmark`).toBe(false);
     }
-  });
-});
-
-// Surface Duo spanned: 2 x 540px screens with a 34px hinge at x=540..574.
-// Needs the ViewportSegments flag (see playwright.config.js) and a CDP display
-// feature; Playwright's own screenshot() resets the emulation, so measure only.
-test.describe('Duo spanned', () => {
-  test.beforeEach(async ({ page, context }, info) => {
-    test.skip(!isSpanned(info), 'spanned-only');
-    const cdp = await context.newCDPSession(page);
-    await cdp.send('Emulation.setDeviceMetricsOverride', {
-      width: 1114, height: 720, deviceScaleFactor: 1, mobile: false,
-      displayFeature: { orientation: 'vertical', offset: 540, maskLength: 34 },
-    });
-  });
-
-  for (const path of ['/', '/thoughts', '/thoughts/old-art-new-doors', '/projects', '/uses', '/now', '/colophon', '/guestbook']) {
-    test(`${path}: no visible text straddles the hinge`, async ({ page }) => {
-      await page.goto(path);
-      await page.waitForLoadState('networkidle');
-      const result = await page.evaluate(() => {
-        const bad = [];
-        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-        let n;
-        while ((n = walker.nextNode())) {
-          const el = n.parentElement;
-          if (!n.textContent.trim() || !el || el.closest('[hidden], [inert], dialog:not([open]), .visually-hidden, .skip-link, script, style, noscript')) continue;
-          const r = document.createRange();
-          r.selectNodeContents(n);
-          for (const rect of r.getClientRects()) {
-            if (rect.width && rect.left < 574 && rect.right > 540) { bad.push(n.textContent.trim().slice(0, 40)); break; }
-          }
-        }
-        return { spanned: matchMedia('(horizontal-viewport-segments: 2)').matches, bad };
-      });
-      expect(result.spanned).toBe(true);
-      expect(result.bad).toEqual([]);
-    });
-  }
-
-  test('/: photo sits on the left screen, About text on the right', async ({ page }) => {
-    await page.goto('/');
-    const fig = await page.locator('.about-figure').boundingBox();
-    const text = await page.locator('.about-text').boundingBox();
-    expect(fig.x + fig.width).toBeLessThanOrEqual(540);
-    expect(text.x).toBeGreaterThanOrEqual(574);
-    expect(text.x + text.width).toBeLessThanOrEqual(1114);
   });
 });

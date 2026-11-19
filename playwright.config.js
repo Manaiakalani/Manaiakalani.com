@@ -24,17 +24,11 @@ module.exports = defineConfig({
     { name: 'wide', use: { viewport: { width: 1440, height: 900 } } },
     // iPhone 18 Pro Max class: 440pt wide, 3x, touch.
     { name: 'iphone-pro-max', use: { viewport: { width: 440, height: 956 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true } },
-    // Surface Duo, one screen.
-    { name: 'duo-single', use: { viewport: { width: 540, height: 720 }, deviceScaleFactor: 2.5, isMobile: true, hasTouch: true } },
-    // Surface Duo spanned across both screens (34px hinge). Segment emulation
-    // needs the ViewportSegments flag; tests/devices.spec.js adds the hinge via CDP.
-    {
-      name: 'duo-spanned',
-      testMatch: /devices\.spec\.js/,
-      use: {
-        viewport: { width: 1114, height: 720 },
-        launchOptions: { args: ['--enable-experimental-web-platform-features', '--enable-features=ViewportSegments'] },
-      },
-    },
+    // iPhone Duo (Apple, 2026): 5.4" outer and 7.6" inner OLED. Apple lists
+    // 1398x2034 and 1878x2670 px; at the usual 3x that is ~466x678 and
+    // ~626x890 CSS px. The inner panel folds without a gap, so no hinge.
+    { name: 'iphone-duo-outer', use: { viewport: { width: 466, height: 678 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true } },
+    { name: 'iphone-duo-inner', use: { viewport: { width: 626, height: 890 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true } },
+    { name: 'iphone-duo-inner-landscape', use: { viewport: { width: 890, height: 626 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true } },
   ],
 });

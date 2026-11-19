@@ -220,6 +220,26 @@ header {
     position: relative;
 }
 
+/* Short landscape screens (iPhone Duo inner screen turned sideways, ~890x626,
+   and phones in landscape): the full header took ~70% of the height. Keep
+   every line, just tighter, so About starts above the fold. */
+@media (orientation: landscape) and (max-height: 700px) {
+    header {
+        padding: calc(3.5rem + env(safe-area-inset-top, 0px)) 0 1.5rem;
+    }
+    header h1 {
+        margin: 0 0 0.15rem;
+    }
+    header .header-subtitle,
+    header .header-hook,
+    header #typing-effect {
+        margin-block: 0.15rem;
+    }
+    header .site-nav {
+        margin-top: 0.6rem;
+    }
+}
+
 /* Item 18: no point animating a 400% gradient nobody can see. */
 header.is-offscreen {
     animation-play-state: paused;
@@ -727,7 +747,6 @@ html:not([data-geocities="true"]) .footer-visits {
 
 .random-thought-btn .icon,
 .random-project-btn .icon,
-.copy-link-btn .icon,
 .heart-beat .icon,
 .building-label .icon {
     width: 1em;
@@ -1218,11 +1237,6 @@ a.building-card:focus-visible {
     scroll-margin-top: 1.5rem;
 }
 
-.thought-entry:target {
-    background-color: var(--bg-secondary);
-    box-shadow: inset 3px 0 0 0 var(--accent);
-}
-
 .thought-anchor {
     color: inherit;
     text-decoration: none;
@@ -1255,53 +1269,6 @@ a.building-card:focus-visible {
     text-align: left;
     margin-top: 0.2rem;
     margin-bottom: 0.45rem;
-}
-
-.copy-link-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 0.15rem;
-    min-width: var(--touch);
-    min-height: var(--touch);
-    padding: 0.25rem;
-    vertical-align: middle;
-    background: none;
-    border: none;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    line-height: 1;
-    cursor: pointer;
-    position: relative;
-    vertical-align: middle;
-    transition: background-color 0.2s ease;
-}
-
-.copy-link-btn:hover,
-.copy-link-btn:focus-visible {
-    background-color: var(--bg-secondary);
-}
-
-.copy-link-btn:focus-visible {
-    outline: 2px solid var(--focus-ring);
-    outline-offset: 2px;
-}
-
-.copy-link-btn.copied::after {
-    content: 'Copied!';
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-bottom: 0.3rem;
-    background: var(--text-primary);
-    color: var(--bg-primary);
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    white-space: nowrap;
-    pointer-events: none;
 }
 
 .thought-excerpt {
@@ -1855,26 +1822,9 @@ footer {
     }
 }
 
-/* Shared permalink arrival: briefly highlight the targeted thought entry */
-@keyframes thought-highlight {
-    from { background-color: var(--focus-ring-shadow); }
-    to   { background-color: transparent; }
-}
-
-.thought-entry--highlight {
-    animation: thought-highlight 1.8s ease-out;
-    border-radius: 8px;
-}
-
 /* The global reduce block above doesn't reach view-transition pseudo-elements,
    so opt them out explicitly for users who prefer reduced motion. */
 @media (prefers-reduced-motion: reduce) {
-    /* No fade for reduced-motion users, but still mark the arrived-at entry. */
-    .thought-entry--highlight {
-        animation: none;
-        background-color: var(--focus-ring-shadow);
-    }
-
     ::view-transition-group(*),
     ::view-transition-old(*),
     ::view-transition-new(*) {
@@ -2430,6 +2380,9 @@ main a:not([class]):hover {
 @media (min-width: 720px) {
     .about-grid {
         grid-template-columns: 11.5rem minmax(0, 1fr);
+        /* Photo lines up with the "About Me" heading instead of floating
+           half-way down a long column (iPhone Duo inner screen, landscape). */
+        align-items: start;
     }
     /* Photo + a 65ch column, centred, instead of a left-heavy row with an
        empty right third on wide screens. */
@@ -2635,85 +2588,4 @@ html[data-geocities="true"] .mini-nav {
 @media (prefers-reduced-motion: reduce) {
     .mini-nav,
     .mini-nav.is-shown { transition: none; }
-}
-
-/* ------------------------------------------------------------------ */
-/* Dual-screen (Surface Duo spanned, foldables): keep text and cards   */
-/* off the hinge. Each half gets one screen; the gap is the hinge.     */
-/* ------------------------------------------------------------------ */
-@media (horizontal-viewport-segments: 2) {
-    :root {
-        --seg-left: env(viewport-segment-width 0 0, 50vw);
-        --seg-right: env(viewport-segment-width 1 0, 50vw);
-        --hinge: calc(env(viewport-segment-left 1 0, 50vw) - env(viewport-segment-right 0 0, 50vw));
-    }
-
-    /* Two-column content: columns land exactly on the two screens. */
-    .about-grid,
-    .featured-grid,
-    .projects-grid {
-        max-width: none;
-        grid-template-columns: var(--seg-left) var(--seg-right);
-        column-gap: var(--hinge);
-        margin-inline: calc(-1 * max(var(--gutter), env(safe-area-inset-left, 0px)));
-    }
-    .about-grid > *,
-    .featured-grid > *,
-    .projects-grid > * {
-        margin-inline: var(--gutter);
-    }
-    .about-grid { align-items: start; }
-    .about-figure { max-width: 16rem; position: sticky; top: var(--space-6); }
-    .about-text h2 { text-align: left; }
-
-    /* Centred, single-column blocks would straddle the hinge: give them the
-       left screen, and the footer the right screen. */
-    header .container,
-    .page-hero > .container,
-    .currently-building-teaser > .container {
-        max-width: var(--seg-left);
-        margin-left: 0;
-        margin-right: 0;
-    }
-    .page-toolbar,
-    .featured-teaser h2,
-    .uses-section h2,
-    .uses-lead,
-    .now-month,
-    main.container > :not(.projects-grid):not(.uses-section) {
-        max-width: calc(var(--seg-left) - 2 * var(--gutter));
-        margin-left: 0;
-        margin-right: auto;
-    }
-    .featured-teaser h2 { text-align: left; }
-    .view-all { margin-left: 0; }
-    .skip-link { left: calc(var(--seg-left) / 2); }
-    .thought-single {
-        max-width: var(--seg-left);
-        margin-left: 0;
-        padding-inline: var(--gutter);
-        box-sizing: border-box;
-    }
-    footer .container {
-        max-width: var(--seg-right);
-        margin-left: calc(var(--seg-left) + var(--hinge));
-        margin-right: 0;
-    }
-
-    /* Thoughts read as two newspaper columns, one per screen. */
-    .thoughts-list {
-        max-width: none;
-        columns: 2;
-        column-gap: calc(var(--hinge) + 2 * var(--gutter));
-    }
-    .thoughts-list > li {
-        break-inside: avoid;
-    }
-
-    .uses-list,
-    .uses-section--studio .uses-list {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        column-gap: calc(var(--hinge) + 2 * var(--gutter));
-    }
 }
