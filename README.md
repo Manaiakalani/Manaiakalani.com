@@ -1,10 +1,17 @@
-# Manaiakalani.com
-
-Personal website for **Maximilian Stein** - Product Manager for **Microsoft Intune** and **Microsoft Security** within Customer Experience Engineering (CxE).
-
-🌐 **Live:** [manaiakalani.com](https://manaiakalani.com)
-
-![manaiakalani.com home](docs/screenshot.png)
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg" />
+    <img src="docs/assets/logo.svg" alt="Manaiakalani logo" width="96" />
+  </picture>
+  <h1>Manaiakalani.com</h1>
+  <p><strong>Personal site of Maximilian Stein, Product Manager for Microsoft Intune and Microsoft Security.</strong></p>
+  <p>
+    <a href="https://github.com/Manaiakalani/Manaiakalani.com/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Manaiakalani/Manaiakalani.com" alt="MIT License" /></a>
+    <a href="https://github.com/Manaiakalani/Manaiakalani.com/actions/workflows/azure-static-web-apps-gray-smoke-07ceed71e.yml"><img src="https://github.com/Manaiakalani/Manaiakalani.com/actions/workflows/azure-static-web-apps-gray-smoke-07ceed71e.yml/badge.svg" alt="Azure Static Web Apps CI/CD" /></a>
+  </p>
+  <p><a href="https://manaiakalani.com">Visit site</a> · <a href="#overview">Overview</a> · <a href="#local-development">Local Development</a></p>
+  <img src="docs/assets/hero.png" alt="Manaiakalani.com screenshot" width="800" />
+</div>
 
 ## Overview
 
