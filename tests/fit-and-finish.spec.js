@@ -1077,7 +1077,8 @@ test('geocities: no inline event handlers or javascript: URLs in retro DOM', asy
       for (const attr of el.attributes) {
         if (/^on/i.test(attr.name)) inlineHandlers++;
       }
-      if (el.tagName === 'A' && (el.getAttribute('href') || '').trim().toLowerCase().startsWith('javascript:')) jsUrls++;
+      const href = (el.getAttribute('href') || '').trim().toLowerCase();
+      if (el.tagName === 'A' && (href.startsWith('javascript:') || href.startsWith('data:') || href.startsWith('vbscript:'))) jsUrls++;
     });
     return { inlineHandlers, jsUrls };
   });
