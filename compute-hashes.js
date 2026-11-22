@@ -38,7 +38,7 @@ for (const file of htmlFiles) {
   
   // Match all inline script blocks (type="importmap", type="application/ld+json", or plain)
   // Regex: <script ...> content </script> where content is non-empty
-  const scriptRegex = /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi;
+  const scriptRegex = /<script\b([^>]*)>([\s\S]*?)<\/script\b[^>]*>/gi;
   let match;
   log(`\n=== ${file} ===`);
   
