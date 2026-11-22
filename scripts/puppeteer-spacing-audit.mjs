@@ -271,8 +271,17 @@ for (const vp of VIEWPORTS) {
   await page.setViewport({ width: vp.width, height: vp.height, deviceScaleFactor: 1 });
   await page.setRequestInterception(true);
   page.on('request', (req) => {
-    const url = req.url();
-    if (url.includes('analytics.manaiakalani.info') || url.includes('api.github.com') || url.includes('cdn.jsdelivr.net')) {
+    let hostname = '';
+    try {
+      hostname = new URL(req.url()).hostname;
+    } catch {
+      return req.continue();
+    }
+    if (
+      hostname === 'analytics.manaiakalani.info' ||
+      hostname === 'api.github.com' ||
+      hostname === 'cdn.jsdelivr.net'
+    ) {
       return req.abort();
     }
     return req.continue();

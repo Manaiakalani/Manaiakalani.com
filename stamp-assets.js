@@ -60,7 +60,8 @@ function stamp(source, hashes) {
   let out = source;
   for (const name of Object.keys(hashes)) {
     const v = hashes[name];
-    const re = new RegExp(name.replace(/\./g, '\\.') + '\\?v=[^"\'\\s]+', 'g');
+    const escaped = name.replace(/\\/g, '\\\\').replace(/\./g, '\\.');
+    const re = new RegExp(escaped + '\\?v=[^"\'\\s]+', 'g');
     out = out.replace(re, name + '?v=' + v);
   }
   return out;
