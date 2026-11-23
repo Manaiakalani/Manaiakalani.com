@@ -36,8 +36,8 @@
   "homepage": "https://github.com/Manaiakalani/Manaiakalani.com#readme",
   "devDependencies": {
     "@lhci/cli": "^0.16.1",
-    "@playwright/test": "^1.65.0",
-    "serve": "^14.2.7"
+    "@playwright/test": "^1.65.1",
+    "serve": "^14.2.8"
   },
   "overrides": {
     "tmp": "^0.2.7",
